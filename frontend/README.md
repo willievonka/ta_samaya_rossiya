@@ -1,1 +1,1 @@
-# frontend_ta_samaya_rossia
+# frontend_ta_samaya_rossiya

@@ -1,1 +1,1 @@
-# ta_samaya_rossia
+# ta_samaya_rossiya
