@@ -1,4 +1,5 @@
 @use '../common-styles/spacing-vars' as *;
+@use '../common-styles/color-vars' as color;
 
 :host {
     display: flex;
@@ -32,6 +33,7 @@
         justify-content: space-between;
         align-items: center;
         padding: $spacing-m $spacing-xl;
+        background-color: color.$bg-secondary;
     }
 
     &__footer-link {
