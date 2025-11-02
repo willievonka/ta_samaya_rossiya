@@ -1,5 +1,11 @@
 @use '../common-styles/spacing-vars' as *;
 
+:host {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
 .app {
     &__header {
         display: flex;
@@ -17,7 +23,8 @@
     }
 
     &__content-wrapper {
-        display: flex;
+        flex: 1;
+        display: block;
     }
 
     &__footer {
