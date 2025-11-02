@@ -6,10 +6,8 @@
         "ta_samaya_rossiya": {
             "projectType": "application",
             "schematics": {
-                "@schematics/angular:*": {
-                    "skipTests": true
-                },
                 "@schematics/angular:component": {
+                    "skipTests": true,
                     "style": "scss"
                 }
             },
