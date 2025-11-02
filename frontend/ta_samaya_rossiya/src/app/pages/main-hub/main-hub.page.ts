@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
@@ -5,8 +6,11 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     standalone: true,
     templateUrl: './main-hub.page.html',
     styleUrl: './styles/main-hub.master.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        CommonModule
+    ]
 })
 export class MainHubPageComponent {
-
+    public mapButtonList: Array<{title: string; url: string; background: string}> = [];
 }

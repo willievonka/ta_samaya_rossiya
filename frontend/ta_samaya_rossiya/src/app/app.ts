@@ -9,5 +9,5 @@ import { RouterOutlet } from '@angular/router';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class App {
-    protected readonly title: Signal<string> = signal('ta_samaya_rossiya');
+    protected readonly title: Signal<string> = signal('Интерактивные карты России с экскурсиями по различным тематикам');
 }

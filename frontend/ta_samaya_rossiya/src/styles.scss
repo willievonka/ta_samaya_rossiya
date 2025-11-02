@@ -1,1 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
+@use './common-styles/spacing-vars' as spacing;
+@use './common-styles/color-vars' as color;
+
+body {
+    font-family: "Manrope", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+h1 {
+    font-size: 44px;
+    font-weight: 800;
+    line-height: spacing.$spacing-4xl;
+    color: color.$text-primary;
+    margin: 0;
+}
+
+a {
+    text-decoration: none;
+    color: color.$text-secondary;
+}
+
+svg {
+    display: block;
+    flex-shrink: 0;
+}
