@@ -1,4 +1,4 @@
-export interface IMainHubButton {
+export interface IMainHubCard {
     id: string;
     title: string;
     backgroundImage: string;

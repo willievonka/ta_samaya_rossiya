@@ -1,20 +1,56 @@
-/* You can add global styles to this file, and also import other style files */
 @use './common-styles/spacing-vars' as spacing;
 @use './common-styles/color-vars' as color;
+
+/* Сброс margin */
+
+body, h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+}
+
+/* body */
 
 body {
     font-family: "Manrope", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
-    margin: 0;
+}
+
+/* текст */
+
+h1, h2, h3 {
+    display: block;
+    font-weight: 800;
 }
 
 h1 {
-    font-size: 44px;
-    font-weight: 800;
-    line-height: spacing.$spacing-4xl;
+    font-size: spacing.$spacing-5xl;
+    line-height: 70px;
     color: color.$text-primary;
-    margin: 0;
+}
+
+h2, h3 {
+    color: color.$text-secondary;
+}
+
+h2 {
+    font-size: 36px;
+    line-height: 44px;
+}
+
+h3 {
+    font-size: spacing.$spacing-xl;
+    line-height: 30px;
+}
+
+/* Теги */
+
+button {
+    all: unset;
+    display: flex;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
 }
 
 a {

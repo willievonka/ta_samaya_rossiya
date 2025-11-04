@@ -1,0 +1,19 @@
+@if (!!data()) {
+    @let isAnalytics = isAnalyticsCard();
+    <button
+        [class.base-card]="!isAnalytics"
+        [class.analytics-card]="isAnalytics"
+    >
+        <h3
+            [class.base-card__title]="!isAnalytics"
+            [class.analytics-card__title]="isAnalytics"
+        >
+            {{ data().title }}
+        </h3>
+        <div
+            [class.base-card__image]="!isAnalytics"
+            [class.analytics-card__image]="isAnalytics"
+            [style.background-image]="data().backgroundImage | base64ToUrl"
+        ></div>
+    </button>
+}

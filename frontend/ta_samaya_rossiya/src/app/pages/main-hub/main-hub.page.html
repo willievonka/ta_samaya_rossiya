@@ -1,12 +1,19 @@
 <div class="main-hub">
-    @for (mapButton of mapButtonList; track mapButton.id) {
-        <button class="main-hub__map-button">
-            <span class="main-hub__map-button-title">
-                {{ mapButton.title }}
-            </span>
-        </button>
-    }
-    <button class="main-hub__add-button">
+    <h2 class="main-hub__title">Тематические экскурсии на карте</h2>
+    <div class="main-hub__content">
+        @if (analyticsMapCard()) {
+            <main-hub-card
+                [data]="analyticsMapCard()"
+                [isAnalyticsCard]="true"
+                (click)="navigateToMap(analyticsMapCard().id)"
+            />
+        }
 
-    </button>
+        @for (mapCard of mapCardList(); track mapCard.id) {
+            <main-hub-card
+                [data]="mapCard"
+                (click)="navigateToMap(mapCard.id)"
+            />
+        }
+    </div>
 </div>

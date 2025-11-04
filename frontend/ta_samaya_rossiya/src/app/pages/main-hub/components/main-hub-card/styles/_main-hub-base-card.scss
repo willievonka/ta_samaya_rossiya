@@ -1,0 +1,13 @@
+@use '../../../../../../common-styles/spacing-vars' as *;
+
+.base-card {
+    &__title {
+        font-size: $spacing-5xl;
+        line-height: $spacing-5xl;
+        max-width: 290px;
+        margin-left: $spacing-2l;
+        margin-right: $spacing-s;
+        align-content: center;
+        text-align: center;
+    }
+}

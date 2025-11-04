@@ -1,0 +1,15 @@
+@use '../../../../../../common-styles/spacing-vars' as *;
+@use '../../../../../../common-styles/color-vars' as color;
+
+button {
+    display: flex;
+    width: 556px;
+    height: 312px;
+    border-radius: $spacing-m;
+    background-color: color.$bg-secondary;
+}
+
+div {
+    flex: 1;
+    border-radius: inherit;
+}

@@ -1,0 +1,18 @@
+@use '../../../../common-styles/spacing-vars' as *;
+
+.main-hub {
+    display: flex;
+    flex-direction: column;
+    padding: $spacing-xl 94px;
+    padding-top: $spacing-m;
+
+    &__title {
+        margin-bottom: 44px;
+    }
+
+    &__content {
+        display: flex;
+        gap: $spacing-xl;
+        flex-wrap: wrap;
+    }
+}
