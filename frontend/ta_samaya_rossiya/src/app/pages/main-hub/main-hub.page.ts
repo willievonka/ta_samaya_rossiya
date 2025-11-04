@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { IMainHubButton } from './interfaces/main-hub-button.interface';
 
 @Component({
     selector: 'main-hub-page',
@@ -12,5 +13,5 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     ]
 })
 export class MainHubPageComponent {
-    public mapButtonList: Array<{title: string; url: string; background: string}> = [];
+    public mapButtonList: IMainHubButton[] = [];
 }

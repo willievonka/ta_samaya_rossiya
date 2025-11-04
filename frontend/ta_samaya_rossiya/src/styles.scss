@@ -20,6 +20,16 @@ h1 {
 a {
     text-decoration: none;
     color: color.$text-secondary;
+    fill: currentColor;
+
+    &:hover, &:active {
+        text-decoration: underline;
+        text-decoration-thickness: 8%;
+    }
+
+    &:active {
+        color: color.$text-tertiary;
+    }
 }
 
 svg {
