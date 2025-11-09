@@ -9,7 +9,7 @@
     environment:
       - ASPNETCORE_URLS=http://+:80
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__MapDBConnection=Server=rossiya-postgres;Database=russiaMapDb;User Id=postgres;Password=postgres;
+      - ConnectionStrings__MapDBConnection=Server=rossiya-postgres;Database=ta-samaya-rossiya;User Id=postgres;Password=2018;
     depends_on:
       - "rossiya-postgres"
     networks:
@@ -22,8 +22,8 @@
       - "5434:5432"
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: russiaMapDb
+      POSTGRES_PASSWORD: 2018
+      POSTGRES_DB: ta-samaya-rossiya
     networks:
       - aspnetcoreapp-network
     volumes:
