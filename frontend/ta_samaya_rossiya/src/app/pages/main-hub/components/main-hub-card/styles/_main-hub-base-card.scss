@@ -4,10 +4,10 @@
     &__title {
         font-size: $spacing-5xl;
         line-height: $spacing-5xl;
-        max-width: 290px;
+        width: 290px;
         margin-left: $spacing-2l;
         margin-right: $spacing-s;
         align-content: center;
-        text-align: center;
+        text-align: start;
     }
 }
