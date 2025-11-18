@@ -1,0 +1,14 @@
+FROM node:25.2.1-alpine3.22
+
+WORKDIR /app
+
+RUN npm install -g @angular/cli
+
+COPY package*.json ./
+
+RUN npm install
+
+EXPOSE 4200
+EXPOSE 9222
+
+CMD ["ng", "serve", "--host", "0.0.0.0", "--poll", "500", "--live-reload"]
