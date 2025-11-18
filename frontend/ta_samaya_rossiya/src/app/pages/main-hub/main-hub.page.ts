@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
 import { IMainHubCard } from './interfaces/main-hub-card.interface';
 import { MainHubCardComponent } from './components/main-hub-card/main-hub-card.component';
-import { MainHubService } from './service/main-hub.service';
+import { MainHubService } from './services/main-hub.service';
 
 @Component({
     selector: 'main-hub-page',
@@ -16,7 +16,7 @@ import { MainHubService } from './service/main-hub.service';
     ]
 })
 export class MainHubPageComponent {
-    protected readonly analyticsMapCard: WritableSignal<IMainHubCard> = signal({} as IMainHubCard);
+    protected readonly analyticsMapCard: WritableSignal<IMainHubCard | undefined> = signal(undefined);
     protected readonly mapCardList: WritableSignal<IMainHubCard[]> = signal([]);
 
     private readonly _mainHubService: MainHubService = inject(MainHubService);

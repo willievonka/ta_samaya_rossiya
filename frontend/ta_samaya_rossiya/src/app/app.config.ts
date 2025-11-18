@@ -2,7 +2,7 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChang
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { MainHubService } from './pages/main-hub/service/main-hub.service';
+import { MainHubService } from './pages/main-hub/services/main-hub.service';
 
 export const appConfig: ApplicationConfig = {
     providers: [

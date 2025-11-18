@@ -1,19 +1,28 @@
-@if (!!data()) {
-    @let isAnalytics = isAnalyticsCard();
-    <button
-        [class.base-card]="!isAnalytics"
-        [class.analytics-card]="isAnalytics"
-    >
+<button
+    class="main-hub-card"
+    [class.base-card]="!isAnalyticsCard() && !isInfoState()"
+>
+    @if (!isInfoState()) {
         <h3
-            [class.base-card__title]="!isAnalytics"
-            [class.analytics-card__title]="isAnalytics"
+            class="main-hub-card__title"
+            [class.base-card__title]="!isAnalyticsCard()"
         >
             {{ data().title }}
         </h3>
         <div
-            [class.base-card__image]="!isAnalytics"
-            [class.analytics-card__image]="isAnalytics"
+            class="main-hub-card__image"
             [style.background-image]="data().backgroundImage | base64ToUrl"
         ></div>
-    </button>
-}
+    } @else {
+        <ng-container *ngTemplateOutlet="info" />
+    }
+</button>
+
+<ng-template #info>
+    <h3 class="main-hub-card__title">
+        {{ data().title }}
+    </h3>
+    <span class="main-hub-card__description">
+        {{ data().description }}
+    </span>
+</ng-template>

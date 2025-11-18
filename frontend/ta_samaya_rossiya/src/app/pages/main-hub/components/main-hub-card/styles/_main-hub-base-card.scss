@@ -1,6 +1,8 @@
 @use '../../../../../../common-styles/spacing-vars' as *;
 
 .base-card {
+    flex-direction: row;
+
     &__title {
         font-size: $spacing-5xl;
         line-height: $spacing-5xl;
