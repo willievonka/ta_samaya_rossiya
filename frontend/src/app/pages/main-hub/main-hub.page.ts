@@ -12,6 +12,9 @@ import { MainHubService } from './services/main-hub.service';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MainHubCardComponent
+    ],
+    providers: [
+        MainHubService
     ]
 })
 export class MainHubPageComponent {
