@@ -1,28 +1,30 @@
+@let content = data();
 <button
     class="main-hub-card"
-    [class.base-card]="!isAnalyticsCard() && !isInfoState()"
+    type="button"
+    [class.title-on-top]="content.isAnalytics"
+    [class.info-visible]="isInfoState()"
+    (mouseenter)="isInfoState.set(true)"
+    (mouseleave)="isInfoState.set(false)"
 >
-    @if (!isInfoState()) {
-        <h3
-            class="main-hub-card__title"
-            [class.base-card__title]="!isAnalyticsCard()"
-        >
-            {{ data().title }}
-        </h3>
-        <div
-            class="main-hub-card__image"
-            [style.background-image]="data().backgroundImage | base64ToUrl"
-        ></div>
-    } @else {
-        <ng-container *ngTemplateOutlet="info" />
-    }
-</button>
-
-<ng-template #info>
-    <h3 class="main-hub-card__title">
-        {{ data().title }}
+    <h3
+        class="main-hub-card__title"
+        [class.main-hub-card__title_on-top]="content.isAnalytics"
+    >
+        {{ content.title }}
     </h3>
-    <span class="main-hub-card__description">
-        {{ data().description }}
-    </span>
-</ng-template>
+
+    <div
+        class="main-hub-card__image"
+        [style.background-image]="content.backgroundImage | base64ToUrl"
+    ></div>
+
+    <div class="main-hub-card__overlay">
+        <h3 class="main-hub-card__title_on-top">
+            {{ content.title }}
+        </h3>
+        <span class="main-hub-card__description">
+            {{ content.description }}
+        </span>
+    </div>
+</button>

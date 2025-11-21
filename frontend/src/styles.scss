@@ -2,23 +2,19 @@
 @use './common-styles/color-vars' as color;
 
 /* Сброс margin */
-
-body, h1, h2, h3, h4, h5, h6 {
+:where(body, h1, h2, h3, h4, h5, h6) {
     margin: 0;
 }
 
 /* body */
-
 body {
     font-family: "Manrope", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
 }
 
-/* текст */
-
+/* Заголовки */
 h1, h2, h3 {
-    display: block;
     font-weight: 800;
 }
 
@@ -28,35 +24,29 @@ h1 {
     color: color.$text-primary;
 }
 
-h2, h3 {
-    color: color.$text-secondary;
-}
-
 h2 {
     font-size: 36px;
     line-height: 44px;
+    color: color.$text-secondary;
 }
 
 h3 {
     font-size: spacing.$spacing-xl;
     line-height: 30px;
+    color: color.$text-secondary;
 }
 
-/* Теги */
-
-button {
-    all: unset;
-    display: flex;
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
+/** Текст */
+span {
+    font-weight: 600;
+    color: color.$text-secondary;
 }
 
 a {
     text-decoration: none;
     color: color.$text-secondary;
     fill: currentColor;
+    transition: color 50ms ease;
 
     &:hover, &:active {
         text-decoration: underline;
@@ -66,6 +56,14 @@ a {
     &:active {
         color: color.$text-tertiary;
     }
+}
+
+/* Теги */
+button {
+    all: unset;
+    display: flex;
+    padding: 0;
+    cursor: pointer;
 }
 
 svg {

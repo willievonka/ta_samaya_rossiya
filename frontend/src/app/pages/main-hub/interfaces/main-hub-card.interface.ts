@@ -3,4 +3,5 @@ export interface IMainHubCard {
     title: string;
     backgroundImage: string;
     description: string;
+    isAnalytics?: boolean
 }

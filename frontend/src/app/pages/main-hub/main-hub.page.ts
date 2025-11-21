@@ -1,5 +1,4 @@
-
-import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Signal, signal } from '@angular/core';
 import { IMainHubCard } from './interfaces/main-hub-card.interface';
 import { MainHubCardComponent } from './components/main-hub-card/main-hub-card.component';
 import { MainHubService } from './services/main-hub.service';
@@ -18,21 +17,17 @@ import { MainHubService } from './services/main-hub.service';
     ]
 })
 export class MainHubPageComponent {
-    protected readonly analyticsMapCard: WritableSignal<IMainHubCard | undefined> = signal(undefined);
-    protected readonly mapCardList: WritableSignal<IMainHubCard[]> = signal([]);
+    protected readonly mainHubService: MainHubService = inject(MainHubService);
 
-    private readonly _mainHubService: MainHubService = inject(MainHubService);
-
-    constructor() {
-        this.analyticsMapCard.set(this._mainHubService.getAnalyticsMapCard());
-        this.mapCardList.set(this._mainHubService.getMapCardList());
-    }
+    protected readonly mapCardList: Signal<IMainHubCard[]> = signal(
+        this.mainHubService.getMapCardList()
+    );
 
     /**
      * Редирект на страницу с картой
      * @param id
      */
     protected navigateToMap(id: string): void {
-        this._mainHubService.navigateToMap(id);
+        this.mainHubService.navigateToMap(id);
     }
 }
