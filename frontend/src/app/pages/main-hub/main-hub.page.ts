@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
 import { IMainHubCard } from './interfaces/main-hub-card.interface';
 import { MainHubCardComponent } from './components/main-hub-card/main-hub-card.component';
@@ -11,7 +11,6 @@ import { MainHubService } from './services/main-hub.service';
     styleUrl: './styles/main-hub.master.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        CommonModule,
         MainHubCardComponent
     ]
 })
