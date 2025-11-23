@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, Signal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
 import { IMainHubCard } from './interfaces/main-hub-card.interface';
 import { MainHubCardComponent } from './components/main-hub-card/main-hub-card.component';
 import { MainHubService } from './services/main-hub.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'main-hub-page',
@@ -19,9 +20,7 @@ import { MainHubService } from './services/main-hub.service';
 export class MainHubPageComponent {
     protected readonly mainHubService: MainHubService = inject(MainHubService);
 
-    protected readonly mapCardList: Signal<IMainHubCard[]> = signal(
-        this.mainHubService.getMapCardList()
-    );
+    protected readonly mapCardList: Signal<IMainHubCard[] | undefined> = toSignal(this.mainHubService.getMapCardList());
 
     /**
      * Редирект на страницу с картой
