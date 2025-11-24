@@ -1,14 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "Backend\WebApi\WebApi.csproj", "{ECF2AFC7-F5FC-4EED-A210-71E86B901478}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csproj", "{ECF2AFC7-F5FC-4EED-A210-71E86B901478}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Backend\Infrastructure\Infrastructure.csproj", "{B18B44FD-6C00-441D-B4BC-2EC4D43767D7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{B18B44FD-6C00-441D-B4BC-2EC4D43767D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Backend\Domain\Domain.csproj", "{787701D2-8F80-4A78-92FE-E3FB65254017}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{787701D2-8F80-4A78-92FE-E3FB65254017}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Backend\Application\Application.csproj", "{44DD5897-DF60-48AE-BDEA-6E2FEF2C3F3C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{FA0FA1F0-F778-4839-AC4C-FE8F4A3B3718}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{44DD5897-DF60-48AE-BDEA-6E2FEF2C3F3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
