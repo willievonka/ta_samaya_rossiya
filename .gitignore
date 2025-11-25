@@ -15,14 +15,7 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
-/.idea/
-/Tests/
-
-../.idea
-../Tests/
-
-**/.idea/
-**/Tests/
+Tests/
 
 # Mono auto generated files
 mono_crash.*
