@@ -1,0 +1,30 @@
+<header class="app__header">
+    <a class="app__logo-link" href="#">
+        <svg class="app__logo">
+            <use href="/sprites/ta-samaya-rossiya-logo.svg" />
+        </svg>
+    </a>
+    <h1>{{ title() }}</h1>
+</header>
+
+<main class="app__content-wrapper">
+    <router-outlet />
+</main>
+
+<footer class="app__footer">
+    <a class="app__footer-link" href="#">
+        Создатели проекта
+    </a>
+    <a class="app__footer-link" href="#">
+        Сайт проекта
+    </a>
+    <a class="app__footer-link" href="#">
+        Связаться с нами
+    </a>
+    <a class="app__footer-link app__footer-link_with-icon" href="#">
+        Мы в
+        <svg class="app__vk-logo">
+            <use href="/sprites/vk-logo.svg" />
+        </svg>
+    </a>
+</footer>

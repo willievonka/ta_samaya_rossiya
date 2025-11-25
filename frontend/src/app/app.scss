@@ -1,0 +1,56 @@
+@use '../common-styles/spacing-vars' as *;
+@use '../common-styles/color-vars' as color;
+
+:host {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.app {
+    &__header {
+        display: flex;
+        align-items: center;
+        padding: $spacing-xl;
+    }
+
+    &__logo {
+        width: 207px;
+        height: $spacing-8xl;
+    }
+
+    &__logo-link {
+        margin-right: $spacing-xl;
+    }
+
+    &__content-wrapper {
+        flex: 1;
+        display: block;
+        padding: $spacing-xl 94px;
+        padding-top: $spacing-m;
+    }
+
+    &__footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: $spacing-m $spacing-xl;
+        background-color: color.$bg-secondary;
+    }
+
+    &__footer-link {
+        font-size: $spacing-l;
+        line-height: $spacing-xl;
+        font-weight: 700;
+
+        &_with-icon {
+            display: flex;
+            gap: $spacing-xs;
+        }
+    }
+
+    &__vk-logo {
+        width: $spacing-xl;
+        height: $spacing-xl;
+    }
+}

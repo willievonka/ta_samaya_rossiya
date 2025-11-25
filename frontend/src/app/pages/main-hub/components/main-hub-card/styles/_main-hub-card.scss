@@ -1,0 +1,26 @@
+@use '../../../../../../common-styles/spacing-vars' as *;
+@use '../../../../../../common-styles/color-vars' as color;
+
+.main-hub-card {
+    display: flex;
+    flex-direction: column;
+    width: 556px;
+    height: 312px;
+    border-radius: $spacing-m;
+    background-color: color.$bg-secondary;
+
+    &__title {
+        margin-top: $spacing-l;
+        margin-left: $spacing-l;
+    }
+
+    &__image {
+        flex: 1;
+        border-radius: inherit;
+    }
+
+    &__description {
+        display: flex;
+        padding: $spacing-l;
+    }
+}
