@@ -1,4 +1,4 @@
-﻿namespace Application.Services.Dtos.OpenStreetMap.RegionSearch;
+﻿namespace Application.Services.Dtos.RegionSearch;
 
 public class SearchRegionItem
 {

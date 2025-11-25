@@ -18,6 +18,7 @@ public class QueryService : IQueryService
         _dbContext = dbContext;
     }
     
+    
     /// <summary>
     /// Выполнить запрос на получение объектов к базе данных с указанным параметрами запроса.
     /// </summary>

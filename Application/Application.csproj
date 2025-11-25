@@ -8,18 +8,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
       <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
       <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.10" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Repository.Interfaces\" />
+      <ProjectReference Include="..\Domain\Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Domain\Domain.csproj" />
+      <Folder Include="Repository.Interfaces\" />
     </ItemGroup>
 
 </Project>
