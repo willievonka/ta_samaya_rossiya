@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
-using Domain.Enums;
+using NetTopologySuite.Geometries;
+using Point = NetTopologySuite.Geometries.Point;
 
 namespace Domain.Entities;
 
@@ -33,9 +34,9 @@ public class HistoricalObject
     public string Description { get; set; }  = "";
     
     /// <summary>
-    /// Ссылка на видеоэкскурсию для встраивания
+    /// Отображается ли регион для пользователей
     /// </summary>
-    public string? VideoUrl { get; set; }
+    public bool IsActive { get; set; } = true;
     
     /// <summary>
     /// Идентификатор исторической линии, к которой принадлежит объект

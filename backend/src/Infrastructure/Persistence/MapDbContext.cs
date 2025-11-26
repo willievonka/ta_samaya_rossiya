@@ -15,41 +15,52 @@ public class MapDbContext : DbContext
     public DbSet<HistoricalLine> HistoricalLines => Set<HistoricalLine>();
     public DbSet<HistoricalObject> HistoricalObjects => Set<HistoricalObject>();
     public DbSet<IndicatorsRegion> IndicatorsRegions => Set<IndicatorsRegion>();
-    public DbSet<LineRegion> LineRegions => Set<LineRegion>();
+    public DbSet<LayerRegion> LayerRegions => Set<LayerRegion>();
+    public DbSet<RegionGeometry> RegionGeometries => Set<RegionGeometry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Map>()
             .HasMany(m => m.Regions)
-            .WithMany(r => r.Maps);
-        
-        modelBuilder.Entity<HistoricalObject>()
-            .HasOne(ho => ho.HistoricalLine)
-            .WithMany()
-            .HasForeignKey(ho => ho.LineId)
+            .WithOne(r => r.Map)
+            .HasForeignKey(r => r.MapId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<HistoricalLine>()
+            .HasOne(l => l.Map)
+            .WithOne(m => m.HistoricalLine)
+            .HasForeignKey<HistoricalLine>(l => l.MapId)
             .OnDelete(DeleteBehavior.Cascade);
         
-        modelBuilder.Entity<IndicatorsRegion>()
-            .HasOne(ir => ir.Region)
-            .WithMany()
-            .HasForeignKey(ir => ir.RegionId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
-        modelBuilder.Entity<LineRegion>()
+        modelBuilder.Entity<LayerRegion>()
             .HasOne(lr => lr.Region)
             .WithMany()
             .HasForeignKey(lr => lr.RegionId)
             .OnDelete(DeleteBehavior.Cascade);
-            
-        modelBuilder.Entity<LineRegion>()
-            .HasOne(lr => lr.Line)
+        
+        modelBuilder.Entity<LayerRegion>()
+            .HasOne(lr => lr.Geometry)
             .WithMany()
-            .HasForeignKey(lr => lr.LineId)
+            .HasForeignKey(lr => lr.GeometryId)
             .OnDelete(DeleteBehavior.Cascade);
-
+        
+        modelBuilder.Entity<IndicatorsRegion>()
+            .HasOne(ir => ir.Region)
+            .WithOne(lr => lr.Indicators)
+            .HasForeignKey<IndicatorsRegion>(ir => ir.RegionId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<HistoricalObject>()
+            .HasOne(ho => ho.HistoricalLine)
+            .WithMany(hl => hl.HistoricalObjects)
+            .HasForeignKey(ho => ho.LineId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
         AddPrimaryKey(modelBuilder);
         
         AddAutoGeneratingId(modelBuilder);
+        
+        base.OnModelCreating(modelBuilder);
     }
 
     private void AddPrimaryKey(ModelBuilder modelBuilder)
@@ -69,13 +80,20 @@ public class MapDbContext : DbContext
         modelBuilder.Entity<IndicatorsRegion>()
             .HasKey(ir => ir.Id);
         
-        modelBuilder.Entity<LineRegion>()
-            .HasKey(lr => lr.Id);
+        modelBuilder.Entity<RegionGeometry>()
+            .HasKey(rg => rg.Id);
+        
+        modelBuilder.Entity<LayerRegion>()
+            .HasKey(rl => rl.Id);
     }
     
     private void AddAutoGeneratingId(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Region>()
+            .Property(x => x.Id)
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<RegionGeometry>()
             .Property(x => x.Id)
             .ValueGeneratedOnAdd();
         
@@ -95,7 +113,7 @@ public class MapDbContext : DbContext
             .Property(x => x.Id)
             .ValueGeneratedOnAdd();
         
-        modelBuilder.Entity<LineRegion>()
+        modelBuilder.Entity<LayerRegion>()
             .Property(x => x.Id)
             .ValueGeneratedOnAdd();
     }

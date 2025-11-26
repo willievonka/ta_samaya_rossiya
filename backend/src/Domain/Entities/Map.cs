@@ -28,7 +28,12 @@ public class Map
     public string? BackgroundImage { get; set; }
     
     /// <summary>
-    /// Регионы для этой карты
+    /// Историческая линия
     /// </summary>
-    public IEnumerable<Region> Regions { get; set; }
+    public HistoricalLine? HistoricalLine { get; set; }
+    
+    /// <summary>
+    /// Отображаемые регионы для этой карты
+    /// </summary>
+    public IEnumerable<LayerRegion> Regions { get; set; }
 }
