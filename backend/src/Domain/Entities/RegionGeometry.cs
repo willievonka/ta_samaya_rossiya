@@ -15,12 +15,12 @@ public class RegionGeometry
     public MultiPolygon Geometry { get; set; }
     
     /// <summary>
-    /// Дата создания 
+    /// Fk на Region
     /// </summary>
-    public DateTime CreatedAt { get; set; }
+    public Guid RegionId { get; set; }
     
     /// <summary>
-    /// Дата обновления
+    /// Регион, которому принадлежит граница
     /// </summary>
-    public DateTime UpdatedAt { get; set; }
+    public Region Region { get; set; }
 }

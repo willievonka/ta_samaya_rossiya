@@ -17,7 +17,7 @@ public class RegionCreationService : IRegionСreationService
         _colorService = colorService;
     }
     
-    public async Task<Region> CreateFromOsmAsync(int osmRegionId, MultiPolygon geometry, string title, Guid? lineId, CancellationToken ct)
+    public Task<Region> CreateFromOsmAsync(int osmRegionId, MultiPolygon geometry, string title, Guid? lineId, CancellationToken ct)
     {
         throw new NotImplementedException("Not implemented yet");
         

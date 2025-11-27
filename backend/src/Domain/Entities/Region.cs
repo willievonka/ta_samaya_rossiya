@@ -19,9 +19,9 @@ public class Region
     /// Является ли регион регионом РФ
     /// </summary>
     public bool IsRussia { get; set; }
-
+    
     /// <summary>
-    /// Тип региона
+    /// Границы региона
     /// </summary>
-    public RegionType Type { get; set; }
+    public RegionGeometry Geometry { get; set; }
 }

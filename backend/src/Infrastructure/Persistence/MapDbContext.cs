@@ -38,12 +38,6 @@ public class MapDbContext : DbContext
             .HasForeignKey(lr => lr.RegionId)
             .OnDelete(DeleteBehavior.Cascade);
         
-        modelBuilder.Entity<LayerRegion>()
-            .HasOne(lr => lr.Geometry)
-            .WithMany()
-            .HasForeignKey(lr => lr.GeometryId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
         modelBuilder.Entity<IndicatorsRegion>()
             .HasOne(ir => ir.Region)
             .WithOne(lr => lr.Indicators)
@@ -56,13 +50,19 @@ public class MapDbContext : DbContext
             .HasForeignKey(ho => ho.LineId)
             .OnDelete(DeleteBehavior.Cascade);
         
+        modelBuilder.Entity<RegionGeometry>()
+            .HasOne(rg => rg.Region)
+            .WithOne(r => r.Geometry)
+            .HasForeignKey<RegionGeometry>(rg => rg.RegionId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
         AddPrimaryKey(modelBuilder);
         
         AddAutoGeneratingId(modelBuilder);
         
         base.OnModelCreating(modelBuilder);
     }
-
+    
     private void AddPrimaryKey(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Region>()

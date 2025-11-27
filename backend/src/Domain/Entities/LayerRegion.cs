@@ -8,29 +8,9 @@ public class LayerRegion
     public Guid Id { get; set; }
     
     /// <summary>
-    /// Отображаемое на карте название региона
-    /// </summary>
-    public string? DisplayTitle { get; set; }
-    
-    /// <summary>
-    /// Размер шрифта отображаемого на карте названия региона
-    /// </summary>
-    public int DisplayTitleFontSize { get; set; } 
-    
-    /// <summary>
     /// Цвет заливки региона
     /// </summary>
     public string FillColor { get; set; } = "";
-    
-    /// <summary>
-    /// Fk на геометрию региона
-    /// </summary>
-    public Guid GeometryId { get; set; }
-    
-    /// <summary>
-    /// Ссылка на геометрию региона
-    /// </summary>
-    public RegionGeometry Geometry { get; set; }
     
     /// <summary>
     /// Ссылка на показатели региона

@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "mapshaper": "^0.6.102",
-    "osmtogeojson": "^3.0.0-beta.5"
+    "mapshaper": "^0.6.113",
+    "osmtogeojson": "^2.2.12"
   }
 }

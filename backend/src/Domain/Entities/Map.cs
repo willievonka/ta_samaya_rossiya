@@ -28,6 +28,16 @@ public class Map
     public string? BackgroundImage { get; set; }
     
     /// <summary>
+    /// Дата создания 
+    /// </summary>
+    public DateTime CreatedAt { get; set; }
+    
+    /// <summary>
+    /// Дата обновления
+    /// </summary>
+    public DateTime UpdatedAt { get; set; }
+    
+    /// <summary>
     /// Историческая линия
     /// </summary>
     public HistoricalLine? HistoricalLine { get; set; }
