@@ -14,6 +14,16 @@ export class MainHubService {
      */
     public getMapCardList(): Observable<IMainHubCard[]> {
         return this._http.get<IMainHubCard[]>('/main-hub-cards/cards.json');
+        // return this._http.get<IMainHubCard[]>('https://remotely-strapping-avocet.cloudpub.ru/api/images/maps')
+        //     .pipe(
+        //         map(data => {
+        //             data.forEach(item => {
+        //                 item.backgroundImage = 'https://remotely-strapping-avocet.cloudpub.ru' + item.backgroundImage;
+        //             });
+
+        //             return data;
+        //         })
+        //     );
     }
 
     /**

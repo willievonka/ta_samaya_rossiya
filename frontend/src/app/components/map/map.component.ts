@@ -6,12 +6,19 @@ import { customCoordsToLatLng } from './utils/custom-coords-to-lat-lng.util';
 @Component({
     selector: 'map',
     standalone: true,
-    template: '<div class="map" #mapContainer></div>',
+    template: `
+        @if(isLoading()) {
+            <p>ISLOADING</p>
+        }
+        <div class="map" #mapContainer></div>
+    `,
     styleUrl: './styles/map.master.scss',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapComponent implements AfterViewInit {
     public readonly layers: InputSignal<IMapLayer[]> = input.required();
+
+    protected readonly isLoading: WritableSignal<boolean> = signal(true);
 
     private readonly _map: WritableSignal<Map | null> = signal<Map | null>(null);
     private readonly _mapContainer: Signal<ElementRef<HTMLDivElement>> = viewChild.required('mapContainer');
@@ -30,9 +37,9 @@ export class MapComponent implements AfterViewInit {
 
         this._map.set(
             map(
-                container, 
-                { 
-                    zoomControl: false, 
+                container,
+                {
+                    zoomControl: false,
                     attributionControl: false,
                     zoomSnap: 0.1
                 }
@@ -51,13 +58,15 @@ export class MapComponent implements AfterViewInit {
             return;
         }
 
-        layers.forEach(layer => {
-            console.log('layer');
+        setTimeout(() => {
+            layers.forEach(layer => {
+                geoJSON(layer.geoData, {
+                    style: layer.style,
+                    coordsToLatLng: customCoordsToLatLng,
+                }).addTo(mapInstance);
+            });
 
-            geoJSON(layer.geoData, {
-                style: layer.style,
-                coordsToLatLng: customCoordsToLatLng,
-            }).addTo(mapInstance);
-        });
+            this.isLoading.set(false);
+        }, 2000);
     }
 }

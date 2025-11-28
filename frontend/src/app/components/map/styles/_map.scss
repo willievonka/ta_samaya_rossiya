@@ -1,5 +1,9 @@
+:host {
+    display: flex;
+    flex: 1;
+}
+
 .map {
     width: 100%;
-    min-height: calc(100vh - 212px);
     background: transparent;
 }

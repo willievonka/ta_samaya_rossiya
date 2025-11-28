@@ -16,7 +16,7 @@
 
     <div
         class="main-hub-card__image"
-        [style.background-image]="content.backgroundImage | base64ToUrl"
+        [style.background-image]="'url(' + content.backgroundImage + ')'"
     ></div>
 
     <div class="main-hub-card__overlay">

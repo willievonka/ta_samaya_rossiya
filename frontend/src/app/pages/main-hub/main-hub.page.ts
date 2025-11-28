@@ -19,7 +19,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 })
 export class MainHubPageComponent {
     protected readonly mainHubService: MainHubService = inject(MainHubService);
-
     protected readonly mapCardList: Signal<IMainHubCard[] | undefined> = toSignal(this.mainHubService.getMapCardList());
 
     /**
