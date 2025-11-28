@@ -1,15 +1,7 @@
 <div class="main-hub">
     <h2 class="main-hub__title">Тематические экскурсии на карте</h2>
-    <div class="main-hub__content">
-        @let analyticsCard = analyticsMapCard();
-        @if (analyticsCard) {
-            <main-hub-card
-                [data]="analyticsCard"
-                [isAnalyticsCard]="true"
-                (click)="navigateToMap(analyticsCard.id)"
-            />
-        }
 
+    <div class="main-hub__content">
         @for (mapCard of mapCardList(); track mapCard.id) {
             <main-hub-card
                 [data]="mapCard"

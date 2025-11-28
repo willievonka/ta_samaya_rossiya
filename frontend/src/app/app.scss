@@ -24,10 +24,8 @@
     }
 
     &__content-wrapper {
+        display: flex;
         flex: 1;
-        display: block;
-        padding: $spacing-xl 94px;
-        padding-top: $spacing-m;
     }
 
     &__footer {
