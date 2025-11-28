@@ -17,9 +17,11 @@ public class RegionCreationService : IRegionСreationService
         _colorService = colorService;
     }
     
-    public async Task<Region> CreateFromOsmAsync(int osmRegionId, MultiPolygon geometry, string title, Guid? lineId, CancellationToken ct)
+    public Task<Region> CreateFromOsmAsync(int osmRegionId, MultiPolygon geometry, string title, Guid? lineId, CancellationToken ct)
     {
-        var region = new Region
+        throw new NotImplementedException("Not implemented yet");
+        
+        /*var region = new Region
         {
             OsmId = osmRegionId,
             Title = title,
@@ -48,6 +50,6 @@ public class RegionCreationService : IRegionСreationService
             }, ct);
         }
         
-        return region;
+        return region;*/
     }
 }

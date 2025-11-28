@@ -43,4 +43,19 @@ public class HistoricalLine
     /// Время последнего изменения исторической линии
     /// </summary>
     public DateTime LastUpdatedAt { get; set; }
+    
+    /// <summary>
+    /// Fk на карту
+    /// </summary>
+    public Guid MapId { get; set; }
+    
+    /// <summary>
+    /// Карта, на которой отображается данная историчекая линия
+    /// </summary>
+    public Map Map { get; set; }
+    
+    /// <summary>
+    /// Исторические объекты
+    /// </summary>
+    public IEnumerable<HistoricalObject>  HistoricalObjects { get; set; }
 }

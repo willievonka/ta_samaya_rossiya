@@ -1,58 +1,19 @@
-﻿using NetTopologySuite.Geometries;
+﻿using Domain.Enums;
+using NetTopologySuite.Geometries;
 
 namespace Domain.Entities;
 
 /// <summary>
-/// Регион на карте, может быть регионом РФ или другой страной
+/// Регион на карте, может быть регионом РФ или другой цельной страной
 /// </summary>
 public class Region
 {
     public Guid Id { get; set; }
 
     /// <summary>
-    /// Id в OpenStreetMap
-    /// </summary>
-    public int OsmId { get; set; }
-
-    /// <summary>
     /// Название региона (для внутреннего отображения)
     /// </summary>
-    public string Title { get; set; } = "";
-    
-    /// <summary>
-    /// Полигон, обозначающий границы региона
-    /// </summary>
-    public MultiPolygon Border { get; set; }
-
-    /// <summary>
-    /// Отображаемое на карте название региона
-    /// </summary>
-    public string? DisplayTitle { get; set; }
-    
-    /// <summary>
-    /// Размер шрифта отображаемого на карте названия региона
-    /// </summary>
-    public int DisplayTitleFontSize { get; set; }
-    
-    /// <summary>
-    /// Метоположение отображаемого на карте названия региона
-    /// </summary>
-    public Point DisplayTitlePosition { get; set; }
-
-    /// <summary>
-    /// Нужно ли отображать на карте название региона из DisplayTitle
-    /// </summary>
-    public bool ShowDisplayTitle { get; set; }
-    
-    /// <summary>
-    /// Цвет заливки региона
-    /// </summary>
-    public string FillColor { get; set; } = "";
-    
-    /// <summary>
-    /// Нужно ли отображать показатели региона по клику на него во вкладке Показатели
-    /// </summary>
-    public bool ShowIndicators { get; set; }
+    public string Name { get; set; } = "";
     
     /// <summary>
     /// Является ли регион регионом РФ
@@ -60,7 +21,7 @@ public class Region
     public bool IsRussia { get; set; }
     
     /// <summary>
-    /// Карты для этого региона
+    /// Границы региона
     /// </summary>
-    public IEnumerable<Map> Maps { get; set; }
+    public RegionGeometry Geometry { get; set; }
 }

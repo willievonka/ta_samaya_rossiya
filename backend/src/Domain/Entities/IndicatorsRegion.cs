@@ -8,14 +8,14 @@ public class IndicatorsRegion
     public Guid Id { get; set; }
     
     /// <summary>
-    /// Идентификатор региона, к которому относятся показатели
+    /// Fk на LayerRegion 
     /// </summary>
     public Guid RegionId { get; set; }
     
     /// <summary>
-    /// Ссылка на регионы, которым принадлежат показатели
+    /// Ссылка на реализацию региона, которому принадлежат показатели
     /// </summary>
-    public Region Region { get; set; }
+    public LayerRegion Region { get; set; }
     
     /// <summary>
     /// Путь к изображению для всплывающего окна показателей региона
@@ -36,4 +36,9 @@ public class IndicatorsRegion
     /// Кол-во участников в регионе
     /// </summary>
     public int Participants { get; set; }
+    
+    /// <summary>
+    /// Отображаются ли показатели пользователям
+    /// </summary>
+    public bool IsActive { get; set; }
 }

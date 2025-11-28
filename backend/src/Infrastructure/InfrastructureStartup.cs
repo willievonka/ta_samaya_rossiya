@@ -1,4 +1,6 @@
-﻿using Infrastructure.Persistence;
+﻿using System.Data;
+using Application.Services.Interfaces;
+using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
@@ -37,11 +39,30 @@ public static class InfrastructureStartup
                     Log.Error($"Migration retry {attempt} due to {exception.Message}. Waiting {delay} before next retry.");
                 });
         var combinedPolicy = Policy.WrapAsync(retryPolicy, timeoutPolicy);
+        
+        var dbContext = scope.ServiceProvider.GetRequiredService<MapDbContext>();
+        
+        await using var connection = dbContext.Database.GetDbConnection();
+        await connection.OpenAsync();
         try
         {
             Log.Information("Checking and migrating Map database.");
-            var dbContext = scope.ServiceProvider.GetRequiredService<MapDbContext>();
+
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT pg_try_advisory_lock(913337);";
+            var lockAcquired = (bool)(await cmd.ExecuteScalarAsync())!;
+
+            if (!lockAcquired)
+            {
+                Log.Warning("Another instance is already performing migration. Skipping.");
+                return;
+            }
+
             await combinedPolicy.ExecuteAsync(async () => await dbContext.Database.MigrateAsync());
+
+            var seeder = scope.ServiceProvider.GetRequiredService<IRegionSeederService>();
+            await seeder.SeedIfEmptyAsync();
+
         }
         catch (Exception e)
         {

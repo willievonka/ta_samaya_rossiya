@@ -28,7 +28,22 @@ public class Map
     public string? BackgroundImage { get; set; }
     
     /// <summary>
-    /// Регионы для этой карты
+    /// Дата создания 
     /// </summary>
-    public IEnumerable<Region> Regions { get; set; }
+    public DateTime CreatedAt { get; set; }
+    
+    /// <summary>
+    /// Дата обновления
+    /// </summary>
+    public DateTime UpdatedAt { get; set; }
+    
+    /// <summary>
+    /// Историческая линия
+    /// </summary>
+    public HistoricalLine? HistoricalLine { get; set; }
+    
+    /// <summary>
+    /// Отображаемые регионы для этой карты
+    /// </summary>
+    public IEnumerable<LayerRegion> Regions { get; set; }
 }

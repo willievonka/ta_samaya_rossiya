@@ -13,10 +13,13 @@ internal class Program
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
+            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
             .WriteTo.File("logs/app.log")
             .CreateBootstrapLogger();
 
         builder.Host.UseSerilog();
+        
+        builder.Services.AddServices();
         
         ConfigureServices(builder.Services, builder.Configuration);
         
@@ -27,7 +30,7 @@ internal class Program
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             c.IncludeXmlComments(xmlPath);
         });
-
+        
         var app = builder.Build();
 
         Directory.CreateDirectory("logs");

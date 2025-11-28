@@ -107,7 +107,8 @@ public class CrudService : ICrudService
         var set = _mapDbContext.Set<T>();
         await set.AddAsync(entity, ct);
         await _mapDbContext.SaveChangesAsync(ct);
-        return EF.Property<Guid>(entity, "Id");
+        var property = typeof(T).GetProperty("Id");
+        return (Guid)property.GetValue(entity);
     }
 
     /// <summary>
@@ -120,7 +121,8 @@ public class CrudService : ICrudService
         var set = _mapDbContext.Set<T>();
         set.Update(entity);
         await _mapDbContext.SaveChangesAsync(ct);
-        return EF.Property<Guid>(entity, "Id");
+        var property = typeof(T).GetProperty("Id");
+        return (Guid)property.GetValue(entity);
     }
     
     /// <summary>
