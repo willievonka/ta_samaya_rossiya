@@ -2,6 +2,7 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, input, I
 import { geoJSON, map, Map } from 'leaflet';
 import { IMapLayer } from '../../interfaces/map-layer.interface';
 import { customCoordsToLatLng } from './utils/custom-coords-to-lat-lng.util';
+import { IMapConfig } from './interfaces/map-config.interface';
 
 @Component({
     selector: 'map',
@@ -17,6 +18,7 @@ import { customCoordsToLatLng } from './utils/custom-coords-to-lat-lng.util';
 })
 export class MapComponent implements AfterViewInit {
     public readonly layers: InputSignal<IMapLayer[]> = input.required();
+    public readonly config: InputSignal<IMapConfig> = input.required();
 
     protected readonly isLoading: WritableSignal<boolean> = signal(true);
 
@@ -26,25 +28,19 @@ export class MapComponent implements AfterViewInit {
     public ngAfterViewInit(): void {
         this.initMap();
         this.renderLayers(this.layers());
+        this.isLoading.set(false);
     }
 
-    /**
-     * Инит карты
-     */
+    /** Инит карты */
     private initMap(): void {
         const container: HTMLDivElement = this._mapContainer().nativeElement;
-        const center: [number, number] = [105, 68.5];
 
         this._map.set(
-            map(
-                container,
-                {
-                    zoomControl: false,
-                    attributionControl: false,
-                    zoomSnap: 0.1
-                }
-            )
-                .setView(customCoordsToLatLng(center), 3.2)
+            map(container, this.config().options)
+                .setView(
+                    customCoordsToLatLng(this.config().center),
+                    this.config().initZoom
+                )
         );
     }
 
@@ -58,15 +54,14 @@ export class MapComponent implements AfterViewInit {
             return;
         }
 
-        setTimeout(() => {
-            layers.forEach(layer => {
-                geoJSON(layer.geoData, {
+        layers.forEach(layer => {
+            geoJSON(
+                layer.geoData,
+                {
                     style: layer.style,
                     coordsToLatLng: customCoordsToLatLng,
-                }).addTo(mapInstance);
-            });
-
-            this.isLoading.set(false);
-        }, 2000);
+                }
+            ).addTo(mapInstance);
+        });
     }
 }
