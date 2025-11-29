@@ -1,6 +1,6 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, input, InputSignal, signal, Signal, viewChild, WritableSignal } from '@angular/core';
-import { geoJSON, map, Map } from 'leaflet';
-import { IMapLayer } from '../../interfaces/map-layer.interface';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, input, InputSignal, output, OutputEmitterRef, signal, Signal, viewChild, WritableSignal } from '@angular/core';
+import { geoJSON, Layer, map, Map } from 'leaflet';
+import { IMapLayer, IMapLayerProperties } from './interfaces/map-layer.interface';
 import { customCoordsToLatLng } from './utils/custom-coords-to-lat-lng.util';
 import { IMapConfig } from './interfaces/map-config.interface';
 
@@ -19,6 +19,7 @@ import { IMapConfig } from './interfaces/map-config.interface';
 export class MapComponent implements AfterViewInit {
     public readonly layers: InputSignal<IMapLayer[]> = input.required();
     public readonly config: InputSignal<IMapConfig> = input.required();
+    public readonly regionSelected: OutputEmitterRef<IMapLayerProperties> = output();
 
     protected readonly isLoading: WritableSignal<boolean> = signal(true);
 
@@ -34,14 +35,15 @@ export class MapComponent implements AfterViewInit {
     /** Инит карты */
     private initMap(): void {
         const container: HTMLDivElement = this._mapContainer().nativeElement;
+        const config: IMapConfig = this.config();
 
-        this._map.set(
-            map(container, this.config().options)
-                .setView(
-                    customCoordsToLatLng(this.config().center),
-                    this.config().initZoom
-                )
-        );
+        const mapInstance: Map = map(container, config.options)
+            .setView(
+                customCoordsToLatLng(config.center),
+                config.initZoom
+            );
+
+        this._map.set(mapInstance);
     }
 
     /**
@@ -55,13 +57,32 @@ export class MapComponent implements AfterViewInit {
         }
 
         layers.forEach(layer => {
-            geoJSON(
-                layer.geoData,
-                {
-                    style: layer.style,
-                    coordsToLatLng: customCoordsToLatLng,
-                }
-            ).addTo(mapInstance);
+            const properties: GeoJSON.GeoJsonProperties = this.getLayerProperties(layer);
+            geoJSON(layer.geoData, properties)
+                .addTo(mapInstance);
         });
+    }
+
+    /**
+     * Получить свойства слоя
+     * @param layer
+     */
+    private getLayerProperties(layer: IMapLayer): GeoJSON.GeoJsonProperties {
+        const isActive: boolean = layer.properties.isActive === true;
+
+        return {
+            ...layer.properties,
+            style: {
+                ...this.config().defaultLayerStyle,
+                ...layer.properties.style,
+            },
+            interactive: isActive,
+            coordsToLatLng: customCoordsToLatLng,
+            onEachFeature: (feature: GeoJSON.Feature, leafletLayer: Layer): void => {
+                if (isActive) {
+                    leafletLayer.on('click', () => this.regionSelected.emit(layer.properties));
+                }
+            }
+        };
     }
 }
