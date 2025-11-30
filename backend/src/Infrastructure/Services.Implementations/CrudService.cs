@@ -31,7 +31,8 @@ public class CrudService : ICrudService
     {
         var set = _mapDbContext.Set<T>().AsQueryable();
         set = ApplyIncludeParams(set, includeParams);
-        return await set.FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id ,ct);
+        var property = typeof(T).GetProperty("Id")!;
+        return await set.FirstOrDefaultAsync(e => (Guid)property.GetValue(e)! == id ,ct);
     }
 
     /// <summary>
@@ -77,8 +78,9 @@ public class CrudService : ICrudService
     {
         var set = _mapDbContext.Set<T>();
         
+        var property = typeof(T).GetProperty("Id");
         var entites = await  _mapDbContext.Set<T>()
-            .Where(e => ids.Contains(EF.Property<Guid>(e, "Id")))
+            .Where(e => ids.Contains((Guid)property.GetValue(e)))
             .ToArrayAsync(ct);
         
         set.RemoveRange(entites);

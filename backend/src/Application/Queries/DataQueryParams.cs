@@ -59,7 +59,7 @@ public class DataQueryParams<TEntity> where TEntity : class
         return set;
     }
 
-    private IQueryable<TEntity> ApplyPagind(IQueryable<TEntity> set)
+    private IQueryable<TEntity> ApplyPaging(IQueryable<TEntity> set)
     {
         if (Paging != null)
         {

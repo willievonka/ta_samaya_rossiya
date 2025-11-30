@@ -15,11 +15,11 @@ internal class Program
             .MinimumLevel.Information()
             .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
             .WriteTo.File("logs/app.log")
-            .CreateBootstrapLogger();
+            .CreateLogger();
 
         builder.Host.UseSerilog();
         
-        builder.Services.AddServices();
+        builder.Services.AddInfrasctructureServices();
         
         ConfigureServices(builder.Services, builder.Configuration);
         
@@ -47,8 +47,8 @@ internal class Program
         
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowLocalhost3000",
-                policy => policy.WithOrigins("http://localhost:3000")
+            options.AddPolicy("AllowAngularDev",
+                policy => policy.WithOrigins("http://localhost:4200")
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials());
@@ -62,7 +62,7 @@ internal class Program
     private static void ConfigureMiddleware(WebApplication app)
     {
         app.UseSerilogRequestLogging();
-        app.UseCors("AllowLocalhost3000");
+        app.UseCors("AllowAngularDev");
         app.UseDefaultFiles();
         app.UseStaticFiles();
         app.UseRouting();

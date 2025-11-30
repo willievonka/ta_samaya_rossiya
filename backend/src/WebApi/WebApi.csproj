@@ -5,6 +5,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>Exe</OutputType>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -1735,6 +1737,10 @@
 
     <ItemGroup>
       <ClCompile Include="OsmToGeoJson\node_modules\msgpackr-extract\src\extract.cpp" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Controllers\AdminControllers\Responses\" />
     </ItemGroup>
 
 </Project>

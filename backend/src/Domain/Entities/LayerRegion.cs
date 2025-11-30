@@ -18,6 +18,11 @@ public class LayerRegion
     public IndicatorsRegion? Indicators { get; set; }
     
     /// <summary>
+    /// Активный ли регион, будем ли мы его отображать
+    /// </summary>
+    public bool IsActive { get; set; }
+    
+    /// <summary>
     /// Fk на регион
     /// </summary>
     public Guid RegionId { get; set; }
@@ -28,7 +33,7 @@ public class LayerRegion
     public Region Region { get; set; }
     
     /// <summary>
-    /// Fk на таблиуц карты
+    /// Fk на таблицу карты
     /// </summary>
     public Guid MapId { get; set; }
     
