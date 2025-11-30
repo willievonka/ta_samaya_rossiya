@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { MapComponent } from '../../components/map/map.component';
 import { MapDataService } from '../../services/map-data.service';
 import { IMapLayer, IMapLayerProperties } from '../../components/map/interfaces/map-layer.interface';
@@ -41,6 +41,7 @@ export class AnalyticsMapPageComponent {
         }
     };
 
+    private readonly _mapInstance: Signal<MapComponent | undefined> = viewChild(MapComponent);
     private readonly _mapDataService: MapDataService = inject(MapDataService);
     private readonly _destroyRef: DestroyRef = inject(DestroyRef);
 
@@ -49,16 +50,16 @@ export class AnalyticsMapPageComponent {
     }
 
     /**
-     * Открыть модалку с переданными properties
+     * Переключает состояние модалки с переданными properties
      * @param properties
      */
-    protected openModal(properties: IMapLayerProperties): void {
-        this.activeLayer.set(properties);
-    }
-
-    /** Закрыть модалку */
-    protected closeModal(): void {
-        this.activeLayer.set(null);
+    protected toggleModal(properties: IMapLayerProperties | null): void {
+        if (properties) {
+            this.activeLayer.set(properties);
+        } else {
+            this.activeLayer.set(null);
+            this._mapInstance()?.clearRegionSelection();
+        }
     }
 
     /** Загрузить слои для карты */
