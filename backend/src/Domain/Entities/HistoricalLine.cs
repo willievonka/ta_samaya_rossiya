@@ -57,5 +57,5 @@ public class HistoricalLine
     /// <summary>
     /// Исторические объекты
     /// </summary>
-    public IEnumerable<HistoricalObject>  HistoricalObjects { get; set; }
+    public IEnumerable<HistoricalObject> HistoricalObjects { get; set; }
 }

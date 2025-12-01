@@ -1,7 +1,10 @@
 using System.Reflection;
+using System.Text.Json;
+using Application;
 using Infrastructure;
 using Microsoft.OpenApi;
 using Serilog;
+using NetTopologySuite.IO.Converters;
 
 namespace WebApi;
 
@@ -43,7 +46,12 @@ internal class Program
 
     private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddControllers();
+        services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                options.JsonSerializerOptions.Converters.Add(new GeoJsonConverterFactory());
+            });
         
         services.AddCors(options =>
         {
@@ -55,7 +63,7 @@ internal class Program
         });
 
         services.AddInfrastructure(configuration);
-        
+        services.AddApplicationServices();
         services.AddEndpointsApiExplorer();
     }
     

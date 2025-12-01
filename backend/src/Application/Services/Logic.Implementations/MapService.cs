@@ -2,27 +2,37 @@
 using Application.Services.Dtos;
 using Application.Services.Interfaces;
 using Domain.Entities;
+using Domain.Repository.Interfaces;
 
 namespace Application.Services.Logic.Implementations;
 
 public class MapService : IMapService
 {
     private readonly ILogger<IMapService> _logger;
-    private readonly ICrudService _crudService;
-    private readonly IQueryService _queryService;
+    private readonly IMapRepository _mapRepository;
+    private readonly ILayerRegionRepository _layerRegionRepository;
+    private readonly IRegionRepository _regionRepository;
     private readonly IImageService _imageService;
 
-    public MapService(ILogger<IMapService> logger, ICrudService crudService, IQueryService queryService,
-        IImageService imageService)
+    public MapService(ILogger<IMapService> logger, IMapRepository mapRepository,
+        ILayerRegionRepository layerRegionRepository, IImageService imageService,
+        IRegionRepository regionRepository)
     {
         _logger = logger;
-        _crudService = crudService;
-        _queryService = queryService;
+        _regionRepository = regionRepository;
+        _mapRepository = mapRepository;
+        _layerRegionRepository = layerRegionRepository;
         _imageService = imageService;
     }
     
-    public async Task<Guid> CreateMapAsync(MapDto mapDto, CancellationToken ct)
+    public async Task<Guid> CreateMapAsync(MapDto? mapDto, CancellationToken ct)
     {
+        if (mapDto is null)
+        {
+            _logger.LogError("MapDto is null");
+            return Guid.Empty;
+        }
+        
         _logger.LogInformation("Creating map");
         
         var map = new Map
@@ -33,8 +43,9 @@ public class MapService : IMapService
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
         };
-        var id = await _crudService.CreateAsync(map, ct);
-
+        await _mapRepository.AddAsync(map, ct);
+        
+        var id = map.Id;
         if (id == Guid.Empty)
         {
             _logger.LogError("Unable to create map");
@@ -47,7 +58,7 @@ public class MapService : IMapService
             string? fileUri = null;
             fileUri = await _imageService.SaveImageAsync(id, "Map", mapDto.BackgroundImage);
             map.BackgroundImage = fileUri;
-            await _crudService.UpdateAsync(map, ct);
+            await _mapRepository.UpdateAsync(map, ct);
         }
         
         _logger.LogInformation("Map {id} created", id);
@@ -59,23 +70,22 @@ public class MapService : IMapService
     {
         _logger.LogInformation("Deleting map {mapId}", mapId);
         
-        var res = await _crudService.TryRemoveAsync<Map>(mapId, ct);
-        if (res)
+        var map = await _mapRepository.GetByIdAsync(mapId, ct);
+        if (map == null)
         {
-            _logger.LogInformation("Map {mapId} deleted", mapId);
-            return true;
+            _logger.LogInformation("Map {mapId} could not be deleted", mapId);
+            return false;
         }
         
-        _logger.LogInformation("Map {mapId} could not be deleted", mapId);
-        return false;
+        await _mapRepository.DeleteByIdAsync(mapId, ct);
+       
+        _logger.LogInformation("Map {mapId} deleted", mapId);
+        return true;
     }
 
     public async Task<MapDto?> GetMapAsync(Guid mapId, CancellationToken ct)
     {
-        var map = await _crudService.GetByIdOrDefaultAsync(mapId, new IncludeParams<Map>
-        {
-            IncludeProperties = [m => m.Regions, m => m.Regions.Select(r => r.Indicators)]
-        }, ct);
+        var map = await _mapRepository.GetByIdAsync(mapId, ct);
 
         if (map == null)
         {
@@ -99,6 +109,7 @@ public class MapService : IMapService
 
             var regionDto = new LayerRegionDto
             {
+                Id = region.Id,
                 IsActive = region.IsActive,
                 FillColor = region.FillColor,
                 Name = region.Region.Name,
@@ -128,7 +139,7 @@ public class MapService : IMapService
 
     public async Task<Guid> UpdateMapAsync(MapDto mapDto, CancellationToken ct)
     {
-        var map = await _crudService.GetByIdOrDefaultAsync<Map>(mapDto.Id!.Value, ct);
+        var map = await _mapRepository.GetByIdAsync(mapDto.Id!.Value, ct);
 
         if (map == null)
         {
@@ -142,6 +153,8 @@ public class MapService : IMapService
             fileUri = await _imageService.UpdateImageAsync(map.Id, map.BackgroundImage, "Map",
                 mapDto.BackgroundImage);
         }
+        
+        //TODO IndicatorService, LayerRegionService
 
         map.BackgroundImage = fileUri;
         map.IsAnalitics = mapDto.IsAnalitics;
@@ -149,16 +162,16 @@ public class MapService : IMapService
         map.Description = mapDto.Description;
         map.UpdatedAt = DateTime.Now;
         
-        var mapId = await _crudService.UpdateAsync(map, ct);
+        await _mapRepository.UpdateAsync(map, ct);
         
-        return mapId;
+        return map.Id;
     }
 
     public async Task<Guid> AddNewLayerRegionAsync(Guid mapId, LayerRegionDto layerRegionDto, CancellationToken ct)
     {
         _logger.LogInformation("Adding layer region {name}", layerRegionDto.Name);
         
-        var map = await _crudService.GetByIdOrDefaultAsync<Map>(mapId, ct);
+        var map = await _mapRepository.GetByIdAsync(mapId, ct);
 
         if (map == null)
         {
@@ -166,10 +179,7 @@ public class MapService : IMapService
             return Guid.Empty;
         }
 
-        var region = (await _queryService.GetAsync(new DataQueryParams<Region>
-        {
-            Expression = r => r.Name.Equals(layerRegionDto.Name)
-        }, ct)).FirstOrDefault();
+        var region = await _regionRepository.GetByNameAsync(layerRegionDto.Name, ct);
 
         if (region == null)
         {
@@ -181,16 +191,10 @@ public class MapService : IMapService
         {
             FillColor = layerRegionDto.FillColor,
             IsActive = layerRegionDto.IsActive,
-            Region = region,
-            Map = map
+            RegionId = region.Id,
+            MapId = mapId
         };
-        var id = await _crudService.CreateAsync(newLayerRegion, ct);
-        
-        if (id == Guid.Empty)
-        {
-            _logger.LogError("Unable to create layer region {name}", layerRegionDto.Name);
-            return Guid.Empty;
-        }
+        await _layerRegionRepository.AddAsync(newLayerRegion, ct);
         
         var indicatorsDto = layerRegionDto.Indicators;
 
@@ -201,7 +205,7 @@ public class MapService : IMapService
             if (indicatorsDto.Image != null)
             {
                 string? fileUri = null;
-                fileUri = await _imageService.SaveImageAsync(id, "Map", indicatorsDto.Image);
+                fileUri = await _imageService.SaveImageAsync(newLayerRegion.Id, "Map", indicatorsDto.Image);
                 indicators.ImagePath = fileUri;
             }
 
@@ -209,13 +213,14 @@ public class MapService : IMapService
             indicators.Excursions = indicatorsDto.Excursions;
             indicators.Participants = indicatorsDto.Participants;
             indicators.Partners = indicatorsDto.Partners;
+            indicators.RegionId = newLayerRegion.Id;
             
             newLayerRegion.Indicators = indicators;
             
-            await _crudService.UpdateAsync(newLayerRegion, ct);
+            await _layerRegionRepository.UpdateAsync(newLayerRegion, ct);
         }
         
         _logger.LogInformation("Layer region {name} created", layerRegionDto.Name);
-        return id;
+        return newLayerRegion.Id;
     }
 }

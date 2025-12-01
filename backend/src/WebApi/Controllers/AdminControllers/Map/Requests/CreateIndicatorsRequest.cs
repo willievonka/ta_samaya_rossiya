@@ -1,0 +1,12 @@
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
+
+namespace WebApi.Controllers.AdminControllers.Map.Requests;
+
+public record CreateIndicatorsRequest(
+    [FromForm] IFormFile? Image,
+    int? Excursions,
+    int? Partners,
+    int? Participants,
+    bool? IsActive
+    );

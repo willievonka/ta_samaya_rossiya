@@ -4,6 +4,8 @@ namespace Application.Services.Dtos;
 
 public class LayerRegionDto
 {
+    public Guid? Id { get; set; }
+    
     /// <summary>
     /// Цвет заливки региона
     /// </summary>
