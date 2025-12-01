@@ -24,6 +24,8 @@ public class MapRepository : IMapRepository
     {
         return await _context.Maps
             .Include(m => m.Regions)
+                .ThenInclude(r => r.Indicators)
+            .Include(r => r.Regions)
                 .ThenInclude(r => r.Region)
                     .ThenInclude(r => r.Geometry)
             .Include(m => m.HistoricalLine)
