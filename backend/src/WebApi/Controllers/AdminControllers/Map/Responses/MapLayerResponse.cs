@@ -7,5 +7,5 @@ public record MapLayerResponse(
     MapLayerPropertiesResponse Properties
 )
 {
-    public string Type => "Feature";
+    public string Type => "Feature";// изменить в обязательнные поля
 };
