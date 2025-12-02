@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApi.Controllers.AdminControllers.Map.Requests;
 
 public record CreateMapRequest(
-    [Required] bool IsAnalitics,
+    [Required] bool IsAnalytics,
     [Required] string Title,
     [Required] string Description,
     [FromForm] IFormFile? BackgroundImage

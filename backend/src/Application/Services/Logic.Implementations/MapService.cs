@@ -113,7 +113,6 @@ public class MapService : IMapService
                 IsActive = region.IsActive,
                 FillColor = region.FillColor,
                 Name = region.Region.Name,
-                IsRussia = region.Region.IsRussia,
                 Geometry = region.Region.Geometry.Geometry,
             };
 

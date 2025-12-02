@@ -22,11 +22,6 @@ public class LayerRegionDto
     public required string Name { get; set; }
     
     /// <summary>
-    /// Является ли регион регионом РФ
-    /// </summary>
-    public required bool IsRussia { get; set; }
-    
-    /// <summary>
     /// Полигон, обозначающий границы региона
     /// </summary>
     public MultiPolygon? Geometry { get; set; }

@@ -38,7 +38,6 @@ public static class LayerRegionMapper
         {
             IsActive = request.IsActive,
             Name = request.Name,
-            IsRussia = request.IsRussia,
             FillColor = request.FillColor,
             Indicators = IndicatorsRegionRequestToDto(request.Indicators),
         };

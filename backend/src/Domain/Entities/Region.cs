@@ -16,11 +16,6 @@ public class Region
     public string Name { get; set; } = "";
     
     /// <summary>
-    /// Является ли регион регионом РФ
-    /// </summary>
-    public bool IsRussia { get; set; }
-    
-    /// <summary>
     /// Границы региона
     /// </summary>
     public RegionGeometry Geometry { get; set; }
