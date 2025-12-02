@@ -11,6 +11,11 @@ public static class LayerRegionMapper
         if (layerRegionDto == null)
             return null;
 
+        if (!layerRegionDto.IsActive)
+        {
+            return new MapLayerPropertiesResponse(layerRegionDto.Name, layerRegionDto.Id);
+        }
+        
         var style = new PathOptionsResponse(layerRegionDto.FillColor);
 
         var indicators = layerRegionDto.Indicators;

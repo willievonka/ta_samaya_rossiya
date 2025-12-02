@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Application;
 using Infrastructure;
 using Microsoft.OpenApi;
@@ -51,6 +52,8 @@ internal class Program
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.Converters.Add(new GeoJsonConverterFactory());
+                options.JsonSerializerOptions.DefaultIgnoreCondition = 
+                    JsonIgnoreCondition.WhenWritingNull;
             });
         
         services.AddCors(options =>
