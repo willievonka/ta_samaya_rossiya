@@ -1,0 +1,50 @@
+@use '../../../../common-styles/spacing-vars' as *;
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateX($spacing-2l);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX($spacing-2l);
+    }
+}
+
+:host {
+    display: flex;
+    flex: 1;
+}
+
+.analytics-map {
+    display: flex;
+    flex: 1;
+    position: relative;
+
+    &__modal {
+        position: absolute;
+        z-index: 500;
+        align-self: center;
+        right: 0;
+        margin-right: $spacing-xl;
+
+        &_enter {
+            animation: fade-in 150ms ease-out;
+        }
+
+        &_leave {
+            animation: fade-out 150ms ease-in;
+        }
+    }
+}

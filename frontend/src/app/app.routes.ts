@@ -4,5 +4,9 @@ export const routes: Routes = [
     {
         path: '',
         loadComponent: () => import('./pages/main-hub/main-hub.page').then(m => m.MainHubPageComponent)
+    },
+    {
+        path: 'analytics-map',
+        loadComponent: () => import('./pages/analytics-map/analytics-map.page').then(m => m.AnalyticsMapPageComponent)
     }
 ];

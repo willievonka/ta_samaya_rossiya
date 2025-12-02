@@ -1,0 +1,58 @@
+@use '../../../../../../common-styles/spacing-vars' as *;
+@use '../../../../../../common-styles/color-vars' as color;
+
+.analytics-map-modal {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    align-items: center;
+    border-radius: $spacing-m;
+    background-color: color.$bg-secondary;
+    box-shadow: -$spacing-xs $spacing-xs $spacing-xs 0 rgba(black, 0.4);
+
+    &__close-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        align-self: flex-end;
+        z-index: 1;
+        margin-top: $spacing-s;
+        margin-right: $spacing-s;
+        padding: $spacing-s;
+        border-radius: 100%;
+        background-color: white;
+        opacity: 0.75;
+    }
+
+    &__image {
+        width: 484px;
+        height: 256px;
+        border-radius: $spacing-m;
+        margin-bottom: $spacing-m;
+    }
+
+    &__title {
+        font-size: $spacing-2l;
+        line-height: 24px;
+        color: color.$text-primary;
+        margin-bottom: $spacing-s;
+    }
+
+    &__info-list {
+        display: flex;
+        justify-content: space-between;
+        gap: $spacing-xl;
+        margin-bottom: $spacing-m;
+    }
+
+    &__info-item {
+        padding-right: $spacing-xl;
+        border-right: 1px solid color.$border-secondary;
+
+        &:last-child {
+            padding: 0;
+            border: 0;
+        }
+    }
+}

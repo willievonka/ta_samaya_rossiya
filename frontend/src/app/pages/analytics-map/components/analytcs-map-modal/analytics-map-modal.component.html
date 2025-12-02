@@ -1,0 +1,37 @@
+@let content = data();
+<div class="analytics-map-modal">
+    <button
+        class="analytics-map-modal__close-button"
+        (click)="closeModal.emit()"
+    >
+        <svg
+            class="analytics-map-modal__close-icon"
+            width="8.6"
+            height="8.6"
+        >
+            <use href="/sprites/cross.svg" />
+        </svg>
+    </button>
+    <img
+        class="analytics-map-modal__image"
+        [src]="content.analyticsData?.imagePath"
+        alt="Изображение региона"
+    >
+    <h3 class="analytics-map-modal__title">
+        {{ content.regionName }}
+    </h3>
+    <div class="analytics-map-modal__info-list">
+        <span class="analytics-map-modal__info-item">
+            {{ content.analyticsData?.partnersCount }}
+            {{ content.analyticsData?.partnersCount | declOfNum:['партнёр','партнёра','партнёров'] }}
+        </span>
+        <span class="analytics-map-modal__info-item">
+            {{ content.analyticsData?.excursionsCount }}
+            {{ content.analyticsData?.excursionsCount | declOfNum:['экскурсия','экскурсии','экскурсий'] }}
+        </span>
+        <span class="analytics-map-modal__info-item">
+            {{ content.analyticsData?.membersCount }}
+            {{ content.analyticsData?.membersCount | declOfNum:['участник','участника','участников'] }}
+        </span>
+    </div>
+</div>

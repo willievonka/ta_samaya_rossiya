@@ -1,0 +1,18 @@
+﻿FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine3.22
+WORKDIR /src
+
+COPY *.sln .
+COPY src/WebApi/WebApi.csproj WebApi/
+COPY src/Application/Application.csproj Application/
+COPY src/Domain/Domain.csproj Domain/
+COPY src/Infrastructure/Infrastructure.csproj Infrastructure/
+
+RUN dotnet restore "WebApi/WebApi.csproj" --disable-parallel
+
+COPY src/ ./
+
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Development
+
+ENTRYPOINT ["dotnet", "run", "--project", "WebApi/WebApi.csproj", "--no-launch-profile", "--urls", "http://+:8080"]
