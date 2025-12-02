@@ -1,7 +1,10 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, input, InputSignal, signal, Signal, viewChild, WritableSignal } from '@angular/core';
-import { geoJSON, map, Map } from 'leaflet';
-import { IMapLayer } from '../../interfaces/map-layer.interface';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, ElementRef, input, InputSignal, output, OutputEmitterRef, signal, Signal, viewChild, WritableSignal } from '@angular/core';
+import { DomEvent, geoJSON, Layer, LeafletMouseEvent, map, Map, Path, PathOptions } from 'leaflet';
+import { IMapLayer, IMapLayerProperties } from './interfaces/map-layer.interface';
 import { customCoordsToLatLng } from './utils/custom-coords-to-lat-lng.util';
+import { IMapConfig } from './interfaces/map-config.interface';
+import { makeBrighterColor } from './utils/make-brighter-color.util';
+import { IActiveLeafletLayer } from './interfaces/leaflet-layer.interface';
 
 @Component({
     selector: 'map',
@@ -17,35 +20,46 @@ import { customCoordsToLatLng } from './utils/custom-coords-to-lat-lng.util';
 })
 export class MapComponent implements AfterViewInit {
     public readonly layers: InputSignal<IMapLayer[]> = input.required();
+    public readonly config: InputSignal<IMapConfig> = input.required();
+    public readonly regionSelected: OutputEmitterRef<IMapLayerProperties | null> = output();
 
     protected readonly isLoading: WritableSignal<boolean> = signal(true);
 
-    private readonly _map: WritableSignal<Map | null> = signal<Map | null>(null);
+    private _map: Map | null = null;
+    private _activeLeaflerLayer: Path | null = null;
     private readonly _mapContainer: Signal<ElementRef<HTMLDivElement>> = viewChild.required('mapContainer');
+    private readonly _defaultLayerStyle: Signal<PathOptions> = computed(() => this.config().defaultLayerStyle);
 
     public ngAfterViewInit(): void {
         this.initMap();
         this.renderLayers(this.layers());
+        this.isLoading.set(false);
     }
 
-    /**
-     * Инит карты
-     */
+    /** Снять выделение с активного слоя */
+    public clearRegionSelection(): void {
+        this.clearActiveLayer();
+    }
+
+    /** Инит карты */
     private initMap(): void {
         const container: HTMLDivElement = this._mapContainer().nativeElement;
-        const center: [number, number] = [105, 68.5];
+        const config: IMapConfig = this.config();
 
-        this._map.set(
-            map(
-                container,
-                {
-                    zoomControl: false,
-                    attributionControl: false,
-                    zoomSnap: 0.1
-                }
-            )
-                .setView(customCoordsToLatLng(center), 3.2)
-        );
+        const mapInstance: Map = map(container, config.options)
+            .setView(
+                customCoordsToLatLng(config.center),
+                config.initZoom
+            );
+
+        mapInstance.on({
+            click: () => {
+                this.clearActiveLayer();
+                this.regionSelected.emit(null);
+            }
+        });
+
+        this._map = mapInstance;
     }
 
     /**
@@ -53,20 +67,112 @@ export class MapComponent implements AfterViewInit {
      * @param layers
      */
     private renderLayers(layers: IMapLayer[]): void {
-        const mapInstance: Map | null = this._map();
+        const mapInstance: Map | null = this._map;
         if (!mapInstance) {
             return;
         }
 
-        setTimeout(() => {
-            layers.forEach(layer => {
-                geoJSON(layer.geoData, {
-                    style: layer.style,
-                    coordsToLatLng: customCoordsToLatLng,
-                }).addTo(mapInstance);
-            });
+        layers.forEach(layer => {
+            const properties: GeoJSON.GeoJsonProperties = this.getLayerProperties(layer);
+            geoJSON(layer.geoData, properties)
+                .addTo(mapInstance);
+        });
+    }
 
-            this.isLoading.set(false);
-        }, 2000);
+    /**
+     * Получить свойства слоя
+     * @param mapLayer
+     */
+    private getLayerProperties(mapLayer: IMapLayer): GeoJSON.GeoJsonProperties {
+        const isActive: boolean = mapLayer.properties.isActive === true;
+
+        return {
+            ...mapLayer.properties,
+            style: {
+                ...this._defaultLayerStyle(),
+                ...mapLayer.properties.style,
+            },
+            interactive: isActive,
+            coordsToLatLng: customCoordsToLatLng,
+            onEachFeature: (feature: GeoJSON.Feature, leafletLayer: Layer): void => {
+                if (isActive) {
+                    const pathLayer: IActiveLeafletLayer = leafletLayer as IActiveLeafletLayer;
+                    pathLayer.originalStyle = { ...pathLayer.options };
+
+                    leafletLayer.on({
+                        click: (event: LeafletMouseEvent) => {
+                            DomEvent.stopPropagation(event);
+                            this.selectRegion(mapLayer, pathLayer);
+                        }
+                    });
+                }
+            }
+        };
+    }
+
+    /**
+     * Выделить регион
+     * @param mapLayer
+     * @param leafletLayer
+     */
+    private selectRegion(mapLayer: IMapLayer, leafletLayer: IActiveLeafletLayer): void {
+        this.regionSelected.emit(mapLayer.properties);
+        this.applyActiveLayerStyle(leafletLayer);
+        leafletLayer.bringToFront();
+    }
+
+    /**
+     * Применяет стиль активного слоя
+     * @param leafletLayer
+     */
+    private applyActiveLayerStyle(leafletLayer: IActiveLeafletLayer): void {
+        const prev: Path | null = this._activeLeaflerLayer;
+
+        if (prev && prev !== leafletLayer) {
+            this.resetLayerStyle(prev);
+        }
+
+        const base: PathOptions = leafletLayer.originalStyle!;
+        if (!leafletLayer.brighterColor) {
+            leafletLayer.brighterColor = makeBrighterColor(base.fillColor!, 15);
+        }
+
+        leafletLayer.setStyle({
+            ...base,
+            weight: 3,
+            fillColor: leafletLayer.brighterColor
+        });
+
+        const nativeElement: SVGElement | undefined = leafletLayer.getElement() as SVGElement;
+        if (nativeElement) {
+            nativeElement.style.filter = 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.33))';
+        }
+
+        this._activeLeaflerLayer = leafletLayer;
+    }
+
+    /**
+     * Сбрасывает стиль слоя к оригинальному
+     * @param leafletLayer
+     */
+    private resetLayerStyle(leafletLayer: IActiveLeafletLayer): void {
+        if (!leafletLayer.originalStyle) {
+            return;
+        }
+
+        leafletLayer.setStyle(leafletLayer.originalStyle);
+
+        const nativeElement: SVGElement | undefined = leafletLayer.getElement() as SVGElement;
+        if (nativeElement) {
+            nativeElement.style.filter = '';
+        }
+    }
+
+    /** Очищает активный слой */
+    private clearActiveLayer(): void {
+        if (this._activeLeaflerLayer) {
+            this.resetLayerStyle(this._activeLeaflerLayer);
+            this._activeLeaflerLayer = null;
+        }
     }
 }

@@ -25,16 +25,4 @@ export class MainHubService {
         //         })
         //     );
     }
-
-    /**
-     * Редирект на страницу с картой
-     * @param id
-     */
-    public navigateToMap(id: string): void {
-        if (id === '0') {
-            this._router.navigate(['analytics-map']);
-        } else {
-            console.log(id);
-        }
-    }
 }

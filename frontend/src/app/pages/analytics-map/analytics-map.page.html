@@ -1,4 +1,18 @@
-@if (mapLayers(); as mapLayers) {
-    <map [layers]="mapLayers" ></map>
-}
-
+<div class="analytics-map">
+    @if (mapLayers(); as mapLayers) {
+        <map
+            [layers]="mapLayers"
+            [config]="mapConfig"
+            (regionSelected)="toggleModal($event)"
+        ></map>
+    }
+    @if (activeLayer()) {
+        <analytics-map-modal
+            class="analytics-map__modal"
+            [data]="activeLayer()!"
+            (closeModal)="toggleModal(null)"
+            animate.enter="analytics-map__modal_enter"
+            animate.leave="analytics-map__modal_leave"
+        ></analytics-map-modal>
+    }
+</div>
