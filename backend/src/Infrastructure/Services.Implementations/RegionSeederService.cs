@@ -2,6 +2,7 @@
 using Application.Queries;
 using Application.Services.Interfaces;
 using Domain.Entities;
+using Domain.Repository.Interfaces;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
@@ -13,27 +14,27 @@ namespace Infrastructure.Services.Implementations;
 /// </summary>
 public class RegionSeederService : IRegionSeederService
 {
-    private readonly ICrudService _crudService;
-    private readonly IQueryService _queryService;
+    private readonly IRegionRepository _regionRepository;
+    private readonly IRegionGeometryRepository _regionGeometryRepository;
     private readonly ILogger<RegionSeederService> _logger;
     private readonly IWebHostEnvironment _webHostEnvironment;
 
-    public RegionSeederService(ICrudService crudService, IQueryService queryService,
+    public RegionSeederService(IRegionRepository regionRepository,  IRegionGeometryRepository regionGeometryRepository,
         ILogger<RegionSeederService> logger,  IWebHostEnvironment webHostEnvironment)
     {
-        _crudService = crudService;
-        _queryService = queryService;
+        _regionRepository = regionRepository;
+        _regionGeometryRepository = regionGeometryRepository;
         _logger = logger;
         _webHostEnvironment = webHostEnvironment;
     }
     
     public async Task SeedIfEmptyAsync(CancellationToken ct = default)
     {
-        var regionsCount = await _queryService.GetCountAsync<Region>(new DataQueryParams<Region>(), ct);
+        var regions = await _regionRepository.GetAllAsync(ct);
 
-        if (regionsCount > 0)
+        if (regions?.Count > 0)
         {
-            _logger.LogInformation("Table Regions already contains {count} entries.", regionsCount);
+            _logger.LogInformation("Table Regions already contains {count} entries.", regions.Count);
             return;
         }
         
@@ -78,19 +79,12 @@ public class RegionSeederService : IRegionSeederService
                     featureNumber, totalCount);
             }
             
-            var regiondId = await _crudService.CreateAsync(new Region
+            await _regionRepository.AddAsync(new Region
             {
                 Name = name ?? $"Новый регион №{featureNumber}",
                 IsRussia = gid0 is "RUS" or "UKR",
                 Geometry = new RegionGeometry { Geometry = geometry },
             }, ct);
-
-            if (regiondId == Guid.Empty)
-            {
-                _logger.LogError("Couldn't create region from feature number {featureNumber} of {totalCount}.",
-                    featureNumber, totalCount);
-                throw new DataException($"Couldn't create region from feature number {featureNumber} of {totalCount}.");
-            }
             
             _logger.LogInformation("Feature {Index} of {Total} finished seed.",  featureNumber, totalCount);
         }

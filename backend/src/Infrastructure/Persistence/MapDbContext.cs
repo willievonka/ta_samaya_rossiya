@@ -56,6 +56,18 @@ public class MapDbContext : DbContext
             .HasForeignKey<RegionGeometry>(rg => rg.RegionId)
             .OnDelete(DeleteBehavior.Cascade);
         
+        modelBuilder.Entity<Map>()
+            .Property(m => m.CreatedAt)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+        
+        modelBuilder.Entity<Map>()
+            .Property(m => m.UpdatedAt)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+        
         AddPrimaryKey(modelBuilder);
         
         AddAutoGeneratingId(modelBuilder);

@@ -1,8 +1,6 @@
-﻿using System.Data;
-using Application.Services.Interfaces;
+﻿using Application.Services.Interfaces;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Polly;
 using Serilog;

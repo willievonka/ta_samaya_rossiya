@@ -176,6 +176,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("fill_color");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
                     b.Property<Guid>("MapId")
                         .HasColumnType("uuid")
                         .HasColumnName("map_id");

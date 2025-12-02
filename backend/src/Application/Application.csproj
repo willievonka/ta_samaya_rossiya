@@ -19,7 +19,6 @@
 
     <ItemGroup>
       <Folder Include="Repository.Interfaces\" />
-      <Folder Include="Services\Dtos\" />
     </ItemGroup>
 
 </Project>

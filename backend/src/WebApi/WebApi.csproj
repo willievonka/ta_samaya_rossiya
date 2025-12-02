@@ -5,6 +5,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>Exe</OutputType>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,6 +14,9 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="NetTopologySuite" Version="2.6.0" />
+      <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
+      <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="4.0.0" />
       <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
@@ -1735,6 +1740,10 @@
 
     <ItemGroup>
       <ClCompile Include="OsmToGeoJson\node_modules\msgpackr-extract\src\extract.cpp" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\images\Map\" />
     </ItemGroup>
 
 </Project>
