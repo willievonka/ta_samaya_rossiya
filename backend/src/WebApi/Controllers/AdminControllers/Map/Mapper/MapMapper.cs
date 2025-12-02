@@ -14,7 +14,7 @@ public static class MapMapper
 
         return new MapDto
         {
-            IsAnalitics = request.IsAnalitics,
+            IsAnalitics = request.IsAnalytics,
             BackgroundImage = request.BackgroundImage,
             Title = request.Title,
             Description = request.Description,

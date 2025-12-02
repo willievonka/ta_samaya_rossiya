@@ -82,7 +82,6 @@ public class RegionSeederService : IRegionSeederService
             await _regionRepository.AddAsync(new Region
             {
                 Name = name ?? $"Новый регион №{featureNumber}",
-                IsRussia = gid0 is "RUS" or "UKR",
                 Geometry = new RegionGeometry { Geometry = geometry },
             }, ct);
             
