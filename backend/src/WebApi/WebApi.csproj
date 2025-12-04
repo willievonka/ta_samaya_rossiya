@@ -1743,7 +1743,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="wwwroot\images\Map\" />
+      <Folder Include="wwwroot\images\map-cards\" />
     </ItemGroup>
 
 </Project>

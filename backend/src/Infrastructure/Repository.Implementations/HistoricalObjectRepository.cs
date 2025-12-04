@@ -23,6 +23,7 @@ public class HistoricalObjectRepository : IHistoricalObjectRepository
     public async Task<HistoricalObject?> GetByIdAsync(Guid histObjectId, CancellationToken ct)
     {
         return await _context.HistoricalObjects
+            .AsNoTracking()
             .FirstOrDefaultAsync(o => o.Id == histObjectId, ct);
     }
 
@@ -46,6 +47,7 @@ public class HistoricalObjectRepository : IHistoricalObjectRepository
     public async Task UpdateAsync(HistoricalObject histObject, CancellationToken ct)
     {
         var existing = await _context.HistoricalObjects
+            .AsNoTracking()
             .FirstOrDefaultAsync(o => o.Id == histObject.Id, ct);
         if (existing != null)
         {
@@ -57,6 +59,7 @@ public class HistoricalObjectRepository : IHistoricalObjectRepository
     public async Task DeleteByIdAsync(Guid histObjectId, CancellationToken ct)
     {
         var existing = await _context.HistoricalObjects
+            .AsNoTracking()
             .FirstOrDefaultAsync(o => o.Id == histObjectId, ct);
         if (existing != null)
         {

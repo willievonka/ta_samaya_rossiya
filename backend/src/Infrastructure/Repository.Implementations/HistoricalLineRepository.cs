@@ -20,7 +20,15 @@ public class HistoricalLineRepository : IHistoricalLineRepository
         await _context.SaveChangesAsync(ct);
     }
 
-    public async Task<HistoricalLine?> GetByIdAsync(Guid histLineId, CancellationToken ct)
+    public async Task<HistoricalLine?> GetHeaderByIdAsync(Guid histLineId, CancellationToken ct)
+    {
+        return await _context.HistoricalLines
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == histLineId, ct); 
+    }
+
+
+    public async Task<HistoricalLine?> GetByIdWithObjectsAsync(Guid histLineId, CancellationToken ct)
     {
         return await _context.HistoricalLines
             .Include(l => l.HistoricalObjects)
@@ -28,7 +36,7 @@ public class HistoricalLineRepository : IHistoricalLineRepository
             .FirstOrDefaultAsync(l => l.Id == histLineId, ct);
     }
 
-    public async Task<HistoricalLine?> GetByMapAsync(Guid mapId, CancellationToken ct)
+    public async Task<HistoricalLine?> GetByMapWithObjectsAsync(Guid mapId, CancellationToken ct)
     {
         return await _context.HistoricalLines
             .Include(l => l.HistoricalObjects)
@@ -39,6 +47,7 @@ public class HistoricalLineRepository : IHistoricalLineRepository
     public async Task UpdateAsync(HistoricalLine histLine, CancellationToken ct)
     {
         var existing = await _context.HistoricalLines
+            .AsNoTracking()
             .FirstOrDefaultAsync(l => l.Id == histLine.Id, ct);
         if (existing != null)
         {
@@ -50,6 +59,7 @@ public class HistoricalLineRepository : IHistoricalLineRepository
     public async Task DeleteByIdAsync(Guid histLineId, CancellationToken ct)
     {
         var existing = await _context.HistoricalLines
+            .AsNoTracking()
             .FirstOrDefaultAsync(l => l.Id == histLineId, ct);
         if (existing != null)
         {

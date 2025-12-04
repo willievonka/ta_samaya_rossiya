@@ -38,6 +38,7 @@ public class RegionGeometryRepository : IRegionGeometryRepository
     public async Task UpdateAsync(RegionGeometry regionGeometry, CancellationToken ct)
     {
         var existingRegionGeometry = await _context.RegionGeometries
+            .AsNoTracking()
             .FirstOrDefaultAsync(g => g.Id == regionGeometry.Id, ct);
         if (existingRegionGeometry != null)
         {
@@ -49,6 +50,7 @@ public class RegionGeometryRepository : IRegionGeometryRepository
     public async Task DeleteByIdAsync(Guid geometryId, CancellationToken ct)
     {
         var geometry = await _context.RegionGeometries
+            .AsNoTracking()
             .FirstOrDefaultAsync(g => g.Id == geometryId, ct);
         if (geometry != null)
         {

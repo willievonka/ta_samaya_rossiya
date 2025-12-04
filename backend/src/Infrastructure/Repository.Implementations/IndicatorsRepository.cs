@@ -23,6 +23,7 @@ public class IndicatorsRepository : IIndicatorsRepository
     public async Task<IndicatorsRegion?> GetByIdAsync(Guid indicatorsId, CancellationToken ct)
     {
         return await _context.IndicatorsRegions
+            .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == indicatorsId, ct);
     }
 
@@ -36,6 +37,7 @@ public class IndicatorsRepository : IIndicatorsRepository
     public async Task UpdateAsync(IndicatorsRegion indicators, CancellationToken ct)
     {
         var existing = await _context.IndicatorsRegions
+            .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == indicators.Id, ct);
         if (existing != null)
         {
@@ -47,6 +49,7 @@ public class IndicatorsRepository : IIndicatorsRepository
     public async Task DeleteByIdAsync(Guid indicatorsId, CancellationToken ct)
     {
         var existing = await _context.IndicatorsRegions
+            .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == indicatorsId, ct);
         if (existing != null)
         {

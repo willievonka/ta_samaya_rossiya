@@ -10,7 +10,7 @@ public class Map
     /// <summary>
     /// Флаг для аналитической карты
     /// </summary>
-    public bool IsAnalitics { get; set; }
+    public bool IsAnalytics { get; set; }
     
     /// <summary>
     /// Название

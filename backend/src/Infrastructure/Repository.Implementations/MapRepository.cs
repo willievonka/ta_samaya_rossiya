@@ -20,41 +20,16 @@ public class MapRepository : IMapRepository
         await _context.SaveChangesAsync(ct);
     }
 
-    public async Task<Map?> GetByIdAsync(Guid mapId, CancellationToken ct)
+    public async Task<Map?> GetHeaderByIdAsync(Guid mapId, CancellationToken ct)
     {
         return await _context.Maps
-            .Include(m => m.Regions)
-                .ThenInclude(r => r.Indicators)
-            .Include(r => r.Regions)
-                .ThenInclude(r => r.Region)
-                    .ThenInclude(r => r.Geometry)
-            .Include(m => m.HistoricalLine)
-                .ThenInclude(l => l.HistoricalObjects)
             .AsNoTracking()
             .FirstOrDefaultAsync(m => m.Id == mapId, ct);
     }
 
-    public async Task<Map?> GetByIdWithActiveRegionsAsync(Guid mapId, CancellationToken ct)
+    public async Task<List<Map>?> GetAllHeadersAsync(CancellationToken ct)
     {
         return await _context.Maps
-            .Include(m => m.Regions)
-                .ThenInclude(r => r.Region)
-                    .ThenInclude(r => r.Geometry)
-            .Include(m => m.HistoricalLine)
-                .ThenInclude(l => l.HistoricalObjects)
-            .AsNoTracking()
-            .Where(m => m.Regions.All(r => r.IsActive == true))
-            .FirstOrDefaultAsync(m => m.Id == mapId, ct);
-    }
-
-    public async Task<List<Map>?> GetAllAsync(Guid mapId, CancellationToken ct)
-    {
-        return await _context.Maps
-            .Include(m => m.Regions)
-                .ThenInclude(r => r.Region)
-                    .ThenInclude(r => r.Geometry)
-            .Include(m => m.HistoricalLine)
-                .ThenInclude(l => l.HistoricalObjects)
             .AsNoTracking()
             .ToListAsync(ct);
     }
@@ -62,6 +37,7 @@ public class MapRepository : IMapRepository
     public async Task UpdateAsync(Map map, CancellationToken ct)
     {
         var existing = await _context.Maps
+            .AsNoTracking()
             .FirstOrDefaultAsync(m => m.Id == map.Id, ct);
         if (existing != null)
         {

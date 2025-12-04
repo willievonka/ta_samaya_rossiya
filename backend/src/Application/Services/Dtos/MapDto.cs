@@ -7,7 +7,7 @@ public class MapDto
     /// <summary>
     /// Флаг аналитической карты
     /// </summary>
-    public required bool IsAnalitics { get; set; }
+    public required bool IsAnalytics { get; set; }
     
     /// <summary>
     /// Название
