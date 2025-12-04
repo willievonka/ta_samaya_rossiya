@@ -171,11 +171,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("FillColor")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("fill_color");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
                         .HasColumnName("is_active");
@@ -200,6 +195,79 @@ namespace Infrastructure.Migrations
                     b.ToTable("layer_regions", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.LayerRegionStyle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ClassName")
+                        .HasColumnType("text")
+                        .HasColumnName("class_name");
+
+                    b.Property<string>("Color")
+                        .HasColumnType("text")
+                        .HasColumnName("color");
+
+                    b.Property<string>("DashArray")
+                        .HasColumnType("text")
+                        .HasColumnName("dash_array");
+
+                    b.Property<string>("DashOffset")
+                        .HasColumnType("text")
+                        .HasColumnName("dash_offset");
+
+                    b.Property<bool?>("Fill")
+                        .HasColumnType("boolean")
+                        .HasColumnName("fill");
+
+                    b.Property<string>("FillColor")
+                        .HasColumnType("text")
+                        .HasColumnName("fill_color");
+
+                    b.Property<double?>("FillOpacity")
+                        .HasColumnType("double precision")
+                        .HasColumnName("fill_opacity");
+
+                    b.Property<string>("FillRule")
+                        .HasColumnType("text")
+                        .HasColumnName("fill_rule");
+
+                    b.Property<string>("LineCap")
+                        .HasColumnType("text")
+                        .HasColumnName("line_cap");
+
+                    b.Property<string>("LineJoin")
+                        .HasColumnType("text")
+                        .HasColumnName("line_join");
+
+                    b.Property<double?>("Opacity")
+                        .HasColumnType("double precision")
+                        .HasColumnName("opacity");
+
+                    b.Property<Guid>("RegionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("region_id");
+
+                    b.Property<bool?>("Stroke")
+                        .HasColumnType("boolean")
+                        .HasColumnName("stroke");
+
+                    b.Property<int?>("Weight")
+                        .HasColumnType("integer")
+                        .HasColumnName("weight");
+
+                    b.HasKey("Id")
+                        .HasName("pk_layer_region_styles");
+
+                    b.HasIndex("RegionId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_layer_region_styles_region_id");
+
+                    b.ToTable("layer_region_styles", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Map", b =>
                 {
                     b.Property<Guid>("Id")
@@ -220,9 +288,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
-                    b.Property<bool>("IsAnalitics")
+                    b.Property<bool>("IsAnalytics")
                         .HasColumnType("boolean")
-                        .HasColumnName("is_analitics");
+                        .HasColumnName("is_analytics");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -340,6 +408,18 @@ namespace Infrastructure.Migrations
                     b.Navigation("Region");
                 });
 
+            modelBuilder.Entity("Domain.Entities.LayerRegionStyle", b =>
+                {
+                    b.HasOne("Domain.Entities.LayerRegion", "Region")
+                        .WithOne("Style")
+                        .HasForeignKey("Domain.Entities.LayerRegionStyle", "RegionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_layer_region_styles_layer_regions_region_id");
+
+                    b.Navigation("Region");
+                });
+
             modelBuilder.Entity("Domain.Entities.RegionGeometry", b =>
                 {
                     b.HasOne("Domain.Entities.Region", "Region")
@@ -360,6 +440,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.LayerRegion", b =>
                 {
                     b.Navigation("Indicators");
+
+                    b.Navigation("Style");
                 });
 
             modelBuilder.Entity("Domain.Entities.Map", b =>

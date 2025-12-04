@@ -16,6 +16,7 @@ public static class InfrastructureExtensions
         services.AddScoped<IIndicatorsRepository, IndicatorsRepository>();
         services.AddScoped<IHistoricalObjectRepository, HistoricalObjectRepository>();
         services.AddScoped<IHistoricalLineRepository, HistoricalLineRepository>();
+        services.AddScoped<ILayerRegionStyleRepository, LayerRegionStyleRepository>();
         
         services.AddScoped<IRegionSeederService, RegionSeederService>();
         services.AddScoped<ISaveImageService, SaveImageService>();

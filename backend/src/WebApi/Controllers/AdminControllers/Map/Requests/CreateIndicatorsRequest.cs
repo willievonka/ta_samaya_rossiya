@@ -5,8 +5,8 @@ namespace WebApi.Controllers.AdminControllers.Map.Requests;
 
 public record CreateIndicatorsRequest(
     [FromForm] IFormFile? Image,
-    int? Excursions,
-    int? Partners,
-    int? Participants,
+    int? ExcursionsCount,
+    int? PartnersCount,
+    int? MembersCount,
     bool? IsActive
     );

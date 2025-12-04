@@ -33,7 +33,7 @@ public class RegionRepository : IRegionRepository
         return await _context.Regions
             .Include(r => r.Geometry)
             .AsNoTracking()
-            .FirstOrDefaultAsync(r => r.Name == name, ct);
+            .FirstOrDefaultAsync(r => EF.Functions.ILike(r.Name, name), ct);
     }
 
     public async Task<List<Region>?> GetAllAsync(CancellationToken ct)
@@ -47,6 +47,7 @@ public class RegionRepository : IRegionRepository
     public async Task UpdateAsync(Region region, CancellationToken ct)
     {
         var existingRegion = await _context.Regions
+            .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == region.Id, ct);
         if (existingRegion != null)
         {
@@ -58,6 +59,7 @@ public class RegionRepository : IRegionRepository
     public async Task DeleteByIdAsync(Guid regionId, CancellationToken ct)
     {
         var existingRegion = await _context.Regions
+            .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == regionId, ct);
         if (existingRegion != null)
         {

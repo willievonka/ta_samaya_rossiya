@@ -8,9 +8,9 @@ public class LayerRegion
     public Guid Id { get; set; }
     
     /// <summary>
-    /// Цвет заливки региона
+    /// Leaflet свойства для стилизации
     /// </summary>
-    public string FillColor { get; set; } = "";
+    public LayerRegionStyle? Style { get; set; }
     
     /// <summary>
     /// Ссылка на показатели региона

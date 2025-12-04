@@ -1,9 +1,9 @@
 ﻿namespace WebApi.Controllers.AdminControllers.Map.Responses;
 
 public sealed record MapLayerPropertiesResponse(
+    Guid Id,
     string RegionName,
-    Guid? Id = null,
     bool? IsActive = null,
-    PathOptionsResponse? Style = null,
+    LayerRegionStyleResponse? Style = null,
     AnalyticsMapLayerPropertiesResponse? AnalyticsData = null
 );

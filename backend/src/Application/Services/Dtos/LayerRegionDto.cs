@@ -9,7 +9,7 @@ public class LayerRegionDto
     /// <summary>
     /// Цвет заливки региона
     /// </summary>
-    public required string FillColor { get; set; }
+    public LayerRegionStyleDto? Style { get; set; }
     
     /// <summary>
     /// Активный ли регион, будем ли мы его отображать

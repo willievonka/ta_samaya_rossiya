@@ -32,8 +32,9 @@ public class SaveImageService : ISaveImageService
             Directory.CreateDirectory(folderPath);
         }
         
+        var extension = Path.GetExtension(newFile.FileName);
         var correctFileName = Regex.Replace(newFile.Name, @"\s+", "").Trim();
-        var fileName = $"{entityId.ToString()}.{correctFileName}";
+        var fileName = $"{entityId.ToString()}.{correctFileName}{extension}";
         var fullPath = Path.Combine(folderPath, fileName);
 
         var relativePath = Path.Combine(UploadsFolder, folder, fileName);
@@ -53,7 +54,7 @@ public class SaveImageService : ISaveImageService
     
     public async Task DeleteImageAsync(string path)
     {
-        var fullPath = Path.Combine(_environment.WebRootPath, UploadsFolder, path);
+        var fullPath = Path.Combine(_environment.WebRootPath, path);
         
         if (string.IsNullOrEmpty(fullPath))
         {

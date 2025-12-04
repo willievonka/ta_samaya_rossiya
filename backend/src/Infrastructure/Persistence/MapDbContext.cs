@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Infrastructure.Persistence.Configurations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence;
@@ -17,6 +18,7 @@ public class MapDbContext : DbContext
     public DbSet<IndicatorsRegion> IndicatorsRegions => Set<IndicatorsRegion>();
     public DbSet<LayerRegion> LayerRegions => Set<LayerRegion>();
     public DbSet<RegionGeometry> RegionGeometries => Set<RegionGeometry>();
+    public DbSet<LayerRegionStyle> LayerRegionStyles => Set<LayerRegionStyle>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,6 +58,12 @@ public class MapDbContext : DbContext
             .HasForeignKey<RegionGeometry>(rg => rg.RegionId)
             .OnDelete(DeleteBehavior.Cascade);
         
+        modelBuilder.Entity<LayerRegionStyle>()
+            .HasOne(s => s.Region)
+            .WithOne(r => r.Style)
+            .HasForeignKey<LayerRegionStyle>(s => s.RegionId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
         modelBuilder.Entity<Map>()
             .Property(m => m.CreatedAt)
             .HasConversion(
@@ -72,7 +80,7 @@ public class MapDbContext : DbContext
         
         AddAutoGeneratingId(modelBuilder);
         
-        base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(modelBuilder); 
     }
     
     private void AddPrimaryKey(ModelBuilder modelBuilder)
@@ -97,6 +105,9 @@ public class MapDbContext : DbContext
         
         modelBuilder.Entity<LayerRegion>()
             .HasKey(rl => rl.Id);
+        
+        modelBuilder.Entity<LayerRegionStyle>()
+            .HasKey(rls => rls.Id);
     }
     
     private void AddAutoGeneratingId(ModelBuilder modelBuilder)
@@ -126,6 +137,10 @@ public class MapDbContext : DbContext
             .ValueGeneratedOnAdd();
         
         modelBuilder.Entity<LayerRegion>()
+            .Property(x => x.Id)
+            .ValueGeneratedOnAdd();
+        
+        modelBuilder.Entity<LayerRegionStyle>()
             .Property(x => x.Id)
             .ValueGeneratedOnAdd();
     }

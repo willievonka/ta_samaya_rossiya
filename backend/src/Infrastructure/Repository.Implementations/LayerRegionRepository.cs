@@ -20,33 +20,30 @@ public class LayerRegionRepository : ILayerRegionRepository
         await _context.SaveChangesAsync(ct);
     }
 
-    public async Task<LayerRegion?> GetByIdAsync(Guid regionId, CancellationToken ct)
+    public async Task<LayerRegion?> GetHeaderByIdAsync(Guid regionId, CancellationToken ct)
     {
         return await _context.LayerRegions
-            .Include(lr => lr.Region)
-                .ThenInclude(r => r.Geometry)
-            .Include(lr => lr.Indicators)
             .AsNoTracking()
             .FirstOrDefaultAsync(lr => lr.Id == regionId, ct);
     }
 
-    public async Task<List<LayerRegion>?> GetAllByMapAsync(Guid mapId, CancellationToken ct)
+    public async Task<List<LayerRegion>?> GetAllByMapAllIncludesAsync(Guid mapId, CancellationToken ct)
     {
         return await _context.LayerRegions
             .Include(lr => lr.Region)
                 .ThenInclude(r => r.Geometry)
-            .Include(lr => lr.Indicators)
+            .Include(lr => lr.Style)
             .Where(lr => lr.MapId == mapId)
             .AsNoTracking()
             .ToListAsync(ct);
     }
 
-    public async Task<List<LayerRegion>?> GetAllActiveByMapAsync(Guid mapId, CancellationToken ct)
+    public async Task<List<LayerRegion>?> GetAllActiveByMapAllInlcudesAsync(Guid mapId, CancellationToken ct)
     {
         return await _context.LayerRegions
             .Include(lr => lr.Region)
                 .ThenInclude(r => r.Geometry)
-            .Include(lr => lr.Indicators)
+            .Include(lr => lr.Style)
             .Where(lr => lr.MapId == mapId)
             .Where(lr => lr.IsActive)
             .AsNoTracking()
@@ -56,6 +53,7 @@ public class LayerRegionRepository : ILayerRegionRepository
     public async Task UpdateAsync(LayerRegion layerRegion, CancellationToken ct)
     {
         var existing = await _context.LayerRegions
+            .AsNoTracking()
             .FirstOrDefaultAsync(lr => lr.Id == layerRegion.Id, ct);
         if (existing != null)
         {
@@ -67,6 +65,7 @@ public class LayerRegionRepository : ILayerRegionRepository
     public async Task DeleteByIdAsync(Guid regionId, CancellationToken ct)
     {
         var existing = await _context.LayerRegions
+            .AsNoTracking()
             .FirstOrDefaultAsync(lr => lr.Id == regionId, ct);
         if (existing != null)
         {

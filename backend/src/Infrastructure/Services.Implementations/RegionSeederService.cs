@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using Application.Queries;
 using Application.Services.Interfaces;
 using Domain.Entities;
 using Domain.Repository.Interfaces;

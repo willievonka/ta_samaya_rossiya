@@ -2,6 +2,8 @@
 
 public class IndicatorsRegionDto
 {
+    public Guid? Id { get; set; }
+    
     /// <summary>
     /// Путь к изображению для всплывающего окна показателей региона
     /// </summary>
