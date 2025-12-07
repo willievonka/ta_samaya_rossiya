@@ -14,7 +14,7 @@ public class LayerRegionDto
     /// <summary>
     /// Активный ли регион, будем ли мы его отображать
     /// </summary>
-    public required bool IsActive { get; set; }
+    public bool? IsActive { get; set; }
     
     /// <summary>
     /// Название региона (для внутреннего отображения)

@@ -24,10 +24,10 @@ public class   MapController : ControllerBase
     /// <param name="mapId">Id карты</param>
     /// <param name="ct">Токен отмены</param>
     /// <returns></returns>
-    [HttpGet("{mapId:guid}")]
+    [HttpGet]
     [ProducesResponseType(typeof(MapLayersFeatureCollectionResponse),StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetMap([FromRoute] Guid mapId, CancellationToken ct)
+    public async Task<IActionResult> GetMap([FromQuery] Guid mapId, CancellationToken ct)
     {
         var map = await _mapService.GetMapAsync(mapId, ct);
 
@@ -36,6 +36,7 @@ public class   MapController : ControllerBase
         return response == null ? NotFound() : Ok(response);
     }
     
+    //TODO получить аналитическую карту без Query и Id
     //TODO: GetMapWithActiveRegions
     
     /// <summary>
@@ -107,12 +108,12 @@ public class   MapController : ControllerBase
     /// <param name="request">Данные для обновления</param>
     /// <param name="ct">Токен отмены</param>
     /// <returns></returns>
-    [HttpPut("{mapId:guid}")]
+    [HttpPut]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(StatusCodes.Status303SeeOther)]  
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateMap([FromRoute] Guid mapId, [FromForm] UpdateMapRequest request,
+    public async Task<IActionResult> UpdateMap([FromQuery] Guid mapId, [FromForm] UpdateMapRequest request,
         CancellationToken ct)
     {
         var mapDto = MapMapper.UpdateMapRequestToDto(request, mapId);
@@ -128,10 +129,10 @@ public class   MapController : ControllerBase
     /// <param name="mapId">Id карты</param>
     /// <param name="ct">Токен отмены</param>
     /// <returns></returns>
-    [HttpDelete("{mapId:guid}")]
+    [HttpDelete]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteMap([FromRoute] Guid mapId, CancellationToken ct)
+    public async Task<IActionResult> DeleteMap([FromQuery] Guid mapId, CancellationToken ct)
     {
         var res = await _mapService.DeleteMapAsync(mapId, ct);
         

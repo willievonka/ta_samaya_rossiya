@@ -4,6 +4,8 @@ namespace Application.Services.Logic.Interfaces;
 
 public interface ILayerRegionService
 {
+    Task MakeRegionActive(Guid layerRegionId, CancellationToken ct);
+    Task CreateAllEmptyRegionsForMap(Guid mapId, CancellationToken ct);
     Task<Guid> CreateLayerRegionAsync(Guid mapId, LayerRegionDto layerRegionDto, CancellationToken ct);
     Task<List<LayerRegionDto>?> GetAllByMapIdAsync(Guid mapId, CancellationToken ct);
     Task<List<LayerRegionDto>?> GetAllActiveByMapIdAsync(Guid mapId, CancellationToken ct);

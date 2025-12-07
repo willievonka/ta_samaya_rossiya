@@ -52,11 +52,11 @@ public class LayerRegionController : ControllerBase
     /// <param name="layerId">Id региона</param>
     /// <param name="ct">Токен отмены</param>
     /// <returns></returns>
-    [HttpDelete("{layerId:guid}")]
+    [HttpDelete]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteLayerRegion([FromRoute] Guid mapId,
-        [FromRoute] Guid layerId, CancellationToken ct)
+    public async Task<IActionResult> DeleteLayerRegion([FromQuery] Guid mapId,
+        [FromQuery] Guid layerId, CancellationToken ct)
     {
         var res = await _layerRegionService.DeleteLayerRegionAsync(layerId, ct);
         
@@ -73,11 +73,11 @@ public class LayerRegionController : ControllerBase
     /// <param name="request">Данные для обновления</param>
     /// <param name="ct">Токен отмены</param>
     /// <returns></returns>
-    [HttpPut("{layerId:guid}")]
+    [HttpPut]
     [ProducesResponseType(StatusCodes.Status303SeeOther)]  
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateLayerRegion([FromRoute] Guid mapId, [FromRoute] Guid layerId,
+    public async Task<IActionResult> UpdateLayerRegion([FromRoute] Guid mapId, [FromQuery] Guid layerId,
         [FromForm] UpdateLayerRegionRequest request, CancellationToken ct)
     {
         var dto = LayerRegionMapper.UpdateLayerRegionRequestToDto(request);
@@ -88,5 +88,49 @@ public class LayerRegionController : ControllerBase
             return NotFound();
         
         return Ok(id);
+    }
+
+    /// <summary>
+    /// Обновить показатели региона
+    /// </summary>
+    /// <param name="mapId">Id карты </param>
+    /// <param name="layerId">Id региона</param>
+    /// <param name="request">Данные для обновления</param>
+    /// <param name="ct">Токен отмены</param>
+    /// <returns></returns>
+    [HttpPatch]
+    [ProducesResponseType(StatusCodes.Status303SeeOther)]  
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateAnalyticsDataRegion([FromRoute] Guid mapId, [FromQuery] Guid layerId,
+        [FromForm] UpdateAnalyticsDataRegionRequest request, CancellationToken ct)
+    {
+        var dto = LayerRegionMapper.UpdateAnalyticsDataRegionToLayerRegionDto(request);
+        
+        var id = await _layerRegionService.UpdateLayerRegionAsync(layerId, dto, ct);
+        
+        if (id == Guid.Empty)
+            return NotFound();
+        
+        return Ok(id);
+    }
+
+    /// <summary>
+    /// Сделать регион активным
+    /// </summary>
+    /// <param name="mapId">Id карты </param>
+    /// <param name="layerId">Id региона</param>
+    /// <param name="ct">Токен отмены</param>
+    /// <returns></returns>
+    [HttpPatch("activate")]//TODO изменить на активация/дезактивацию
+    [ProducesResponseType(StatusCodes.Status303SeeOther)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> MakeRegionActive([FromRoute] Guid mapId, [FromQuery] Guid layerId,
+        CancellationToken ct)
+    {
+        await _layerRegionService.MakeRegionActive(layerId, ct);
+        
+        return Ok();
     }
 }

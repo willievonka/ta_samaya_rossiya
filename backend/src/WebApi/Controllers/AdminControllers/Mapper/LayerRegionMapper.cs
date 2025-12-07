@@ -12,7 +12,7 @@ public static class LayerRegionMapper
         if (layerRegionDto == null)
             return null;
 
-        if (!layerRegionDto.IsActive)
+        if (!layerRegionDto.IsActive!.Value)
         {
             return new MapLayerPropertiesResponse(layerRegionDto.Id!.Value, layerRegionDto.Name);
         }
@@ -40,6 +40,15 @@ public static class LayerRegionMapper
             IsActive = request.IsActive,
             Name = request.RegionName,
             Style = LayerRegionStyleMapper.StyleRequestToDto(request.Style),
+            Indicators = IndicatorsRegionRequestToDto(request.AnalyticsData),
+        };
+    }
+
+    public static LayerRegionDto UpdateAnalyticsDataRegionToLayerRegionDto(UpdateAnalyticsDataRegionRequest request)
+    {
+        return new LayerRegionDto
+        {
+            Name = "",
             Indicators = IndicatorsRegionRequestToDto(request.AnalyticsData),
         };
     }

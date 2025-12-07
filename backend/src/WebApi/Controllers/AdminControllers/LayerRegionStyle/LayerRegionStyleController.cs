@@ -39,42 +39,21 @@ public class LayerRegionStyleController : ControllerBase
         if (styleId == Guid.Empty)
             BadRequest();
         
-        return RedirectToAction(nameof(GetStyle), new { mapId, layerId, styleId });
+        return RedirectToAction(nameof(GetStyleByLayerId), new { mapId, layerId, styleId });
     }
     
     /// <summary>
-    /// Получить стиль по его Id
-    /// </summary>
-    /// <param name="mapId">Id карты</param>
-    /// <param name="layerId">Id региона</param>
-    /// <param name="styleId">Id стиля</param>
-    /// <param name="ct">Токен отмены</param>
-    [HttpGet("{styleId:guid}")]
-    [ProducesResponseType(typeof(LayerRegionStyleResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetStyle([FromRoute] Guid mapId, [FromRoute] Guid layerId,
-        [FromRoute] Guid styleId, CancellationToken ct)
-    {
-        var style = await _layerRegionStyleService.GetStyleByLayerIdAsync(layerId, ct);
-        
-        var response = LayerRegionStyleMapper.StyleDtoToResponse(style);
-
-        return response == null ? NotFound() : Ok(response);
-    }
-    
-    /// <summary>
-    /// Получить стиль региона по id региона
+    /// Получить стиль по layer Id
     /// </summary>
     /// <param name="mapId">Id карты</param>
     /// <param name="layerId">Id региона</param>
     /// <param name="ct">Токен отмены</param>
-    /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(LayerRegionStyleResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetStyleByLayerId([FromRoute] Guid mapId, [FromRoute] Guid layerId, CancellationToken ct)
+    public async Task<IActionResult> GetStyleByLayerId([FromRoute] Guid mapId, [FromRoute] Guid layerId,
+        CancellationToken ct)
     {
         var style = await _layerRegionStyleService.GetStyleByLayerIdAsync(layerId, ct);
         

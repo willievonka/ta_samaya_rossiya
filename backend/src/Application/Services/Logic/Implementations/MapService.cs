@@ -12,6 +12,7 @@ public class MapService : IMapService
     private readonly IImageService _imageService;
     private readonly ILayerRegionService _layerRegionService;
 
+
     private const string FilePath = "map-cards"; 
     
     public MapService(ILogger<IMapService> logger, IMapRepository mapRepository, 
@@ -86,6 +87,8 @@ public class MapService : IMapService
         }
         
         _logger.LogInformation("Map {id} created", id);
+        
+        await _layerRegionService.CreateAllEmptyRegionsForMap(id, ct);
         
         return id;
     }

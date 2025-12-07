@@ -40,5 +40,5 @@ services:
       - POSTGRES_HOST=db
       - POSTGRES_DB=ta-samaya-rossiya-db
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=ta-samaya-rossiya
+      - POSTGRES_PASSWORD=2018
       - POSTGRES_PORT=5432

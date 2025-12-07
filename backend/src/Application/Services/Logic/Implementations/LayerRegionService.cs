@@ -24,6 +24,50 @@ public class LayerRegionService : ILayerRegionService
         _indicatorsService = indicatorsService;
         _layerRegionStyleService = layerRegionStyleService;
     }
+
+    public async Task MakeRegionActive(Guid layerRegionId, CancellationToken ct)
+    {
+        var layerRegion = await _layerRegionRepository.GetHeaderByIdAsync(layerRegionId, ct);
+
+        if (layerRegion == null)
+        {
+            _logger.LogError("Invalid region id {regionId}", layerRegionId);
+            return;
+        }
+        
+        layerRegion.IsActive = true;
+        await _layerRegionRepository.UpdateAsync(layerRegion, ct);
+    }
+    
+    /// <summary>
+    /// Заполнить только что созданную карту неактивными базовыми регионами
+    /// </summary>
+    /// <param name="mapId"></param>
+    /// <param name="ct"></param>
+    public async Task CreateAllEmptyRegionsForMap(Guid mapId, CancellationToken ct)
+    {
+        _logger.LogInformation("Filling map {id} with inactive all regions from DataBase", mapId);
+        
+        var regions = await _regionRepository.GetAllAsync(ct);
+
+        if (regions == null)
+        {
+            _logger.LogError("There are no base regions in the database");
+            return;
+        }
+        
+        foreach (var region in regions)
+        {
+            await _layerRegionRepository.AddAsync(new LayerRegion
+            {
+                IsActive = false,
+                RegionId = region.Id,
+                MapId = mapId
+            }, ct);
+        }
+        
+        _logger.LogInformation("Finish filling map {id}", mapId);
+    }
     
     public async Task<Guid> CreateLayerRegionAsync(Guid mapId, LayerRegionDto layerRegionDto, CancellationToken ct)
     {
@@ -37,10 +81,15 @@ public class LayerRegionService : ILayerRegionService
         
         var newLayerRegion = new LayerRegion
         {
-            IsActive = layerRegionDto.IsActive,
             RegionId = region.Id,
             MapId = mapId,
         };
+
+        if (layerRegionDto.IsActive != null)
+        {
+            newLayerRegion.IsActive = layerRegionDto.IsActive.Value;
+        }
+        
         await _layerRegionRepository.AddAsync(newLayerRegion, ct);
 
         if (layerRegionDto.Indicators != null)
@@ -95,8 +144,11 @@ public class LayerRegionService : ILayerRegionService
             _logger.LogError("Invalid region id {regionId}", layerRegionDto.Id);
             return Guid.Empty;
         }
-        
-        layerRegion.IsActive = layerRegionDto.IsActive;
+
+        if (layerRegionDto.IsActive != null)
+        {
+            layerRegion.IsActive = layerRegionDto.IsActive.Value;
+        }
 
         if (layerRegionDto.Indicators != null)
         {
