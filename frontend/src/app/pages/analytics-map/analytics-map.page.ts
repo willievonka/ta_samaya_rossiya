@@ -6,6 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
 import { IMapConfig } from '../../components/map/interfaces/map-config.interface';
 import { AnalyticsMapModalComponent } from './components/analytcs-map-modal/analytics-map-modal.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'analytics-map-page',
@@ -44,9 +45,11 @@ export class AnalyticsMapPageComponent {
     private readonly _mapInstance: Signal<MapComponent | undefined> = viewChild(MapComponent);
     private readonly _mapDataService: MapDataService = inject(MapDataService);
     private readonly _destroyRef: DestroyRef = inject(DestroyRef);
+    private readonly _route: ActivatedRoute = inject(ActivatedRoute);
 
     constructor() {
-        this.loadMapLayers();
+        const mapId: string = this._route.snapshot.queryParamMap.get('id') ?? '';
+        this.loadMapLayers(mapId);
     }
 
     /**
@@ -62,9 +65,11 @@ export class AnalyticsMapPageComponent {
         }
     }
 
-    /** Загрузить слои для карты */
-    private loadMapLayers(): void {
-        this._mapDataService.getAnalyticsMapData()
+    /** Загрузить слои для карты
+     * @param mapId
+     */
+    private loadMapLayers(mapId: string): void {
+        this._mapDataService.getAnalyticsMapData(mapId)
             .pipe(
                 tap(layers => this.mapLayers.set(layers)),
                 takeUntilDestroyed(this._destroyRef)

@@ -5,7 +5,7 @@
         @for (mapCard of mapCardList(); track mapCard.id) {
             <main-hub-card
                 [data]="mapCard"
-                [routerLink]="mapCard.id"
+                (click)="navigateToMap(mapCard)"
             />
         }
     </div>

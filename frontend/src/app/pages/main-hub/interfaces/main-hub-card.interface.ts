@@ -1,7 +1,7 @@
 export interface IMainHubCard {
     id: string;
     title: string;
-    backgroundImage: string;
+    backgroundImagePath: string;
     description: string;
     isAnalytics?: boolean
 }

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { IMainHubCard } from '../interfaces/main-hub-card.interface';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment, IEnvironment } from '../../../../environments';
 
@@ -13,15 +13,6 @@ export class MainHubService {
      * Получить список карточек
      */
     public getMapCardList(): Observable<IMainHubCard[]> {
-        return this._http.get<IMainHubCard[]>(`${this._env.clientApiUrl}/maps/cards`)
-            .pipe(
-                map(data => {
-                    data.forEach(item => {
-                        item.backgroundImage = `${this._env.host}${item.backgroundImage}`;
-                    });
-
-                    return data;
-                })
-            );
+        return this._http.get<IMainHubCard[]>(`${this._env.clientApiUrl}/maps/cards`);
     }
 }
