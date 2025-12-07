@@ -2,7 +2,7 @@
 
 public record MapCardResponse(
     Guid Id,
-    bool IsAnalytics,
+    bool? IsAnalytics,
     string Title, 
     string Description, 
     string? BackgroundImagePath
