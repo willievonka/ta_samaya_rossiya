@@ -83,12 +83,13 @@ public static class MapMapper
         return mapDto;
     }
 
-    public static MapsCardsResponse? MapsDtosToMapsCardsResponse(List<MapDto>? mapDtos)
+    public static List<MapCardResponse>? MapsDtosToMapsCardsResponse(List<MapDto>? mapDtos)
     {
-        if (mapDtos == null)
-            return new MapsCardsResponse(null);
-        
         var response = new List<MapCardResponse>();
+        
+        if (mapDtos == null)
+            return response;
+        
         foreach (var mapDto in mapDtos)
         {
             response.Add(new MapCardResponse(
@@ -100,6 +101,6 @@ public static class MapMapper
                 ));
         }
 
-        return new MapsCardsResponse(response);
+        return response;
     }
 }

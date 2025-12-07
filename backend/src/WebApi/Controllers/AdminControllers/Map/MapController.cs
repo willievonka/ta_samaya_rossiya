@@ -45,12 +45,13 @@ public class   MapController : ControllerBase
     /// <param name="ct">Токен отмены</param>
     /// <returns></returns>
     [HttpGet("cards")]
-    [ProducesResponseType(typeof(MapsCardsResponse),StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<MapCardResponse>),StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllMapsCards(CancellationToken ct)
     {
         var cards = await _mapService.GetAllCardsASync(ct);
         
+        //TODO: 
         var response = MapMapper.MapsDtosToMapsCardsResponse(cards);
         
         return response == null ? NotFound() : Ok(response);
@@ -69,6 +70,7 @@ public class   MapController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CreateMap([FromForm] CreateMapRequest request, CancellationToken ct)
     {
+        //TODO исправить IsAnalitics на nullable
         var mapDto = MapMapper.CreateMapRequestToDto(request);
         var id = await _mapService.CreateMapAsync(mapDto, ct);
         
