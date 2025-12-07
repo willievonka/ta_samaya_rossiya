@@ -15,6 +15,7 @@
     <img
         class="analytics-map-modal__image"
         [src]="content.analyticsData?.imagePath"
+        (error)="handleImageFallback($event, '/fallbacks/modal-default-image.png')"
         alt="Изображение региона"
     >
     <h3 class="analytics-map-modal__title">
