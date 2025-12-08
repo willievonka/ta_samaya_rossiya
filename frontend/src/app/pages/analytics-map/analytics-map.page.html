@@ -1,4 +1,9 @@
 <div class="analytics-map">
+    <page-header
+        class="analytics-map__header"
+        [title]="'Аналитическая карта России'"
+        [isDetached]="true"
+    />
     @if (mapLayers(); as mapLayers) {
         <map
             [layers]="mapLayers"

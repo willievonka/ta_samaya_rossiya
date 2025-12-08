@@ -7,6 +7,7 @@ import { tap } from 'rxjs';
 import { IMapConfig } from '../../components/map/interfaces/map-config.interface';
 import { AnalyticsMapModalComponent } from './components/analytcs-map-modal/analytics-map-modal.component';
 import { ActivatedRoute } from '@angular/router';
+import { PageHeaderComponent } from '../../components/page-header/page-header.component';
 
 @Component({
     selector: 'analytics-map-page',
@@ -16,7 +17,8 @@ import { ActivatedRoute } from '@angular/router';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MapComponent,
-        AnalyticsMapModalComponent
+        AnalyticsMapModalComponent,
+        PageHeaderComponent
     ],
     providers: [
         MapDataService

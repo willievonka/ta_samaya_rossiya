@@ -8,21 +8,6 @@
 }
 
 .app {
-    &__header {
-        display: flex;
-        align-items: center;
-        padding: $spacing-xl;
-    }
-
-    &__logo {
-        width: 207px;
-        height: $spacing-8xl;
-    }
-
-    &__logo-link {
-        margin-right: $spacing-xl;
-    }
-
     &__content-wrapper {
         display: flex;
         flex: 1;

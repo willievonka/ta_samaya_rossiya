@@ -1,0 +1,14 @@
+<div
+    class="page-header"
+    [class.is-detached]="isDetached()"
+>
+    <a
+        class="page-header__logo-link"
+        [routerLink]="'/'"
+    >
+        <svg class="page-header__logo">
+            <use href="/sprites/ta-samaya-rossiya-logo.svg" />
+        </svg>
+    </a>
+    <h1>{{ title() }}</h1>
+</div>

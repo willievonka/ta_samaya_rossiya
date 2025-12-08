@@ -5,6 +5,7 @@ import { MainHubService } from './services/main-hub.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs';
+import { PageHeaderComponent } from '../../components/page-header/page-header.component';
 
 @Component({
     selector: 'main-hub-page',
@@ -12,7 +13,10 @@ import { tap } from 'rxjs';
     templateUrl: './main-hub.page.html',
     styleUrl: './styles/main-hub.master.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [MainHubCardComponent],
+    imports: [
+        MainHubCardComponent,
+        PageHeaderComponent
+    ],
     providers: [MainHubService]
 })
 export class MainHubPageComponent {

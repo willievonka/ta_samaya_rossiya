@@ -8,7 +8,7 @@
     align-items: center;
     border-radius: $spacing-m;
     background-color: color.$bg-secondary;
-    box-shadow: -$spacing-xs $spacing-xs $spacing-xs 0 rgba(black, 0.4);
+    box-shadow: -$spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
 
     &__close-button {
         display: flex;

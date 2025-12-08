@@ -2,6 +2,8 @@
 
 :host {
     display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 
 .main-hub {
@@ -11,7 +13,7 @@
     padding: $spacing-xl 94px;
     padding-top: $spacing-m;
 
-    &__title {
+    &__description {
         margin-bottom: 44px;
     }
 
