@@ -5,6 +5,7 @@ import { customCoordsToLatLng } from './utils/custom-coords-to-lat-lng.util';
 import { IMapConfig } from './interfaces/map-config.interface';
 import { makeBrighterColor } from './utils/make-brighter-color.util';
 import { IActiveLeafletLayer } from './interfaces/leaflet-layer.interface';
+import { Feature, GeoJsonProperties } from 'geojson';
 
 @Component({
     selector: 'map',
@@ -73,7 +74,7 @@ export class MapComponent implements AfterViewInit {
         }
 
         layers.forEach(layer => {
-            const properties: GeoJSON.GeoJsonProperties = this.getLayerProperties(layer);
+            const properties: GeoJsonProperties = this.getLayerProperties(layer);
             geoJSON(layer.geoData, properties)
                 .addTo(mapInstance);
         });
@@ -83,7 +84,7 @@ export class MapComponent implements AfterViewInit {
      * Получить свойства слоя
      * @param mapLayer
      */
-    private getLayerProperties(mapLayer: IMapLayer): GeoJSON.GeoJsonProperties {
+    private getLayerProperties(mapLayer: IMapLayer): GeoJsonProperties {
         const isActive: boolean = mapLayer.properties.isActive === true;
 
         return {
@@ -94,7 +95,7 @@ export class MapComponent implements AfterViewInit {
             },
             interactive: isActive,
             coordsToLatLng: customCoordsToLatLng,
-            onEachFeature: (feature: GeoJSON.Feature, leafletLayer: Layer): void => {
+            onEachFeature: (feature: Feature, leafletLayer: Layer): void => {
                 if (isActive) {
                     const pathLayer: IActiveLeafletLayer = leafletLayer as IActiveLeafletLayer;
                     pathLayer.originalStyle = { ...pathLayer.options };

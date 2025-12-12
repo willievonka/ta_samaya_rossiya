@@ -41,6 +41,7 @@
     "@angular/compiler-cli": "^21.0.0",
     "@types/jasmine": "~5.1.0",
     "@types/leaflet": "^1.9.20",
+    "@types/geojson": "^7946.0.16",
     "angular-eslint": "20.6.0",
     "baseline-browser-mapping": "^2.8.29",
     "eslint": "^9.35.0",

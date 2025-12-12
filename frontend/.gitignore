@@ -51,6 +51,7 @@ yarn.lock
 /libpeerconnection.log
 testem.log
 /typings
+.github/
 
 # System files
 .DS_Store

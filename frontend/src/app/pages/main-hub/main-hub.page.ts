@@ -35,7 +35,7 @@ export class MainHubPageComponent {
      * @param card
      */
     protected navigateToMap(card: IMainHubCard): void {
-        const path: string = card.isAnalytics ? '/analytics-map' : 'map';
+        const path: string = card.isAnalytics ? 'analytics-map' : 'map';
         this._router.navigate([path], {
             queryParams: { id: card.id }
         });

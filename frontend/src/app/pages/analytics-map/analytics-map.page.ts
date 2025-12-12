@@ -19,9 +19,6 @@ import { PageHeaderComponent } from '../../components/page-header/page-header.co
         MapComponent,
         AnalyticsMapModalComponent,
         PageHeaderComponent
-    ],
-    providers: [
-        MapDataService
     ]
 })
 export class AnalyticsMapPageComponent {

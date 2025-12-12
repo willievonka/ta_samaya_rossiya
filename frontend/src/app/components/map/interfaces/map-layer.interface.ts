@@ -1,7 +1,8 @@
+import { Geometry } from 'geojson';
 import { PathOptions } from 'leaflet';
 
 export interface IMapLayer {
-    geoData: GeoJSON.Geometry;
+    geoData: Geometry;
     properties: IMapLayerProperties;
 }
 
