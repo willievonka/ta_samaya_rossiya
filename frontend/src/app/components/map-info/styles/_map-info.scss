@@ -1,0 +1,40 @@
+@use '../../../../common-styles/spacing-vars' as *;
+@use '../../../../common-styles/color-vars' as color;
+
+.map-info {
+    position: relative;
+
+    &__icon {
+        position: relative;
+        background-color: color.$bg-primary;
+        border-radius: 50%;
+        box-shadow: -$spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
+        cursor: pointer;
+
+        &:hover + .map-info__modal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    &__modal {
+        display: flex;
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        right: 100%;
+        bottom: 100%;
+        padding: $spacing-xl;
+        background-color: color.$bg-primary;
+        border-radius: $spacing-m;
+        box-shadow: -$spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
+        transform: translateY($spacing-s);
+        transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    &__modal-text {
+        display: flex;
+        width: 688px;
+        white-space: pre-line;
+    }
+}

@@ -1,15 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, Signal, signal, viewChild, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { MapComponent } from '../../components/map/map.component';
 import { MapDataService } from '../../services/map-data.service';
 import { IMapLayer, IMapLayerProperties } from '../../components/map/interfaces/map-layer.interface';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { tap } from 'rxjs';
+import { take, tap } from 'rxjs';
 import { IMapConfig } from '../../components/map/interfaces/map-config.interface';
-import { AnalyticsMapModalComponent } from './components/analytcs-map-modal/analytics-map-modal.component';
+import { AnalyticsMapModalComponent } from './components/analytics-map-modal/analytics-map-modal.component';
 import { ActivatedRoute } from '@angular/router';
 import { PageHeaderComponent } from '../../components/page-header/page-header.component';
 import { MapZoomComponent } from '../../components/map-zoom/map-zoom.component';
 import { IMapZoomActions } from '../../components/map/interfaces/map-zoom-actions.interface';
+import { MapInfoComponent } from '../../components/map-info/map-info.component';
 
 @Component({
     selector: 'analytics-map-page',
@@ -20,6 +20,7 @@ import { IMapZoomActions } from '../../components/map/interfaces/map-zoom-action
     imports: [
         MapComponent,
         MapZoomComponent,
+        MapInfoComponent,
         AnalyticsMapModalComponent,
         PageHeaderComponent
     ]
@@ -46,14 +47,16 @@ export class AnalyticsMapPageComponent {
         }
     };
 
+    protected readonly infoText: string = `Карта России с участниками проекта.
+    Ознакомьтесь с регионами, где наша деятельность активно развивается.
+    Каждый указанный субъект РФ представлен на карте, позволяя быстро оценить географический охват и найти интересующие вас локации для получения дополнительной информации.`;
+
     private readonly _mapInstance: Signal<MapComponent | undefined> = viewChild(MapComponent);
     private readonly _mapDataService: MapDataService = inject(MapDataService);
-    private readonly _destroyRef: DestroyRef = inject(DestroyRef);
     private readonly _route: ActivatedRoute = inject(ActivatedRoute);
 
     constructor() {
-        const mapId: string = this._route.snapshot.queryParamMap.get('id') ?? '';
-        this.loadMapLayers(mapId);
+        this.loadMapLayers();
     }
 
     /**
@@ -69,14 +72,14 @@ export class AnalyticsMapPageComponent {
         }
     }
 
-    /** Загрузить слои для карты
-     * @param mapId
-     */
-    private loadMapLayers(mapId: string): void {
+    /** Загрузить слои для карты */
+    private loadMapLayers(): void {
+        const mapId: string = this._route.snapshot.queryParamMap.get('id') ?? '';
+
         this._mapDataService.getAnalyticsMapData(mapId)
             .pipe(
                 tap(layers => this.mapLayers.set(layers)),
-                takeUntilDestroyed(this._destroyRef)
+                take(1)
             )
             .subscribe();
     }

@@ -24,6 +24,10 @@
             (closeModal)="toggleModal(null)"
             animate.enter="analytics-map__modal_enter"
             animate.leave="analytics-map__modal_leave"
-        ></analytics-map-modal>
+        />
     }
+    <map-info
+        class="analytics-map__info"
+        [text]="infoText"
+    />
 </div>

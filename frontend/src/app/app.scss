@@ -15,9 +15,10 @@
 
     &__footer {
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
-        padding: $spacing-m $spacing-xl;
+        gap: $spacing-3xl;
+        padding: $spacing-m;
         background-color: color.$bg-secondary;
     }
 

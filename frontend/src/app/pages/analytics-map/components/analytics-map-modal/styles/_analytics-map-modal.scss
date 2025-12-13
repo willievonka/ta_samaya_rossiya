@@ -7,7 +7,7 @@
     position: relative;
     align-items: center;
     border-radius: $spacing-m;
-    background-color: color.$bg-secondary;
+    background-color: color.$bg-primary;
     box-shadow: -$spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
 
     &__close-button {

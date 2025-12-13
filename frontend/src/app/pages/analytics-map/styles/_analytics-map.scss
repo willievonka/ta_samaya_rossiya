@@ -60,4 +60,11 @@
             animation: fade-out 150ms ease-in;
         }
     }
+
+    &__info {
+        position: absolute;
+        z-index: 500;
+        right: $spacing-m;
+        bottom: $spacing-m;
+    }
 }
