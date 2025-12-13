@@ -1,0 +1,71 @@
+@use '../../../../common-styles/spacing-vars' as *;
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateX($spacing-m);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX($spacing-m);
+    }
+}
+
+:host {
+    display: flex;
+    flex: 1;
+}
+
+.map {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    position: relative;
+    justify-content: center;
+
+    &__header {
+        position: absolute;
+        z-index: 450;
+        top: $spacing-m;
+        left: $spacing-m;
+        padding-right: $spacing-m;
+    }
+
+    &__zoom-controls {
+        position: absolute;
+        z-index: 500;
+        left: $spacing-m;
+    }
+
+    &__modal {
+        position: absolute;
+        z-index: 500;
+        right: $spacing-m;
+
+        &_enter {
+            animation: fade-in 150ms ease-out;
+        }
+
+        &_leave {
+            animation: fade-out 150ms ease-in;
+        }
+    }
+
+    &__info {
+        position: absolute;
+        z-index: 500;
+        right: $spacing-m;
+        bottom: $spacing-m;
+    }
+}

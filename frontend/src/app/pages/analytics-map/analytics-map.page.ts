@@ -5,7 +5,7 @@ import { AnalyticsMapModalComponent } from './components/analytics-map-modal/ana
 import { PageHeaderComponent } from '../../components/page-header/page-header.component';
 import { MapZoomComponent } from '../../components/map-zoom/map-zoom.component';
 import { MapInfoComponent } from '../../components/map-info/map-info.component';
-import { MapBasePage } from '../../components/map-base-page/map.base.page';
+import { MapPageBaseComponent } from '../../components/map-page/map.page.base.component';
 
 @Component({
     selector: 'analytics-map-page',
@@ -21,7 +21,7 @@ import { MapBasePage } from '../../components/map-base-page/map.base.page';
         PageHeaderComponent
     ]
 })
-export class AnalyticsMapPageComponent extends MapBasePage {
+export class AnalyticsMapPageComponent extends MapPageBaseComponent {
     protected readonly activeLayer: WritableSignal<IMapLayerProperties | null> = signal(null);
 
     /**

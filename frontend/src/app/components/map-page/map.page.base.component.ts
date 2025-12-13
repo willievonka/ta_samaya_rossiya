@@ -9,7 +9,7 @@ import { take, tap } from 'rxjs';
 @Directive({
     standalone: true
 })
-export class MapBasePage {
+export class MapPageBaseComponent {
     protected readonly mapInstance: Signal<MapComponent | undefined> = viewChild(MapComponent);
 
     protected readonly pageTitle: WritableSignal<string | undefined> = signal(undefined);
