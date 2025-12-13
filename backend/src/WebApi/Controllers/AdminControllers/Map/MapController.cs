@@ -25,7 +25,7 @@ public class   MapController : ControllerBase
     /// <param name="ct">Токен отмены</param>
     /// <returns></returns>
     [HttpGet]
-    [ProducesResponseType(typeof(MapLayersFeatureCollectionResponse),StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MapPageResponse),StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetMap([FromQuery] Guid mapId, CancellationToken ct)
     {
@@ -65,7 +65,7 @@ public class   MapController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(MapLayersFeatureCollectionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status303SeeOther)]  
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CreateMap([FromForm] CreateMapRequest request, CancellationToken ct)

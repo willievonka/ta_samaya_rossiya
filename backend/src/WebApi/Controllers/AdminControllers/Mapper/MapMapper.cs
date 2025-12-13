@@ -20,12 +20,12 @@ public static class MapMapper
         };
     }
 
-    public static MapLayersFeatureCollectionResponse? MapDtoToResponse(MapDto? dto)
+    public static MapPageResponse? MapDtoToResponse(MapDto? dto)
     {
         if (dto == null)
             return null;
 
-        var response = new List<MapLayerResponse>();
+        var features = new List<MapLayerResponse>();
 
         if (dto.Regions != null)
         {
@@ -33,12 +33,14 @@ public static class MapMapper
             {
                 var regionResponse = LayerRegionMapper.LayerRegionDtoToResponse(region);
                 var geometry = region.Geometry;
-                response.Add(new MapLayerResponse(geometry!,
+                features.Add(new MapLayerResponse(geometry!,
                     regionResponse!));
             }
         }
+        
+        var layers = new MapLayersFeatureCollectionResponse(features);
 
-        return new MapLayersFeatureCollectionResponse(response);
+        return new MapPageResponse(layers, dto.Title, dto.Description);
     }
 
     public static MapDto? UpdateMapCardRequestToDto(UpdateMapCardRequest? request, Guid mapId)
