@@ -60,7 +60,7 @@ internal class Program
         services.AddCors(options =>
         {
             options.AddPolicy("AllowAngularDev",
-                policy => policy.WithOrigins("http://localhost:4200")
+                policy => policy.WithOrigins("https://localhost:4200")
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials());
