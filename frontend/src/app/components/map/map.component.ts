@@ -51,8 +51,8 @@ export class MapComponent implements AfterViewInit {
 
         const mapInstance: Map = map(container, config.options)
             .setView(
-                customCoordsToLatLng(config.center),
-                config.initZoom
+                customCoordsToLatLng(config.options.center as [number, number]),
+                config.options.minZoom
             );
 
         mapInstance.on({
@@ -68,8 +68,8 @@ export class MapComponent implements AfterViewInit {
             zoomIn: () => mapInstance.zoomIn(),
             zoomOut: () => mapInstance.zoomOut(),
             resetZoom: () => mapInstance.setView(
-                customCoordsToLatLng(config.center),
-                config.initZoom,
+                customCoordsToLatLng(config.options.center as [number, number]),
+                config.options.minZoom,
                 { animate: true }
             )
         });

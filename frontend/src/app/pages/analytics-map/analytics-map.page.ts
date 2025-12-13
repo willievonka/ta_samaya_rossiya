@@ -35,10 +35,9 @@ export class AnalyticsMapPageComponent {
             attributionControl: false,
             zoomSnap: 0.1,
             minZoom: 3,
-            maxZoom: 7
+            maxZoom: 7,
+            center: [105, 72.5]
         },
-        center: [105, 72.5],
-        initZoom: 3,
         defaultLayerStyle: {
             fillColor: '#B4B4B4',
             fillOpacity: 1,
