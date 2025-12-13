@@ -7,6 +7,7 @@ import { makeBrighterColor } from './utils/make-brighter-color.util';
 import { IActiveLeafletLayer } from './interfaces/leaflet-layer.interface';
 import { Feature, GeoJsonProperties } from 'geojson';
 import { IMapZoomActions } from './interfaces/map-zoom-actions.interface';
+import { mapConfig } from './map.config';
 
 @Component({
     selector: 'map',
@@ -22,7 +23,6 @@ import { IMapZoomActions } from './interfaces/map-zoom-actions.interface';
 })
 export class MapComponent implements AfterViewInit {
     public readonly layers: InputSignal<IMapLayer[]> = input.required();
-    public readonly config: InputSignal<IMapConfig> = input.required();
     public readonly zoomActions: WritableSignal<IMapZoomActions | null> = signal(null);
     public readonly regionSelected: OutputEmitterRef<IMapLayerProperties | null> = output();
 
@@ -30,11 +30,13 @@ export class MapComponent implements AfterViewInit {
 
     private _map: Map | null = null;
     private _activeLeaflerLayer: Path | null = null;
+    private readonly _config: IMapConfig = mapConfig;
     private readonly _mapContainer: Signal<ElementRef<HTMLDivElement>> = viewChild.required('mapContainer');
-    private readonly _defaultLayerStyle: Signal<PathOptions> = computed(() => this.config().defaultLayerStyle);
+    private readonly _defaultLayerStyle: Signal<PathOptions> = computed(() => this._config.defaultLayerStyle);
 
     public ngAfterViewInit(): void {
         this.initMap();
+        this.setZoomActions();
         this.renderLayers(this.layers());
         this.isLoading.set(false);
     }
@@ -47,7 +49,7 @@ export class MapComponent implements AfterViewInit {
     /** Инит карты */
     private initMap(): void {
         const container: HTMLDivElement = this._mapContainer().nativeElement;
-        const config: IMapConfig = this.config();
+        const config: IMapConfig = this._config;
 
         const mapInstance: Map = map(container, config.options)
             .setView(
@@ -63,16 +65,6 @@ export class MapComponent implements AfterViewInit {
         });
 
         this._map = mapInstance;
-
-        this.zoomActions.set({
-            zoomIn: () => mapInstance.zoomIn(),
-            zoomOut: () => mapInstance.zoomOut(),
-            resetZoom: () => mapInstance.setView(
-                customCoordsToLatLng(config.options.center as [number, number]),
-                config.options.minZoom,
-                { animate: true }
-            )
-        });
     }
 
     /**
@@ -89,6 +81,25 @@ export class MapComponent implements AfterViewInit {
             const properties: GeoJsonProperties = this.getLayerProperties(layer);
             geoJSON(layer.geoData, properties)
                 .addTo(mapInstance);
+        });
+    }
+
+    /** Установить действия для зума */
+    private setZoomActions(): void {
+        const config: IMapConfig = this._config;
+        const mapInstance: Map | null = this._map;
+        if (!mapInstance) {
+            return;
+        }
+
+        this.zoomActions.set({
+            zoomIn: () => mapInstance.zoomIn(),
+            zoomOut: () => mapInstance.zoomOut(),
+            resetZoom: () => mapInstance.setView(
+                customCoordsToLatLng(config.options.center as [number, number]),
+                config.options.minZoom,
+                { animate: true }
+            )
         });
     }
 

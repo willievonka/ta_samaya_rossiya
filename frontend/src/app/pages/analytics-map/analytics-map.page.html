@@ -15,7 +15,6 @@
     @if (mapLayers(); as mapLayers) {
         <map
             [layers]="mapLayers"
-            [config]="mapConfig"
             (regionSelected)="toggleModal($event)"
         ></map>
     }

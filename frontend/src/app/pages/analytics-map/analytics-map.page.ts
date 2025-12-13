@@ -3,7 +3,6 @@ import { MapComponent } from '../../components/map/map.component';
 import { MapDataService } from '../../services/map-data.service';
 import { IMapLayer, IMapLayerProperties } from '../../components/map/interfaces/map-layer.interface';
 import { take, tap } from 'rxjs';
-import { IMapConfig } from '../../components/map/interfaces/map-config.interface';
 import { AnalyticsMapModalComponent } from './components/analytics-map-modal/analytics-map-modal.component';
 import { ActivatedRoute } from '@angular/router';
 import { PageHeaderComponent } from '../../components/page-header/page-header.component';
@@ -34,22 +33,6 @@ export class AnalyticsMapPageComponent {
     protected readonly activeLayer: WritableSignal<IMapLayerProperties | null> = signal(null);
 
     protected readonly pageTitleExample: string = 'Аналитическая карта России';
-    protected readonly mapConfig: IMapConfig = {
-        options: {
-            zoomControl: false,
-            attributionControl: false,
-            zoomSnap: 0.1,
-            minZoom: 3,
-            maxZoom: 7,
-            center: [105, 72.5]
-        },
-        defaultLayerStyle: {
-            fillColor: '#B4B4B4',
-            fillOpacity: 1,
-            color: '#FFF',
-            weight: 1
-        }
-    };
     protected readonly infoTextExample: string = `Карта России с участниками проекта.
     Ознакомьтесь с регионами, где наша деятельность активно развивается.
     Каждый указанный субъект РФ представлен на карте, позволяя быстро оценить географический охват и найти интересующие вас локации для получения дополнительной информации.`;
