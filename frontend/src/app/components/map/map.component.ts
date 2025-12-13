@@ -32,7 +32,7 @@ export class MapComponent implements AfterViewInit {
     private readonly _config: IMapConfig = mapConfig;
     private readonly _mapContainer: Signal<ElementRef<HTMLDivElement>> = viewChild.required('mapContainer');
     private _map: Map | null = null;
-    private _activeLeaflerLayer: Path | null = null;
+    private _activeLeafletLayer: Path | null = null;
 
     public ngAfterViewInit(): void {
         this.initMap();
@@ -150,7 +150,7 @@ export class MapComponent implements AfterViewInit {
      * @param leafletLayer
      */
     private applyActiveLayerStyle(leafletLayer: IActiveLeafletLayer): void {
-        const prev: Path | null = this._activeLeaflerLayer;
+        const prev: Path | null = this._activeLeafletLayer;
 
         if (prev && prev !== leafletLayer) {
             this.resetLayerStyle(prev);
@@ -172,7 +172,7 @@ export class MapComponent implements AfterViewInit {
             nativeElement.style.filter = 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.33))';
         }
 
-        this._activeLeaflerLayer = leafletLayer;
+        this._activeLeafletLayer = leafletLayer;
     }
 
     /**
@@ -194,9 +194,9 @@ export class MapComponent implements AfterViewInit {
 
     /** Очистить активный слой */
     private clearActiveLayer(): void {
-        if (this._activeLeaflerLayer) {
-            this.resetLayerStyle(this._activeLeaflerLayer);
-            this._activeLeaflerLayer = null;
+        if (this._activeLeafletLayer) {
+            this.resetLayerStyle(this._activeLeafletLayer);
+            this._activeLeafletLayer = null;
         }
     }
 }
