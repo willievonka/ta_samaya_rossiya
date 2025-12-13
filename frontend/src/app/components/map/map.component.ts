@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, computed, ElementRef, input, InputSignal, output, OutputEmitterRef, signal, Signal, viewChild, WritableSignal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, input, InputSignal, output, OutputEmitterRef, signal, Signal, viewChild, WritableSignal } from '@angular/core';
 import { DomEvent, geoJSON, Layer, LeafletMouseEvent, map, Map, Path, PathOptions } from 'leaflet';
 import { IMapLayer, IMapLayerProperties } from './interfaces/map-layer.interface';
 import { customCoordsToLatLng } from './utils/custom-coords-to-lat-lng.util';
@@ -32,11 +32,9 @@ export class MapComponent implements AfterViewInit {
     private _activeLeaflerLayer: Path | null = null;
     private readonly _config: IMapConfig = mapConfig;
     private readonly _mapContainer: Signal<ElementRef<HTMLDivElement>> = viewChild.required('mapContainer');
-    private readonly _defaultLayerStyle: Signal<PathOptions> = computed(() => this._config.defaultLayerStyle);
 
     public ngAfterViewInit(): void {
         this.initMap();
-        this.setZoomActions();
         this.renderLayers(this.layers());
         this.isLoading.set(false);
     }
@@ -65,6 +63,7 @@ export class MapComponent implements AfterViewInit {
         });
 
         this._map = mapInstance;
+        this.setZoomActions();
     }
 
     /**
@@ -113,7 +112,7 @@ export class MapComponent implements AfterViewInit {
         return {
             ...mapLayer.properties,
             style: {
-                ...this._defaultLayerStyle(),
+                ...this._config.defaultLayerStyle,
                 ...mapLayer.properties.style,
             },
             interactive: isActive,

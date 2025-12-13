@@ -58,7 +58,7 @@ export class AnalyticsMapPageComponent {
         }
     }
 
-    /** Загрузить слои для карты */
+    /** Инициализация карты */
     private initMap(): void {
         const mapId: string = this._route.snapshot.queryParamMap.get('id') ?? '';
         this._mapDataService.getMapData(mapId)
