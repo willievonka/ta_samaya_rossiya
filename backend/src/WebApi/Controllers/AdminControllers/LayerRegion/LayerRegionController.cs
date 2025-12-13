@@ -29,7 +29,7 @@ public class LayerRegionController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(MapLayersFeatureCollectionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddNewLayerRegion([FromRoute] Guid mapId,

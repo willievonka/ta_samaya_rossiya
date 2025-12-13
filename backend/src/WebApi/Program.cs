@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application;
 using Infrastructure;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.OpenApi;
 using Serilog;
 using NetTopologySuite.IO.Converters;
@@ -59,7 +60,7 @@ internal class Program
         services.AddCors(options =>
         {
             options.AddPolicy("AllowAngularDev",
-                policy => policy.WithOrigins("http://localhost:4200")
+                policy => policy.WithOrigins("https://localhost:4200")
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials());
