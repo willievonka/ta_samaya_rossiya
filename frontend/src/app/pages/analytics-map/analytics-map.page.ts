@@ -25,17 +25,12 @@ import { MapInfoComponent } from '../../components/map-info/map-info.component';
     ]
 })
 export class AnalyticsMapPageComponent {
-    protected readonly pageTitle: WritableSignal<string> = signal('');
+    protected readonly pageTitle: WritableSignal<string | undefined> = signal(undefined);
+    protected readonly infoText: WritableSignal<string | undefined> = signal(undefined);
     protected readonly mapLayers: WritableSignal<IMapLayer[] | undefined> = signal(undefined);
-    protected readonly zoomActions: Signal<IMapZoomActions | null> = computed(() => this._mapInstance()?.zoomActions() ?? null);
-    protected readonly infoText: WritableSignal<string | null> = signal(null);
+    protected readonly zoomActions: Signal<IMapZoomActions | undefined> = computed(() => this._mapInstance()?.zoomActions());
 
     protected readonly activeLayer: WritableSignal<IMapLayerProperties | null> = signal(null);
-
-    protected readonly pageTitleExample: string = 'Аналитическая карта России';
-    protected readonly infoTextExample: string = `Карта России с участниками проекта.
-    Ознакомьтесь с регионами, где наша деятельность активно развивается.
-    Каждый указанный субъект РФ представлен на карте, позволяя быстро оценить географический охват и найти интересующие вас локации для получения дополнительной информации.`;
 
     private readonly _mapInstance: Signal<MapComponent | undefined> = viewChild(MapComponent);
     private readonly _mapDataService: MapDataService = inject(MapDataService);
@@ -63,12 +58,13 @@ export class AnalyticsMapPageComponent {
         const mapId: string = this._route.snapshot.queryParamMap.get('id') ?? '';
         this._mapDataService.getMapData(mapId)
             .pipe(
-                tap(layers => this.mapLayers.set(layers)),
+                tap(data => {
+                    this.pageTitle.set(data.pageTitle);
+                    this.mapLayers.set(data.layers);
+                    this.infoText.set(data.infoText);
+                }),
                 take(1)
             )
             .subscribe();
-
-        this.pageTitle.set(this.pageTitleExample);
-        this.infoText.set(this.infoTextExample);
     }
 }

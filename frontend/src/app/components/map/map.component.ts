@@ -23,7 +23,7 @@ import { mapConfig } from './map.config';
 })
 export class MapComponent implements AfterViewInit {
     public readonly layers: InputSignal<IMapLayer[]> = input.required();
-    public readonly zoomActions: WritableSignal<IMapZoomActions | null> = signal(null);
+    public readonly zoomActions: WritableSignal<IMapZoomActions | undefined> = signal(undefined);
     public readonly regionSelected: OutputEmitterRef<IMapLayerProperties | null> = output();
 
     protected readonly isLoading: WritableSignal<boolean> = signal(true);
