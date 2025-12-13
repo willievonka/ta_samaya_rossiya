@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { IMapLayer } from '../components/map/interfaces/map-layer.interface';
-import { IMapLayerProperties } from '../components/map/interfaces/map-layer.interface';
-import { environment } from '../../environments';
+import { IMapLayer } from '../interfaces/map-layer.interface';
+import { IMapLayerProperties } from '../interfaces/map-layer.interface';
+import { environment } from '../../../../environments';
 import { FeatureCollection } from 'geojson';
 
 @Injectable({ providedIn: 'root' })

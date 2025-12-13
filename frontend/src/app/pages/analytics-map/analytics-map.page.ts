@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { MapComponent } from '../../components/map/map.component';
-import { MapDataService } from '../../services/map-data.service';
+import { MapDataService } from '../../components/map/services/map-data.service';
 import { IMapLayer, IMapLayerProperties } from '../../components/map/interfaces/map-layer.interface';
 import { take, tap } from 'rxjs';
 import { AnalyticsMapModalComponent } from './components/analytics-map-modal/analytics-map-modal.component';
