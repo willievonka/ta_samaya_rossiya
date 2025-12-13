@@ -26,10 +26,14 @@ import { MapInfoComponent } from '../../components/map-info/map-info.component';
     ]
 })
 export class AnalyticsMapPageComponent {
-    protected readonly activeLayer: WritableSignal<IMapLayerProperties | null> = signal(null);
+    protected readonly pageTitle: WritableSignal<string> = signal('');
     protected readonly mapLayers: WritableSignal<IMapLayer[] | undefined> = signal(undefined);
     protected readonly zoomActions: Signal<IMapZoomActions | null> = computed(() => this._mapInstance()?.zoomActions() ?? null);
+    protected readonly infoText: WritableSignal<string | null> = signal(null);
 
+    protected readonly activeLayer: WritableSignal<IMapLayerProperties | null> = signal(null);
+
+    protected readonly pageTitleExample: string = 'Аналитическая карта России';
     protected readonly mapConfig: IMapConfig = {
         options: {
             zoomControl: false,
@@ -46,8 +50,7 @@ export class AnalyticsMapPageComponent {
             weight: 1
         }
     };
-
-    protected readonly infoText: string = `Карта России с участниками проекта.
+    protected readonly infoTextExample: string = `Карта России с участниками проекта.
     Ознакомьтесь с регионами, где наша деятельность активно развивается.
     Каждый указанный субъект РФ представлен на карте, позволяя быстро оценить географический охват и найти интересующие вас локации для получения дополнительной информации.`;
 
@@ -56,7 +59,7 @@ export class AnalyticsMapPageComponent {
     private readonly _route: ActivatedRoute = inject(ActivatedRoute);
 
     constructor() {
-        this.loadMapLayers();
+        this.initMap();
     }
 
     /**
@@ -73,14 +76,16 @@ export class AnalyticsMapPageComponent {
     }
 
     /** Загрузить слои для карты */
-    private loadMapLayers(): void {
+    private initMap(): void {
         const mapId: string = this._route.snapshot.queryParamMap.get('id') ?? '';
-
-        this._mapDataService.getAnalyticsMapData(mapId)
+        this._mapDataService.getMapData(mapId)
             .pipe(
                 tap(layers => this.mapLayers.set(layers)),
                 take(1)
             )
             .subscribe();
+
+        this.pageTitle.set(this.pageTitleExample);
+        this.infoText.set(this.infoTextExample);
     }
 }

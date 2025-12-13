@@ -1,9 +1,11 @@
 <div class="analytics-map">
-    <page-header
-        class="analytics-map__header"
-        [title]="'Аналитическая карта России'"
-        [isDetached]="true"
-    />
+    @if (pageTitle(); as pageTitle) {
+        <page-header
+            class="analytics-map__header"
+            [title]="pageTitle"
+            [isDetached]="true"
+        />
+    }
     @if (zoomActions(); as zoomActions) {
         <map-zoom
             class="analytics-map__zoom-controls"
@@ -26,8 +28,10 @@
             animate.leave="analytics-map__modal_leave"
         />
     }
-    <map-info
-        class="analytics-map__info"
-        [text]="infoText"
-    />
+    @if (infoText(); as infoText) {
+        <map-info
+            class="analytics-map__info"
+            [text]="infoText"
+        />
+    }
 </div>

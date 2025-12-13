@@ -12,10 +12,10 @@ export class MapDataService {
     private readonly _apiUrl: string = environment.clientApiUrl;
 
     /**
-     * Получить данные для аналитической карты
+     * Получить данные для карты по mapId
      * @param mapId
      */
-    public getAnalyticsMapData(mapId: string): Observable<IMapLayer[]> {
+    public getMapData(mapId: string): Observable<IMapLayer[]> {
         return this._http.get<FeatureCollection>(`${this._apiUrl}/maps`, { params: { mapId } })
             .pipe(
                 map(({ features }: FeatureCollection) =>
