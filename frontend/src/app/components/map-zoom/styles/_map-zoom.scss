@@ -1,0 +1,20 @@
+@use '../../../../common-styles/spacing-vars' as *;
+@use '../../../../common-styles/color-vars' as color;
+
+.map-zoom {
+    display: flex;
+    flex-direction: column;
+    background-color: color.$bg-accent;
+    border-radius: $spacing-s;
+    box-shadow: $spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
+
+
+    &__button {
+        padding: $spacing-s;
+        border-radius: $spacing-s;
+
+        &:active {
+            background-color: #394ec5;
+        }
+    }
+}

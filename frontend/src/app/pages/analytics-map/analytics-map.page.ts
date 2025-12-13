@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, Signal, signal, viewChild, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { MapComponent } from '../../components/map/map.component';
 import { MapDataService } from '../../services/map-data.service';
 import { IMapLayer, IMapLayerProperties } from '../../components/map/interfaces/map-layer.interface';
@@ -8,6 +8,8 @@ import { IMapConfig } from '../../components/map/interfaces/map-config.interface
 import { AnalyticsMapModalComponent } from './components/analytcs-map-modal/analytics-map-modal.component';
 import { ActivatedRoute } from '@angular/router';
 import { PageHeaderComponent } from '../../components/page-header/page-header.component';
+import { MapZoomComponent } from '../../components/map-zoom/map-zoom.component';
+import { IMapZoomActions } from '../../components/map/interfaces/map-zoom-actions.interface';
 
 @Component({
     selector: 'analytics-map-page',
@@ -17,6 +19,7 @@ import { PageHeaderComponent } from '../../components/page-header/page-header.co
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MapComponent,
+        MapZoomComponent,
         AnalyticsMapModalComponent,
         PageHeaderComponent
     ]
@@ -24,15 +27,18 @@ import { PageHeaderComponent } from '../../components/page-header/page-header.co
 export class AnalyticsMapPageComponent {
     protected readonly activeLayer: WritableSignal<IMapLayerProperties | null> = signal(null);
     protected readonly mapLayers: WritableSignal<IMapLayer[] | undefined> = signal(undefined);
+    protected readonly zoomActions: Signal<IMapZoomActions | null> = computed(() => this._mapInstance()?.zoomActions() ?? null);
 
     protected readonly mapConfig: IMapConfig = {
         options: {
             zoomControl: false,
             attributionControl: false,
-            zoomSnap: 0.1
+            zoomSnap: 0.1,
+            minZoom: 3,
+            maxZoom: 7
         },
-        center: [105, 68.5],
-        initZoom: 3.2,
+        center: [105, 72.5],
+        initZoom: 3,
         defaultLayerStyle: {
             fillColor: '#B4B4B4',
             fillOpacity: 1,

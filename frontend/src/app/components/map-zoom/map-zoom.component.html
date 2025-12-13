@@ -1,0 +1,29 @@
+<div class="map-zoom">
+    <button
+        class="map-zoom__button"
+        type="button"
+        (click)="zoomIn()"
+    >
+        <svg width="24" height="24">
+            <use href="/sprites/plus.svg"/>
+        </svg>
+    </button>
+    <button
+        class="map-zoom__button"
+        type="button"
+        (click)="zoomOut()"
+    >
+        <svg width="24" height="24">
+            <use href="/sprites/minus.svg"/>
+        </svg>
+    </button>
+    <button
+        class="map-zoom__button"
+        type="button"
+        (click)="resetZoom()"
+    >
+        <svg width="24" height="24">
+            <use href="/sprites/scope.svg"/>
+        </svg>
+    </button>
+</div>

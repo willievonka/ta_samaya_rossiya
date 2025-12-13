@@ -4,6 +4,12 @@
         [title]="'Аналитическая карта России'"
         [isDetached]="true"
     />
+    @if (zoomActions(); as zoomActions) {
+        <map-zoom
+            class="analytics-map__zoom-controls"
+            [zoomActions]="zoomActions"
+        />
+    }
     @if (mapLayers(); as mapLayers) {
         <map
             [layers]="mapLayers"

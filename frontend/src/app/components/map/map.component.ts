@@ -6,6 +6,7 @@ import { IMapConfig } from './interfaces/map-config.interface';
 import { makeBrighterColor } from './utils/make-brighter-color.util';
 import { IActiveLeafletLayer } from './interfaces/leaflet-layer.interface';
 import { Feature, GeoJsonProperties } from 'geojson';
+import { IMapZoomActions } from './interfaces/map-zoom-actions.interface';
 
 @Component({
     selector: 'map',
@@ -22,6 +23,7 @@ import { Feature, GeoJsonProperties } from 'geojson';
 export class MapComponent implements AfterViewInit {
     public readonly layers: InputSignal<IMapLayer[]> = input.required();
     public readonly config: InputSignal<IMapConfig> = input.required();
+    public readonly zoomActions: WritableSignal<IMapZoomActions | null> = signal(null);
     public readonly regionSelected: OutputEmitterRef<IMapLayerProperties | null> = output();
 
     protected readonly isLoading: WritableSignal<boolean> = signal(true);
@@ -61,6 +63,16 @@ export class MapComponent implements AfterViewInit {
         });
 
         this._map = mapInstance;
+
+        this.zoomActions.set({
+            zoomIn: () => mapInstance.zoomIn(),
+            zoomOut: () => mapInstance.zoomOut(),
+            resetZoom: () => mapInstance.setView(
+                customCoordsToLatLng(config.center),
+                config.initZoom,
+                { animate: true }
+            )
+        });
     }
 
     /**
