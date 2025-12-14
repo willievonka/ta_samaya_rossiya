@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace WebApi.Controllers.AdminControllers.Map.Responses;
+namespace WebApi.Controllers.AdminControllers.LayerRegion.Response;
 
 public record MapLayersFeatureCollectionResponse(
     IReadOnlyList<MapLayerResponse> Features

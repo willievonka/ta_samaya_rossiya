@@ -1,6 +1,6 @@
-﻿namespace WebApi.Controllers.AdminControllers.Map.Requests;
+﻿namespace WebApi.Controllers.AdminControllers.LayerRegionStyle.Request;
 
-public record CreateLayerRegionStyleRequest(
+public record UpsertLayerRegionStyleRequest(
     bool? Stroke,
     string? Color,
     int? Weight,

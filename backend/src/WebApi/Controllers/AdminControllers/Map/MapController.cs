@@ -1,5 +1,4 @@
-﻿using Application.Services.Interfaces;
-using Application.Services.Logic.Interfaces;
+﻿using Application.Services.Logic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Controllers.AdminControllers.Map.Requests;
 using WebApi.Controllers.AdminControllers.Map.Responses;
@@ -9,7 +8,7 @@ namespace WebApi.Controllers.AdminControllers.Map;
 
 [ApiController]
 [Route("api/admin/maps")]
-public class   MapController : ControllerBase
+public class MapController : ControllerBase
 {
     private readonly IMapService _mapService;
     
@@ -36,7 +35,6 @@ public class   MapController : ControllerBase
         return response == null ? NotFound() : Ok(response);
     }
     
-    //TODO получить аналитическую карту без Query и Id
     //TODO: GetMapWithActiveRegions
     
     /// <summary>
@@ -54,7 +52,7 @@ public class   MapController : ControllerBase
         //TODO: 
         var response = MapMapper.MapsDtosToMapsCardsResponse(cards);
         
-        return response == null ? NotFound() : Ok(response);
+        return Ok(response);
     }
 
     /// <summary>
@@ -70,13 +68,9 @@ public class   MapController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CreateMap([FromForm] CreateMapRequest request, CancellationToken ct)
     {
-        //TODO исправить IsAnalitics на nullable
         var mapDto = MapMapper.CreateMapRequestToDto(request);
-        var id = await _mapService.CreateMapAsync(mapDto, ct);
         
-        var map = await _mapService.GetMapAsync(id, ct);
-
-        var response = MapMapper.MapDtoToResponse(map);
+        await _mapService.CreateMapAsync(mapDto, ct);
         
         return RedirectToAction(nameof(GetAllMapsCards));
     }
@@ -98,7 +92,7 @@ public class   MapController : ControllerBase
     {
         var mapDto = MapMapper.UpdateMapCardRequestToDto(request, mapId);
         
-        var response = await _mapService.UpdateMapAsync(mapDto, ct);
+        await _mapService.UpdateMapAsync(mapDto, ct);
         
         return RedirectToAction(nameof(GetAllMapsCards));
     }
@@ -112,7 +106,7 @@ public class   MapController : ControllerBase
     /// <returns></returns>
     [HttpPut]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(StatusCodes.Status303SeeOther)]  
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateMap([FromQuery] Guid mapId, [FromForm] UpdateMapRequest request,
@@ -120,9 +114,12 @@ public class   MapController : ControllerBase
     {
         var mapDto = MapMapper.UpdateMapRequestToDto(request, mapId);
         
-        var response = await _mapService.UpdateMapAsync(mapDto, ct);
+        var id = await _mapService.UpdateMapAsync(mapDto, ct);
         
-        return RedirectToAction(nameof(GetMap), new { mapId = mapId });
+        if (id == Guid.Empty)
+            return BadRequest();
+        
+        return Ok(id);
     }
 
     /// <summary>

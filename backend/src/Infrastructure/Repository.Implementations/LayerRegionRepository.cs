@@ -27,23 +27,21 @@ public class LayerRegionRepository : ILayerRegionRepository
             .FirstOrDefaultAsync(lr => lr.Id == regionId, ct);
     }
 
-    public async Task<List<LayerRegion>?> GetAllByMapAllIncludesAsync(Guid mapId, CancellationToken ct)
+    public async Task<List<LayerRegion>?> GetAllWithRegionAndGeometryByMapIdAsync(Guid mapId, CancellationToken ct)
     {
         return await _context.LayerRegions
             .Include(lr => lr.Region)
                 .ThenInclude(r => r.Geometry)
-            .Include(lr => lr.Style)
             .Where(lr => lr.MapId == mapId)
             .AsNoTracking()
             .ToListAsync(ct);
     }
 
-    public async Task<List<LayerRegion>?> GetAllActiveByMapAllInlcudesAsync(Guid mapId, CancellationToken ct)
+    public async Task<List<LayerRegion>?> GetAllActiveWithRegionAndGeometryByMapAsync(Guid mapId, CancellationToken ct)
     {
         return await _context.LayerRegions
             .Include(lr => lr.Region)
                 .ThenInclude(r => r.Geometry)
-            .Include(lr => lr.Style)
             .Where(lr => lr.MapId == mapId)
             .Where(lr => lr.IsActive)
             .AsNoTracking()

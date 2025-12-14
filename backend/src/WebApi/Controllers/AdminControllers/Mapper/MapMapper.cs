@@ -1,4 +1,5 @@
 ﻿using Application.Services.Dtos;
+using WebApi.Controllers.AdminControllers.LayerRegion.Response;
 using WebApi.Controllers.AdminControllers.Map.Requests;
 using WebApi.Controllers.AdminControllers.Map.Responses;
 
@@ -17,6 +18,9 @@ public static class MapMapper
             BackgroundImage = request.BackgroundImage,
             Title = request.Title,
             Description = request.Description,
+            Info = request.InfoText,
+            ActiveLayerRegionsColor = request.ActiveLayerColor,
+            HistoricalObjectPointColor = request.PointColor,
         };
     }
 
@@ -31,16 +35,20 @@ public static class MapMapper
         {
             foreach (var region in dto.Regions)
             {
-                var regionResponse = LayerRegionMapper.LayerRegionDtoToResponse(region);
+                var regionResponse = dto.IsAnalytics != null && dto.IsAnalytics!.Value
+                    ? LayerRegionMapper.LayerRegionDtoToResponse(region, true)
+                    : LayerRegionMapper.LayerRegionDtoToResponse(region);
+                
                 var geometry = region.Geometry;
-                features.Add(new MapLayerResponse(geometry!,
+                features.Add(new MapLayerResponse(geometry,
                     regionResponse!));
             }
         }
         
         var layers = new MapLayersFeatureCollectionResponse(features);
 
-        return new MapPageResponse(layers, dto.Title, dto.Description);
+        return new MapPageResponse(layers, dto.Title!, dto.Info!,
+            dto.ActiveLayerRegionsColor, dto.HistoricalObjectPointColor);
     }
 
     public static MapDto? UpdateMapCardRequestToDto(UpdateMapCardRequest? request, Guid mapId)
@@ -70,6 +78,9 @@ public static class MapMapper
             BackgroundImage = request.BackgroundImage,
             Title = request.Title,
             Description = request.Description,
+            Info = request.InfoText,
+            ActiveLayerRegionsColor = request.ActiveLayerColor,
+            HistoricalObjectPointColor = request.PointColor,
         };
 
         if (request.Regions != null)
@@ -85,7 +96,7 @@ public static class MapMapper
         return mapDto;
     }
 
-    public static List<MapCardResponse>? MapsDtosToMapsCardsResponse(List<MapDto>? mapDtos)
+    public static List<MapCardResponse> MapsDtosToMapsCardsResponse(List<MapDto>? mapDtos)
     {
         var response = new List<MapCardResponse>();
         
@@ -97,8 +108,8 @@ public static class MapMapper
             response.Add(new MapCardResponse(
                 mapDto.Id!.Value,
                 mapDto.IsAnalytics,
-                mapDto.Title,
-                mapDto.Description,
+                mapDto.Title!,
+                mapDto.Description!,
                 mapDto.BackgroundImagePath
                 ));
         }

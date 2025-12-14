@@ -3,7 +3,7 @@
 namespace WebApi.Controllers.AdminControllers.Map.Requests;
 
 public record UpdateMapCardRequest(
-    [Required] bool IsAnalytics, 
+    bool? IsAnalytics, 
     [Required] string Title,
     [Required] string Description,
     IFormFile? BackgroundImage

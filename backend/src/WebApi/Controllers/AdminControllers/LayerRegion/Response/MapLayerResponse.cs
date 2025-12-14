@@ -1,7 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 using NetTopologySuite.Geometries;
+using WebApi.Controllers.AdminControllers.Map.Responses;
 
-namespace WebApi.Controllers.AdminControllers.Map.Responses;
+namespace WebApi.Controllers.AdminControllers.LayerRegion.Response;
 
 public record MapLayerResponse(
     Geometry Geometry,

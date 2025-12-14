@@ -1,4 +1,4 @@
-﻿namespace WebApi.Controllers.AdminControllers.Map.Responses;
+﻿namespace WebApi.Controllers.AdminControllers.LayerRegionStyle.Response;
 
 public record LayerRegionStyleResponse(
     bool? Stroke = null,

@@ -11,8 +11,7 @@ public class MapService : IMapService
     private readonly IMapRepository _mapRepository;
     private readonly IImageService _imageService;
     private readonly ILayerRegionService _layerRegionService;
-
-
+    
     private const string FilePath = "map-cards"; 
     
     public MapService(ILogger<IMapService> logger, IMapRepository mapRepository, 
@@ -24,6 +23,11 @@ public class MapService : IMapService
         _layerRegionService = layerRegionService;
     }
 
+    /// <summary>
+    /// Получает только свойства карт, без остальных includes
+    /// </summary>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<List<MapDto>> GetAllCardsASync(CancellationToken ct)
     {
         var cards = await _mapRepository.GetAllHeadersAsync(ct);
@@ -43,6 +47,7 @@ public class MapService : IMapService
                 Id = card.Id,
                 Title = card.Title,
                 Description = card.Description,
+                Info = card.Info,
                 IsAnalytics = card.IsAnalytics,
                 BackgroundImagePath = card.BackgroundImage
             });
@@ -51,6 +56,12 @@ public class MapService : IMapService
         return list.OrderByDescending(m => m.IsAnalytics).ToList();
     }
 
+    /// <summary>
+    /// Создаёт карту, также заполняет её пустыми слоями регионов. (нужно для отображения неактивных на карте)
+    /// </summary>
+    /// <param name="mapDto"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<Guid> CreateMapAsync(MapDto? mapDto, CancellationToken ct)
     {
         if (mapDto is null)
@@ -63,11 +74,14 @@ public class MapService : IMapService
         
         var map = new Map
         {
-            Title = mapDto.Title,
-            Description = mapDto.Description,
+            Title = mapDto.Title!,
+            Description = mapDto.Description!,
+            Info = mapDto.Info!,
             IsAnalytics = mapDto.IsAnalytics,
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
+            ActiveLayerRegionsColor = mapDto.ActiveLayerRegionsColor,
+            HistoricalObjectPointColor = mapDto.HistoricalObjectPointColor,
         };
         await _mapRepository.AddAsync(map, ct);
         
@@ -80,8 +94,7 @@ public class MapService : IMapService
         
         if (mapDto.BackgroundImage != null)
         { 
-            string? fileUri = null;
-            fileUri = await _imageService.SaveImageAsync(id, FilePath, mapDto.BackgroundImage);
+            var fileUri = await _imageService.SaveImageAsync(id, FilePath, mapDto.BackgroundImage);
             map.BackgroundImage = fileUri;
             await _mapRepository.UpdateAsync(map, ct);
         }
@@ -93,6 +106,12 @@ public class MapService : IMapService
         return id;
     }
 
+    /// <summary>
+    /// Удаляет карту по её Id
+    /// </summary>
+    /// <param name="mapId"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<bool> DeleteMapAsync(Guid mapId, CancellationToken ct)
     {
         _logger.LogInformation("Deleting map {mapId}", mapId);
@@ -115,6 +134,12 @@ public class MapService : IMapService
         return true;
     }
 
+    /// <summary>
+    /// Получает полную модель карты со всеми вытекающими(регионами, стилями, показателями), полный include
+    /// </summary>
+    /// <param name="mapId"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<MapDto?> GetMapAsync(Guid mapId, CancellationToken ct)
     {
         var map = await _mapRepository.GetHeaderByIdAsync(mapId, ct);
@@ -130,15 +155,24 @@ public class MapService : IMapService
             Id = map.Id,
             Title = map.Title,
             Description = map.Description,
+            Info = map.Info,
             IsAnalytics = map.IsAnalytics,
             BackgroundImagePath = map.BackgroundImage,
+            ActiveLayerRegionsColor = map.ActiveLayerRegionsColor,
+            HistoricalObjectPointColor = map.HistoricalObjectPointColor,
         };
         
-        mapDto.Regions = await _layerRegionService.GetAllByMapIdAsync(mapId, ct);;
+        mapDto.Regions = await _layerRegionService.GetAllByMapIdAsync(mapId, ct);
         
         return mapDto;
     }
 
+    /// <summary>
+    /// Обновляет карту, обновятся только не null значения. Остальные свойства сохраняться прежними.
+    /// </summary>
+    /// <param name="mapDto"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<Guid> UpdateMapAsync(MapDto? mapDto, CancellationToken ct)
     {
         if (mapDto == null)
@@ -154,20 +188,24 @@ public class MapService : IMapService
             _logger.LogError("Map {mapId} could not be found", mapDto.Id);
             return Guid.Empty;
         }
-
-        string? fileUri = null;
+        
         if (mapDto.BackgroundImage != null)
         { 
-            fileUri = await _imageService.UpdateImageAsync(map.Id, map.BackgroundImage, FilePath,
+            var fileUri = await _imageService.UpdateImageAsync(map.Id, map.BackgroundImage, FilePath,
                 mapDto.BackgroundImage);
+            
+            map.BackgroundImage = fileUri;
         }
         
-        map.BackgroundImage = fileUri;
-        map.IsAnalytics = mapDto.IsAnalytics;
-        map.Title = mapDto.Title;
-        map.Description = mapDto.Description;
-        map.UpdatedAt = DateTime.Now;
+        if (mapDto.Title != null) map.Title = mapDto.Title;
+        if (mapDto.Description != null) map.Description = mapDto.Description;
+        if (mapDto.IsAnalytics != null) map.IsAnalytics = mapDto.IsAnalytics;
+        if (mapDto.ActiveLayerRegionsColor != null) map.ActiveLayerRegionsColor = mapDto.ActiveLayerRegionsColor;
+        if (mapDto.HistoricalObjectPointColor != null) map.HistoricalObjectPointColor = mapDto.HistoricalObjectPointColor;
+        if (mapDto.Info != null) map.Info = mapDto.Info;
 
+        map.UpdatedAt = DateTime.Now;
+        
         if (mapDto.Regions != null)
         {
             foreach (var regionDto in mapDto.Regions)
@@ -181,6 +219,13 @@ public class MapService : IMapService
         return map.Id;
     }
 
+    /// <summary>
+    /// Добавляет новый слой региона со стилями и показателями.
+    /// </summary>
+    /// <param name="mapId"></param>
+    /// <param name="layerRegionDto"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<Guid> AddNewLayerRegionAsync(Guid mapId, LayerRegionDto layerRegionDto, CancellationToken ct)
     {
         _logger.LogInformation("Adding layer region {name}", layerRegionDto.Name);

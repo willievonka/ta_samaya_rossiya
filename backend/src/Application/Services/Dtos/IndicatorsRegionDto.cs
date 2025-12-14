@@ -9,25 +9,28 @@ public class IndicatorsRegionDto
     /// </summary>
     public string? ImagePath { get; set; }
     
+    /// <summary>
+    /// Для загрузки изображения
+    /// </summary>
     public IFormFile? Image { get; set; }
     
     /// <summary>
     /// Кол-во экскурсий в регионе
     /// </summary>
-    public required int Excursions { get; set; }
+    public int? Excursions { get; set; }
     
     /// <summary>
     /// Кол-во партнеров в регионе
     /// </summary>
-    public required int Partners { get; set; }
+    public int? Partners { get; set; }
     
     /// <summary>
     /// Кол-во участников в регионе
     /// </summary>
-    public required int Participants { get; set; }
+    public int? Participants { get; set; }
     
     /// <summary>
     /// Отображаются ли показатели пользователям
     /// </summary>
-    public required bool IsActive { get; set; }
+    public bool? IsActive { get; set; }
 }

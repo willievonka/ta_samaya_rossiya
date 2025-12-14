@@ -12,13 +12,25 @@ public class MapDto
     /// <summary>
     /// Название
     /// </summary>
-    public required string Title { get; set; }
+    public string? Title { get; set; }
     
     /// <summary>
     /// Описание
     /// </summary>
-    public required string Description { get; set; }
+    public string? Description { get; set; }
     
+    /// <summary>
+    /// Инфо текст для подробной информации карты
+    /// </summary>
+    public string? Info { get; set; }  
+    
+    public string? ActiveLayerRegionsColor { get; set; }
+    
+    public string? HistoricalObjectPointColor { get; set; }
+    
+    /// <summary>
+    /// Для загрузки изображения
+    /// </summary>
     public IFormFile? BackgroundImage { get; set; }
     
     public string? BackgroundImagePath { get; set; }
