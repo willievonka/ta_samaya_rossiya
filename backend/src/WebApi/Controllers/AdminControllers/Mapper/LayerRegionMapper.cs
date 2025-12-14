@@ -1,5 +1,7 @@
 ﻿using Application.Services.Dtos;
+using WebApi.Controllers.AdminControllers.HistoricalObject.Response;
 using WebApi.Controllers.AdminControllers.LayerRegion.Request;
+using WebApi.Controllers.AdminControllers.LayerRegion.Response;
 using WebApi.Controllers.AdminControllers.Map.Requests;
 using WebApi.Controllers.AdminControllers.Map.Responses;
 
@@ -7,30 +9,39 @@ namespace WebApi.Controllers.AdminControllers.Mapper;
 
 public static class LayerRegionMapper
 {
-    public static MapLayerPropertiesResponse? LayerRegionDtoToResponse(LayerRegionDto? layerRegionDto)
+    public static MapLayerPropertiesResponse? LayerRegionDtoToResponse(LayerRegionDto? layerRegionDto, bool isAnalyticsMap = false)
     {
         if (layerRegionDto == null)
             return null;
 
-        if (!layerRegionDto.IsActive!.Value)
+        if (!layerRegionDto.IsActive!.Value && isAnalyticsMap)
         {
             return new MapLayerPropertiesResponse(layerRegionDto.Id!.Value, layerRegionDto.Name);
         }
         
         var style = LayerRegionStyleMapper.StyleDtoToResponse(layerRegionDto.Style);
 
+        AnalyticsMapLayerPropertiesResponse? analiticsProperties = null;
         var indicators = layerRegionDto.Indicators;
         if (indicators != null)
         {
-            var analiticsProperties = new AnalyticsMapLayerPropertiesResponse(indicators.ImagePath!, indicators.Partners, 
-                indicators.Excursions, indicators.Participants);
-            
-            return new MapLayerPropertiesResponse(layerRegionDto.Id!.Value, layerRegionDto.Name,  layerRegionDto.IsActive, 
-                style, analiticsProperties);
+            analiticsProperties = new AnalyticsMapLayerPropertiesResponse(indicators.ImagePath!, indicators.Partners!.Value, 
+                indicators.Excursions!.Value, indicators.Participants!.Value);
         }
         
-        return new MapLayerPropertiesResponse(layerRegionDto.Id!.Value, layerRegionDto.Name, layerRegionDto.IsActive, 
-            style, null);
+        List<HistoricalObjectResponse>? points = null;
+        if (layerRegionDto.HistoricalObjects != null && !isAnalyticsMap)
+        {
+            points = new List<HistoricalObjectResponse>();
+
+            foreach (var historicalObject in layerRegionDto.HistoricalObjects)
+            {
+                points.Add(HistoricalObjectMapper.HistoricalObjectDtoToResponse(historicalObject)!);
+            }
+        }
+        
+        return new MapLayerPropertiesResponse(layerRegionDto.Id!.Value, layerRegionDto.Name, null, 
+            style, analiticsProperties, points);
     }
 
     public static LayerRegionDto CreateLayerRegionRequestToDto(CreateLayerRegionRequest request)
@@ -64,7 +75,7 @@ public static class LayerRegionMapper
         };
     }
 
-    public static IndicatorsRegionDto? IndicatorsRegionRequestToDto(CreateIndicatorsRequest? request)
+    public static IndicatorsRegionDto? IndicatorsRegionRequestToDto(UpsertIndicatorsRequest? request)
     {
         if  (request == null)
             return null;

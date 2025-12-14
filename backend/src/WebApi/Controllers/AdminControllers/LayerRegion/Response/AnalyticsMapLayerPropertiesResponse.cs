@@ -1,4 +1,4 @@
-﻿namespace WebApi.Controllers.AdminControllers.Map.Responses;
+﻿namespace WebApi.Controllers.AdminControllers.LayerRegion.Response;
 
 public record AnalyticsMapLayerPropertiesResponse(
     string ImagePath,

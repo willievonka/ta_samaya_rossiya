@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Application.Services.Dtos;
+﻿using Application.Services.Dtos;
 using Application.Services.Logic.Interfaces;
 using Domain.Entities;
 using Domain.Repository.Interfaces;
@@ -18,6 +17,13 @@ public class LayerRegionStyleService : ILayerRegionStyleService
         _logger = logger;
     }
     
+    /// <summary>
+    /// Создаёт стиль слоя региона
+    /// </summary>
+    /// <param name="layerRegionId">Id слоя региона</param>
+    /// <param name="styleDto"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<Guid> AddAsync(Guid layerRegionId, LayerRegionStyleDto? styleDto, CancellationToken ct)
     {
         if (styleDto == null)
@@ -50,6 +56,12 @@ public class LayerRegionStyleService : ILayerRegionStyleService
         return style.Id;
     }
     
+    /// <summary>
+    /// Получает стиль по Id слоя региона
+    /// </summary>
+    /// <param name="layerRegionId">Id слоя региона</param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<LayerRegionStyleDto?> GetStyleByLayerIdAsync(Guid layerRegionId, CancellationToken ct)
     {
         var style = await _layerRegionStyleRepository.GetByLayerRegionIdAsync(layerRegionId, ct);
@@ -78,6 +90,13 @@ public class LayerRegionStyleService : ILayerRegionStyleService
         };
     }
 
+    /// <summary>
+    /// Обновляет стиль слоя региона, обновятся только не null значения. Остальные свойства сохраняться прежними.
+    /// </summary>
+    /// <param name="layerRegionId">Id слоя региона</param>
+    /// <param name="styleDto"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<LayerRegionStyleDto?> UpdateAsync(Guid layerRegionId, LayerRegionStyleDto? styleDto, CancellationToken ct)
     {
         if (styleDto == null)
@@ -112,6 +131,11 @@ public class LayerRegionStyleService : ILayerRegionStyleService
         return styleDto;
     }
 
+    /// <summary>
+    /// Удаляет стиль слоя региона по Id слоя региона
+    /// </summary>
+    /// <param name="layerRegionId">Id слоя региона</param>
+    /// <param name="ct"></param>
     public async Task DeleteByLayerIdAsync(Guid layerRegionId, CancellationToken ct)
     {
         var style = await _layerRegionStyleRepository.GetByLayerRegionIdAsync(layerRegionId, ct);

@@ -1,16 +1,18 @@
 ﻿using System.Text.Json.Serialization;
-using Application.Services.Dtos;
+using WebApi.Controllers.AdminControllers.LayerRegion.Response;
 
 namespace WebApi.Controllers.AdminControllers.Map.Responses;
 
 public record MapPageResponse
 {
     public MapPageResponse(MapLayersFeatureCollectionResponse layers,
-        string pageTitle, string infoText)
+        string pageTitle, string infoText, string? activeLayerColor, string? pointColor)
     {
         this.Layers = layers;
         this.PageTitle = pageTitle;
         this.InfoText = infoText;
+        this.ActiveLayerColor = activeLayerColor;
+        this.PointColor = pointColor;
     }
     
     [JsonPropertyOrder(0)]
@@ -21,4 +23,10 @@ public record MapPageResponse
     
     [JsonPropertyOrder(2)]
     public MapLayersFeatureCollectionResponse Layers { get; }
+    
+    [JsonPropertyOrder(3)]
+    public string? ActiveLayerColor { get; }
+    
+    [JsonPropertyOrder(4)]
+    public string? PointColor { get; }
 }

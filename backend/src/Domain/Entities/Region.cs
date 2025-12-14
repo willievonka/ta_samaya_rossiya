@@ -1,7 +1,4 @@
-﻿using Domain.Enums;
-using NetTopologySuite.Geometries;
-
-namespace Domain.Entities;
+﻿namespace Domain.Entities;
 
 /// <summary>
 /// Регион на карте, может быть регионом РФ или другой цельной страной

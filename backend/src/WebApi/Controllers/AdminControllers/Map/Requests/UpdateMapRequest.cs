@@ -1,11 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using WebApi.Controllers.AdminControllers.LayerRegion.Request;
 
 namespace WebApi.Controllers.AdminControllers.Map.Requests;
 
 public record UpdateMapRequest(
-    [Required] bool IsAnalytics, 
-    [Required] string Title,
-    [Required] string Description,
+    bool? IsAnalytics, 
+    string? Title,
+    string? Description,
+    string? InfoText,
+    string? ActiveLayerColor,
+    string? PointColor,
     IFormFile? BackgroundImage,
     IEnumerable<CreateLayerRegionRequest>? Regions
     );

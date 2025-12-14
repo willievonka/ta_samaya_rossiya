@@ -1,5 +1,4 @@
 ﻿using Domain.Entities;
-using Infrastructure.Persistence.Configurations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence;
@@ -13,7 +12,6 @@ public class MapDbContext : DbContext
     
     public DbSet<Region> Regions => Set<Region>();
     public DbSet<Map> Maps => Set<Map>();
-    public DbSet<HistoricalLine> HistoricalLines => Set<HistoricalLine>();
     public DbSet<HistoricalObject> HistoricalObjects => Set<HistoricalObject>();
     public DbSet<IndicatorsRegion> IndicatorsRegions => Set<IndicatorsRegion>();
     public DbSet<LayerRegion> LayerRegions => Set<LayerRegion>();
@@ -26,12 +24,6 @@ public class MapDbContext : DbContext
             .HasMany(m => m.Regions)
             .WithOne(r => r.Map)
             .HasForeignKey(r => r.MapId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<HistoricalLine>()
-            .HasOne(l => l.Map)
-            .WithOne(m => m.HistoricalLine)
-            .HasForeignKey<HistoricalLine>(l => l.MapId)
             .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder.Entity<LayerRegion>()
@@ -47,9 +39,9 @@ public class MapDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder.Entity<HistoricalObject>()
-            .HasOne(ho => ho.HistoricalLine)
+            .HasOne(ho => ho.LayerRegion)
             .WithMany(hl => hl.HistoricalObjects)
-            .HasForeignKey(ho => ho.LineId)
+            .HasForeignKey(ho => ho.LayerRegionId)
             .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder.Entity<RegionGeometry>()
@@ -91,9 +83,6 @@ public class MapDbContext : DbContext
         modelBuilder.Entity<Map>()
             .HasKey(m => m.Id);
         
-        modelBuilder.Entity<HistoricalLine>()
-            .HasKey(hl => hl.Id);
-        
         modelBuilder.Entity<HistoricalObject>()
             .HasKey(ho => ho.Id);
         
@@ -121,10 +110,6 @@ public class MapDbContext : DbContext
             .ValueGeneratedOnAdd();
         
         modelBuilder.Entity<Map>()
-            .Property(x => x.Id)
-            .ValueGeneratedOnAdd();
-        
-        modelBuilder.Entity<HistoricalLine>()
             .Property(x => x.Id)
             .ValueGeneratedOnAdd();
         

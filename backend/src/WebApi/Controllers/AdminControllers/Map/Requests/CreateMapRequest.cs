@@ -7,5 +7,8 @@ public record CreateMapRequest(
     bool? IsAnalytics,
     [Required] string Title,
     [Required] string Description,
+    [Required] string InfoText,
+    string? ActiveLayerColor,
+    string? PointColor,
     [FromForm] IFormFile? BackgroundImage
     );
