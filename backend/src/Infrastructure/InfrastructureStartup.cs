@@ -32,7 +32,7 @@ public static class InfrastructureStartup
             .WaitAndRetryAsync(
                 retryCount: 5,
                 sleepDurationProvider: attempt => TimeSpan.FromSeconds(attempt * 2),
-                onRetry: (exception, delay, attempt, context) =>
+                onRetry: (exception, delay, attempt) =>
                 {
                     Log.Error($"Migration retry {attempt} due to {exception.Message}. Waiting {delay} before next retry.");
                 });

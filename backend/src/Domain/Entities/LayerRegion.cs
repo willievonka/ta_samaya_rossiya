@@ -41,4 +41,9 @@ public class LayerRegion
     /// Ссылка на карту
     /// </summary>
     public Map Map { get; set; }
+    
+    /// <summary>
+    /// Исторические объекты региона
+    /// </summary>
+    public IEnumerable<HistoricalObject>? HistoricalObjects { get; set; }
 }

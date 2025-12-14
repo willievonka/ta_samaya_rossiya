@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Application.Services.Interfaces;
+﻿using Application.Services.Interfaces;
 using Domain.Entities;
 using Domain.Repository.Interfaces;
 using NetTopologySuite.Features;
@@ -14,15 +13,13 @@ namespace Infrastructure.Services.Implementations;
 public class RegionSeederService : IRegionSeederService
 {
     private readonly IRegionRepository _regionRepository;
-    private readonly IRegionGeometryRepository _regionGeometryRepository;
     private readonly ILogger<RegionSeederService> _logger;
     private readonly IWebHostEnvironment _webHostEnvironment;
 
-    public RegionSeederService(IRegionRepository regionRepository,  IRegionGeometryRepository regionGeometryRepository,
+    public RegionSeederService(IRegionRepository regionRepository,
         ILogger<RegionSeederService> logger,  IWebHostEnvironment webHostEnvironment)
     {
         _regionRepository = regionRepository;
-        _regionGeometryRepository = regionGeometryRepository;
         _logger = logger;
         _webHostEnvironment = webHostEnvironment;
     }

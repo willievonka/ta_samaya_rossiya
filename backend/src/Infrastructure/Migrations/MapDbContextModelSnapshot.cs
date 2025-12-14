@@ -24,58 +24,6 @@ namespace Infrastructure.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Entities.HistoricalLine", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
-
-                    b.Property<DateTime>("LastUpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_updated_at");
-
-                    b.Property<string>("LineColor")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("line_color");
-
-                    b.Property<int>("LineStyle")
-                        .HasColumnType("integer")
-                        .HasColumnName("line_style");
-
-                    b.Property<Guid>("MapId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("map_id");
-
-                    b.Property<string>("MarkerImagePath")
-                        .HasColumnType("text")
-                        .HasColumnName("marker_image_path");
-
-                    b.Property<string>("MarkerLegend")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("marker_legend");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("title");
-
-                    b.HasKey("Id")
-                        .HasName("pk_historical_lines");
-
-                    b.HasIndex("MapId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_historical_lines_map_id");
-
-                    b.ToTable("historical_lines", (string)null);
-                });
-
             modelBuilder.Entity("Domain.Entities.HistoricalObject", b =>
                 {
                     b.Property<Guid>("Id")
@@ -93,32 +41,32 @@ namespace Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<string>("ExcursionUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("excursion_url");
+
                     b.Property<string>("ImagePath")
                         .HasColumnType("text")
                         .HasColumnName("image_path");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
-
-                    b.Property<Guid>("LineId")
+                    b.Property<Guid>("LayerRegionId")
                         .HasColumnType("uuid")
-                        .HasColumnName("line_id");
-
-                    b.Property<int>("Number")
-                        .HasColumnType("integer")
-                        .HasColumnName("number");
+                        .HasColumnName("layer_region_id");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("title");
 
+                    b.Property<int>("Year")
+                        .HasColumnType("integer")
+                        .HasColumnName("year");
+
                     b.HasKey("Id")
                         .HasName("pk_historical_objects");
 
-                    b.HasIndex("LineId")
-                        .HasDatabaseName("ix_historical_objects_line_id");
+                    b.HasIndex("LayerRegionId")
+                        .HasDatabaseName("ix_historical_objects_layer_region_id");
 
                     b.ToTable("historical_objects", (string)null);
                 });
@@ -275,6 +223,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("ActiveLayerRegionsColor")
+                        .HasColumnType("text")
+                        .HasColumnName("active_layer_regions_color");
+
                     b.Property<string>("BackgroundImage")
                         .HasColumnType("text")
                         .HasColumnName("background_image");
@@ -287,6 +239,15 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("description");
+
+                    b.Property<string>("HistoricalObjectPointColor")
+                        .HasColumnType("text")
+                        .HasColumnName("historical_object_point_color");
+
+                    b.Property<string>("Info")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("info");
 
                     b.Property<bool?>("IsAnalytics")
                         .HasColumnType("boolean")
@@ -351,28 +312,16 @@ namespace Infrastructure.Migrations
                     b.ToTable("region_geometries", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.HistoricalLine", b =>
-                {
-                    b.HasOne("Domain.Entities.Map", "Map")
-                        .WithOne("HistoricalLine")
-                        .HasForeignKey("Domain.Entities.HistoricalLine", "MapId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_historical_lines_maps_map_id");
-
-                    b.Navigation("Map");
-                });
-
             modelBuilder.Entity("Domain.Entities.HistoricalObject", b =>
                 {
-                    b.HasOne("Domain.Entities.HistoricalLine", "HistoricalLine")
+                    b.HasOne("Domain.Entities.LayerRegion", "LayerRegion")
                         .WithMany("HistoricalObjects")
-                        .HasForeignKey("LineId")
+                        .HasForeignKey("LayerRegionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_historical_objects_historical_lines_line_id");
+                        .HasConstraintName("fk_historical_objects_layer_regions_layer_region_id");
 
-                    b.Navigation("HistoricalLine");
+                    b.Navigation("LayerRegion");
                 });
 
             modelBuilder.Entity("Domain.Entities.IndicatorsRegion", b =>
@@ -432,13 +381,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("Region");
                 });
 
-            modelBuilder.Entity("Domain.Entities.HistoricalLine", b =>
-                {
-                    b.Navigation("HistoricalObjects");
-                });
-
             modelBuilder.Entity("Domain.Entities.LayerRegion", b =>
                 {
+                    b.Navigation("HistoricalObjects");
+
                     b.Navigation("Indicators");
 
                     b.Navigation("Style");
@@ -446,8 +392,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Map", b =>
                 {
-                    b.Navigation("HistoricalLine");
-
                     b.Navigation("Regions");
                 });
 

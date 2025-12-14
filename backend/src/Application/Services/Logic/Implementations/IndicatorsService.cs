@@ -21,6 +21,13 @@ public class IndicatorsService : IIndicatorsService
         _imageService = imageService;
     }
     
+    /// <summary>
+    /// Создаёт показатели слоя региона
+    /// </summary>
+    /// <param name="layerRegionId">id слоя региона</param>
+    /// <param name="indicatorsRegionDto"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<Guid> CreateIndicatorsAsync(Guid layerRegionId, IndicatorsRegionDto? indicatorsRegionDto, CancellationToken ct)
     {
         if (indicatorsRegionDto == null)
@@ -31,26 +38,32 @@ public class IndicatorsService : IIndicatorsService
         
         _logger.LogInformation("Creating IndicatorsRegion");
         
-        var indicators = new IndicatorsRegion();
+        var indicators = new IndicatorsRegion
+        {
+            IsActive = indicatorsRegionDto.IsActive!.Value,
+            Excursions = indicatorsRegionDto.Excursions!.Value,
+            Participants = indicatorsRegionDto.Participants!.Value,
+            Partners = indicatorsRegionDto.Partners!.Value,
+            RegionId = layerRegionId
+        };
             
         if (indicatorsRegionDto.Image != null)
         {
-            string? fileUri = null;
-            fileUri = await _imageService.SaveImageAsync(layerRegionId, FilePath, indicatorsRegionDto.Image);
+            var fileUri = await _imageService.SaveImageAsync(layerRegionId, FilePath, indicatorsRegionDto.Image);
             indicators.ImagePath = fileUri;
         }
-
-        indicators.IsActive = indicatorsRegionDto.IsActive;
-        indicators.Excursions = indicatorsRegionDto.Excursions;
-        indicators.Participants = indicatorsRegionDto.Participants;
-        indicators.Partners = indicatorsRegionDto.Partners;
-        indicators.RegionId = layerRegionId;
         
         await _indicatorsRepository.AddAsync(indicators, ct);
         
         return indicators.Id;
     }
 
+    /// <summary>
+    /// Получает показатели слоя региона по Id слоя региона
+    /// </summary>
+    /// <param name="layerRegionId">id слоя региона</param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<IndicatorsRegionDto?> GetIndicatorsByLayerRegionAsync(Guid layerRegionId, CancellationToken ct)
     {
         var indicators = await _indicatorsRepository.GetByLayerRegionAsync(layerRegionId, ct);
@@ -72,9 +85,16 @@ public class IndicatorsService : IIndicatorsService
         };
     }
 
+    /// <summary>
+    /// Обновляет показатели слоя региона
+    /// </summary>
+    /// <param name="layerId">id слоя региона</param>
+    /// <param name="indicatorsRegionDto"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<Guid> UpdateIndicatorsAsync(Guid layerId, IndicatorsRegionDto indicatorsRegionDto, CancellationToken ct)
     {
-        var indicators = await _indicatorsRepository.GetByIdAsync(layerId, ct);
+        var indicators = await _indicatorsRepository.GetByLayerRegionAsync(layerId, ct);
 
         if (indicators == null)
         {
@@ -82,24 +102,30 @@ public class IndicatorsService : IIndicatorsService
             return Guid.Empty;
         }
         
-        string? fileUri = null;
         if (indicatorsRegionDto.Image != null)
         { 
-            fileUri = await _imageService.UpdateImageAsync(indicators.Id, indicators.ImagePath, FilePath,
+            var fileUri = await _imageService.UpdateImageAsync(indicators.Id, indicators.ImagePath, FilePath,
                 indicatorsRegionDto.Image);
+            
+            indicators.ImagePath = fileUri;
         }
         
-        indicators.IsActive = indicatorsRegionDto.IsActive;
-        indicators.Excursions = indicatorsRegionDto.Excursions;
-        indicators.Participants = indicatorsRegionDto.Participants;
-        indicators.Partners = indicatorsRegionDto.Partners;
-        indicators.ImagePath = fileUri;
+        if (indicatorsRegionDto.IsActive != null) indicators.IsActive = indicatorsRegionDto.IsActive.Value;
+        if (indicatorsRegionDto.Excursions != null) indicators.Excursions = indicatorsRegionDto.Excursions.Value;
+        if (indicatorsRegionDto.Participants != null) indicators.Participants = indicatorsRegionDto.Participants.Value;
+        if (indicatorsRegionDto.Partners != null) indicators.Partners = indicatorsRegionDto.Partners.Value;
         
         await _indicatorsRepository.UpdateAsync(indicators, ct);
         
         return indicators.Id;
     }
 
+    /// <summary>
+    /// Удаляет показатели слоя региона
+    /// </summary>
+    /// <param name="indicatorsId">Id показателей региона</param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<bool> DeleteIndicatorsAsync(Guid indicatorsId, CancellationToken ct)
     {
         _logger.LogInformation("Deleting Indicators {indicatorsId}", indicatorsId);

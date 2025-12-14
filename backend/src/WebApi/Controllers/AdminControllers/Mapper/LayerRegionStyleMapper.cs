@@ -1,4 +1,6 @@
 ﻿using Application.Services.Dtos;
+using WebApi.Controllers.AdminControllers.LayerRegionStyle.Request;
+using WebApi.Controllers.AdminControllers.LayerRegionStyle.Response;
 using WebApi.Controllers.AdminControllers.Map.Requests;
 using WebApi.Controllers.AdminControllers.Map.Responses;
 
@@ -6,12 +8,12 @@ namespace WebApi.Controllers.AdminControllers.Mapper;
 
 public static class LayerRegionStyleMapper
 {
-    public static LayerRegionStyleDto? StyleRequestToDto(CreateLayerRegionStyleRequest? request)
+    public static LayerRegionStyleDto? StyleRequestToDto(UpsertLayerRegionStyleRequest? request)
     {
         if (request == null)
             return null;
         
-        if (request.Equals(new CreateLayerRegionStyleRequest(null, null, null, null, null, 
+        if (request.Equals(new UpsertLayerRegionStyleRequest(null, null, null, null, null, 
                 null, null, null, null, null, null, null, null)))
         {
             return null;

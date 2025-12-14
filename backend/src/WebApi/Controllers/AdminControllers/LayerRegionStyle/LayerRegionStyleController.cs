@@ -1,5 +1,7 @@
 ﻿using Application.Services.Logic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Controllers.AdminControllers.LayerRegionStyle.Request;
+using WebApi.Controllers.AdminControllers.LayerRegionStyle.Response;
 using WebApi.Controllers.AdminControllers.Map.Requests;
 using WebApi.Controllers.AdminControllers.Map.Responses;
 using WebApi.Controllers.AdminControllers.Mapper;
@@ -30,7 +32,7 @@ public class LayerRegionStyleController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddStyleRegion([FromRoute] Guid mapId, [FromRoute] Guid layerId,
-        [FromBody] CreateLayerRegionStyleRequest request, CancellationToken ct)
+        [FromBody] UpsertLayerRegionStyleRequest request, CancellationToken ct)
     {
         var dto = LayerRegionStyleMapper.StyleRequestToDto(request);
 
@@ -75,7 +77,7 @@ public class LayerRegionStyleController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateByLayerIdStyle([FromRoute] Guid mapId, [FromRoute] Guid layerId,
-        [FromBody] CreateLayerRegionStyleRequest request, CancellationToken ct)
+        [FromBody] UpsertLayerRegionStyleRequest request, CancellationToken ct)
     {
         var dto = LayerRegionStyleMapper.StyleRequestToDto(request);
 

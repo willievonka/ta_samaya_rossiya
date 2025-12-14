@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Controllers.AdminControllers.LayerRegion.Request;
 using WebApi.Controllers.AdminControllers.Map.Requests;
-using WebApi.Controllers.AdminControllers.Map.Responses;
 using WebApi.Controllers.AdminControllers.Mapper;
 
 namespace WebApi.Controllers.AdminControllers.LayerRegion;
@@ -74,7 +73,7 @@ public class LayerRegionController : ControllerBase
     /// <param name="ct">Токен отмены</param>
     /// <returns></returns>
     [HttpPut]
-    [ProducesResponseType(StatusCodes.Status303SeeOther)]  
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]  
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateLayerRegion([FromRoute] Guid mapId, [FromQuery] Guid layerId,
@@ -99,7 +98,7 @@ public class LayerRegionController : ControllerBase
     /// <param name="ct">Токен отмены</param>
     /// <returns></returns>
     [HttpPatch]
-    [ProducesResponseType(StatusCodes.Status303SeeOther)]  
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]  
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateAnalyticsDataRegion([FromRoute] Guid mapId, [FromQuery] Guid layerId,
@@ -116,20 +115,20 @@ public class LayerRegionController : ControllerBase
     }
 
     /// <summary>
-    /// Сделать регион активным
+    /// Активировать/дезактвировать слой региона в засимисости от нынешнего состояния.
     /// </summary>
     /// <param name="mapId">Id карты </param>
     /// <param name="layerId">Id региона</param>
     /// <param name="ct">Токен отмены</param>
     /// <returns></returns>
-    [HttpPatch("activate")]//TODO изменить на активация/дезактивацию
+    [HttpPatch("activation")]
     [ProducesResponseType(StatusCodes.Status303SeeOther)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> MakeRegionActive([FromRoute] Guid mapId, [FromQuery] Guid layerId,
+    public async Task<IActionResult> SwitchRegionActivation([FromRoute] Guid mapId, [FromQuery] Guid layerId,
         CancellationToken ct)
     {
-        await _layerRegionService.MakeRegionActive(layerId, ct);
+        await _layerRegionService.SwitchRegionActivation(layerId, ct);
         
         return Ok();
     }

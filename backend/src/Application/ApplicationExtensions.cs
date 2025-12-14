@@ -1,5 +1,4 @@
-﻿using Application.Services.Interfaces;
-using Application.Services.Logic.Implementations;
+﻿using Application.Services.Logic.Implementations;
 using Application.Services.Logic.Interfaces;
 
 namespace Application;
@@ -13,6 +12,7 @@ public static class ApplicationExtensions
         services.AddScoped<ILayerRegionStyleService, LayerRegionStyleService>();
         services.AddScoped<ILayerRegionService, LayerRegionService>();
         services.AddScoped<IMapService, MapService>();
+        services.AddScoped<IHistoricalObjectService, HistoricalObjectService>();
         return services;
     }
 }

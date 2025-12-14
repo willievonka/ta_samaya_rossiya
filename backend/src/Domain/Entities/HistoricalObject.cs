@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-using NetTopologySuite.Geometries;
-using Point = NetTopologySuite.Geometries.Point;
+﻿using Point = NetTopologySuite.Geometries.Point;
 
 namespace Domain.Entities;
 
@@ -14,9 +12,9 @@ public class HistoricalObject
     public Point Coordinates { get; set; }
     
     /// <summary>
-    /// Порядковый номер объекта внутри исторической линии
+    /// Год исторического объекта 
     /// </summary>
-    public int Number { get; set; }
+    public int Year { get; set; }
 
     /// <summary>
     /// Название объекта
@@ -24,27 +22,27 @@ public class HistoricalObject
     public string Title { get; set; } = "";
     
     /// <summary>
-    /// Путь к изображению в локальном хранилище (images/objects/image.png)
-    /// </summary>
-    public string? ImagePath { get; set; }
-    
-    /// <summary>
     /// Описание объекта
     /// </summary>
     public string Description { get; set; }  = "";
     
     /// <summary>
-    /// Отображается ли регион для пользователей
+    /// Путь к изображению в локальном хранилище (images/objects/image.png)
     /// </summary>
-    public bool IsActive { get; set; } = true;
+    public string? ImagePath { get; set; }
+    
+    /// <summary>
+    /// Ссылка на видоэкскурсию по объекты
+    /// </summary>
+    public string? ExcursionUrl { get; set; }
     
     /// <summary>
     /// Идентификатор исторической линии, к которой принадлежит объект
     /// </summary>
-    public Guid LineId { get; set; }
+    public Guid LayerRegionId { get; set; }
 
     /// <summary>
     /// Ссылка на историческую линию, которой принадлежит объект
     /// </summary>
-    public HistoricalLine HistoricalLine { get; set; }
+    public LayerRegion LayerRegion { get; set; }
 }

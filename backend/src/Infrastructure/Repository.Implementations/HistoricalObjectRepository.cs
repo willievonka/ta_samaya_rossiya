@@ -27,19 +27,10 @@ public class HistoricalObjectRepository : IHistoricalObjectRepository
             .FirstOrDefaultAsync(o => o.Id == histObjectId, ct);
     }
 
-    public async Task<List<HistoricalObject>?> GetAllByHistoricalLineAsync(Guid histLineId, CancellationToken ct)
+    public async Task<List<HistoricalObject>?> GetAllByLayerRegionIdAsync(Guid layerRegionId, CancellationToken ct)
     {
         return await _context.HistoricalObjects
-            .Where(o => o.LineId == histLineId)
-            .AsNoTracking()
-            .ToListAsync(ct);
-    }
-
-    public async Task<List<HistoricalObject>?> GetActiveByHistoricalLineAsync(Guid histLineId, CancellationToken ct)
-    {
-        return await _context.HistoricalObjects
-            .Where(o => o.LineId == histLineId)
-            .Where(o => o.IsActive)
+            .Where(o => o.LayerRegionId == layerRegionId)
             .AsNoTracking()
             .ToListAsync(ct);
     }

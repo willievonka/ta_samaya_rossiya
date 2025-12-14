@@ -24,7 +24,9 @@ public class LayerRegionDto
     /// <summary>
     /// Полигон, обозначающий границы региона
     /// </summary>
-    public MultiPolygon? Geometry { get; set; }
+    public MultiPolygon Geometry { get; set; }
     
     public IndicatorsRegionDto? Indicators { get; set; }
+    
+    public IEnumerable<HistoricalObjectDto>? HistoricalObjects { get; set; }
 }
