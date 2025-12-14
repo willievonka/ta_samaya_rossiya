@@ -8,27 +8,27 @@ import { IActiveLeafletLayer } from './interfaces/leaflet-layer.interface';
 import { Feature, GeoJsonProperties } from 'geojson';
 import { IMapZoomActions } from './interfaces/map-zoom-actions.interface';
 import { mapConfig } from './map.config';
+import { IMapPoint } from './interfaces/map-point.interface';
 
 @Component({
     selector: 'map',
     standalone: true,
-    template: `
-        @if(isLoading()) {
-            <p>ISLOADING</p>
-        }
-        <div class="map" #mapContainer></div>
-    `,
+    template: `<div class="map" #mapContainer></div>`,
     styleUrl: './styles/map.master.scss',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapComponent implements AfterViewInit {
+    /** Inputs */
     public readonly layers: InputSignal<IMapLayer[]> = input.required();
 
-    public readonly zoomActions: WritableSignal<IMapZoomActions | undefined> = signal(undefined);
+    /** Outputs */
     public readonly regionSelected: OutputEmitterRef<IMapLayerProperties | null> = output();
+    public readonly pointSelected: OutputEmitterRef<IMapPoint | null> = output();
 
-    protected readonly isLoading: WritableSignal<boolean> = signal(true);
+    /** Public fields*/
+    public readonly zoomActions: WritableSignal<IMapZoomActions | undefined> = signal(undefined);
 
+    /** Private fields */
     private readonly _config: IMapConfig = mapConfig;
     private readonly _mapContainer: Signal<ElementRef<HTMLDivElement>> = viewChild.required('mapContainer');
     private _map: Map | null = null;
@@ -37,7 +37,6 @@ export class MapComponent implements AfterViewInit {
     public ngAfterViewInit(): void {
         this.initMap();
         this.renderLayers(this.layers());
-        this.isLoading.set(false);
     }
 
     /** Снять выделение с активного слоя */
