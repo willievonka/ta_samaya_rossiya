@@ -22,7 +22,10 @@ export class MapDataService {
             );
     }
 
-    /** Смаппить dto в модель */
+    /**
+     * Смаппить dto в модель
+     * @param dto
+     */
     private mapDtoToModel(dto: IMapDto): IMapModel {
         return {
             pageTitle: dto.pageTitle,

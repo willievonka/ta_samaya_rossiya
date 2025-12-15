@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, input, InputSignal, output, OutputEmitterRef, signal, Signal, viewChild, WritableSignal } from '@angular/core';
-import { DomEvent, geoJSON, Layer, LeafletMouseEvent, map, Map, Path, PathOptions } from 'leaflet';
+import { divIcon, DivIcon, DomEvent, geoJSON, Layer, LeafletMouseEvent, map, Map, marker, Path, PathOptions } from 'leaflet';
 import { IMapLayer, IMapLayerProperties } from './interfaces/map-layer.interface';
 import { customCoordsToLatLng } from './utils/custom-coords-to-lat-lng.util';
 import { IMapConfig } from './interfaces/map-config.interface';
@@ -20,6 +20,8 @@ import { IMapPoint } from './interfaces/map-point.interface';
 export class MapComponent implements AfterViewInit {
     /** Inputs */
     public readonly layers: InputSignal<IMapLayer[]> = input.required();
+    public readonly activeLayerColor: InputSignal<string | undefined> = input();
+    public readonly pointColor: InputSignal<string | undefined> = input();
 
     /** Outputs */
     public readonly regionSelected: OutputEmitterRef<IMapLayerProperties | null> = output();
@@ -63,18 +65,14 @@ export class MapComponent implements AfterViewInit {
         });
 
         this._map = mapInstance;
-        this.setZoomActions();
+        this.setZoomActions(mapInstance);
     }
 
     /** Установить действия для зума */
-    private setZoomActions(): void {
+    private setZoomActions(mapInstance: Map): void {
         const config: IMapConfig = this._config;
-        const mapInstance: Map | null = this._map;
-        if (!mapInstance) {
-            return;
-        }
 
-        this.zoomActions.set({
+        const actions: IMapZoomActions = {
             zoomIn: () => mapInstance.zoomIn(),
             zoomOut: () => mapInstance.zoomOut(),
             resetZoom: () => mapInstance.setView(
@@ -82,7 +80,9 @@ export class MapComponent implements AfterViewInit {
                 config.options.minZoom,
                 { animate: true }
             )
-        });
+        };
+
+        this.zoomActions.set(actions);
     }
 
     /**
@@ -96,41 +96,95 @@ export class MapComponent implements AfterViewInit {
         }
 
         layers.forEach(layer => {
-            const properties: GeoJsonProperties = this.getLayerProperties(layer);
+            const properties: GeoJsonProperties = this.buildLayerProperties(layer);
             geoJSON(layer.geoData, properties)
                 .addTo(mapInstance);
+
+            const points: IMapPoint[] | undefined = layer.properties.points;
+            if (points?.length) {
+                points.forEach((point) => this.renderPoint(point, mapInstance));
+            }
         });
+    }
+
+    /**
+     * Отрисовать точку на карте
+     * @param point
+     */
+    private renderPoint(point: IMapPoint, mapInstance: Map): void {
+        const color: string = this.pointColor() || this._config.defaultPointOptions.color;
+        const iconSize: number = this._config.defaultPointOptions.iconSize;
+        const ancorSize: number = iconSize / 2;
+
+        const icon: DivIcon = divIcon({
+            className: 'map__point',
+            html: `
+                <div class="map__point-icon" style="background-color: ${color}">
+                    1
+                </div>
+            `,
+            iconSize: [iconSize, iconSize],
+            iconAnchor: [ancorSize, ancorSize]
+        });
+
+        marker(customCoordsToLatLng(point.coordinates, true), { icon })
+            .addTo(mapInstance);
     }
 
     /**
      * Получить свойства слоя
      * @param mapLayer
      */
-    private getLayerProperties(mapLayer: IMapLayer): GeoJsonProperties {
+    private buildLayerProperties(mapLayer: IMapLayer): GeoJsonProperties {
         const isActive: boolean = mapLayer.properties.isActive === true;
+        const hasPoints: boolean = !!mapLayer.properties.points?.length;
 
-        return {
+        const layerStyle: PathOptions = this.createLayerStyle(
+            mapLayer.properties.style,
+            hasPoints
+        );
+
+        const properties: GeoJsonProperties = {
             ...mapLayer.properties,
-            style: {
-                ...this._config.defaultLayerStyle,
-                ...mapLayer.properties.style,
-            },
+            style: layerStyle,
             interactive: isActive,
             coordsToLatLng: customCoordsToLatLng,
             onEachFeature: (feature: Feature, leafletLayer: Layer): void => {
-                if (isActive) {
-                    const pathLayer: IActiveLeafletLayer = leafletLayer as IActiveLeafletLayer;
-                    pathLayer.originalStyle = { ...pathLayer.options };
-
-                    leafletLayer.on({
-                        click: (event: LeafletMouseEvent) => {
-                            DomEvent.stopPropagation(event);
-                            this.selectRegion(mapLayer, pathLayer);
-                        }
-                    });
+                if (!isActive) {
+                    return;
                 }
+
+                const pathLayer: IActiveLeafletLayer = leafletLayer as IActiveLeafletLayer;
+                pathLayer.originalStyle = { ...pathLayer.options };
+
+                leafletLayer.on({
+                    click: (event: LeafletMouseEvent) => {
+                        DomEvent.stopPropagation(event);
+                        this.selectRegion(mapLayer, pathLayer);
+                    }
+                });
             }
         };
+
+        return properties;
+    }
+
+    /**
+     * Создать стиль для слоя
+     * @param currentLayerStyle
+     * @param hasPoints
+     */
+    private createLayerStyle(currentLayerStyle: PathOptions | undefined, hasPoints: boolean): PathOptions {
+        const defaultLayerStyle: PathOptions = this._config.defaultLayerStyle;
+        const overrideColor: string | undefined = hasPoints ? this.activeLayerColor() : undefined;
+
+        const resultStyle: PathOptions = {
+            ...defaultLayerStyle,
+            ...currentLayerStyle,
+            ...(overrideColor ? { fillColor: overrideColor } : {})
+        };
+
+        return resultStyle;
     }
 
     /**
@@ -149,10 +203,9 @@ export class MapComponent implements AfterViewInit {
      * @param leafletLayer
      */
     private applyActiveLayerStyle(leafletLayer: IActiveLeafletLayer): void {
-        const prev: Path | null = this._activeLeafletLayer;
-
-        if (prev && prev !== leafletLayer) {
-            this.resetLayerStyle(prev);
+        const previous: Path | null = this._activeLeafletLayer;
+        if (previous && previous !== leafletLayer) {
+            this.resetLayerStyle(previous);
         }
 
         const base: PathOptions = leafletLayer.originalStyle!;
@@ -193,9 +246,11 @@ export class MapComponent implements AfterViewInit {
 
     /** Очистить активный слой */
     private clearActiveLayer(): void {
-        if (this._activeLeafletLayer) {
-            this.resetLayerStyle(this._activeLeafletLayer);
-            this._activeLeafletLayer = null;
+        if (!this._activeLeafletLayer) {
+            return;
         }
+
+        this.resetLayerStyle(this._activeLeafletLayer);
+        this._activeLeafletLayer = null;
     }
 }

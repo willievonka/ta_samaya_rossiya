@@ -70,3 +70,21 @@ svg {
     display: block;
     flex-shrink: 0;
 }
+
+/* Стили для карт */
+.map {
+    &__point-icon {
+        display: flex;
+        width: spacing.$spacing-3xl;
+        height: spacing.$spacing-3xl;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid white;
+        border-radius: 50%;
+        color: white;
+        font-family: "Manrope", sans-serif;
+        font-size: spacing.$spacing-2l;
+        line-height: normal;
+        font-weight: 800;
+    }
+}

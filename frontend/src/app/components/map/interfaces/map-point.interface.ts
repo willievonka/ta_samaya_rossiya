@@ -7,3 +7,8 @@ export interface IMapPoint {
     description: string;
     excursionUrl: string;
 }
+
+export interface IDefaultMapPointOptions {
+    color: string;
+    iconSize: number;
+}

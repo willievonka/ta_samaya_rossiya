@@ -18,6 +18,4 @@ import { MapInfoComponent } from '../../components/map-info/map-info.component';
         MapInfoComponent
     ]
 })
-export class MapPageComponent extends MapPageBaseComponent {
-
-}
+export class MapPageComponent extends MapPageBaseComponent {}
