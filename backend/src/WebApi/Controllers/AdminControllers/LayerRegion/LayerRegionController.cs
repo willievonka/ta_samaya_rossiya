@@ -54,7 +54,7 @@ public class LayerRegionController : ControllerBase
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteLayerRegion([FromQuery] Guid mapId,
+    public async Task<IActionResult> DeleteLayerRegion([FromRoute] Guid mapId,
         [FromQuery] Guid layerId, CancellationToken ct)
     {
         var res = await _layerRegionService.DeleteLayerRegionAsync(layerId, ct);

@@ -14,9 +14,16 @@ public static class LayerRegionMapper
         if (layerRegionDto == null)
             return null;
 
-        if (!layerRegionDto.IsActive!.Value && isAnalyticsMap)
+        bool? isActive = null;
+        
+        if (isAnalyticsMap)
         {
-            return new MapLayerPropertiesResponse(layerRegionDto.Id!.Value, layerRegionDto.Name);
+            if (!layerRegionDto.IsActive!.Value)
+            {
+                return new MapLayerPropertiesResponse(layerRegionDto.Id!.Value, layerRegionDto.Name);
+            }
+            
+            isActive = layerRegionDto.IsActive;
         }
         
         var style = LayerRegionStyleMapper.StyleDtoToResponse(layerRegionDto.Style);
@@ -40,7 +47,7 @@ public static class LayerRegionMapper
             }
         }
         
-        return new MapLayerPropertiesResponse(layerRegionDto.Id!.Value, layerRegionDto.Name, null, 
+        return new MapLayerPropertiesResponse(layerRegionDto.Id!.Value, layerRegionDto.Name, isActive, 
             style, analiticsProperties, points);
     }
 

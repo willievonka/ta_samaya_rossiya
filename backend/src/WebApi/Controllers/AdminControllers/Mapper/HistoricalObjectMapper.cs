@@ -13,7 +13,7 @@ public static class HistoricalObjectMapper
 
         foreach (var point in request.Points)
         {
-            list.Add(CreateHistoricalObjectRequestToDto(point));
+            list.Add(CreateHistoricalObjectRequestToDto(point, point.LayerId));
         }
         
         return list;
@@ -52,11 +52,11 @@ public static class HistoricalObjectMapper
         );
     }
 
-    public static HistoricalObjectDto CreateHistoricalObjectRequestToDto(CreateHistoricalObjectRequest request)
+    public static HistoricalObjectDto CreateHistoricalObjectRequestToDto(CreateHistoricalObjectRequest request, Guid layerId)
     {
         return new HistoricalObjectDto
         {
-            LayerRegionId = request.LayerRegionId,
+            LayerRegionId = layerId,
             Title = request.Title,
             Description = request.Description,
             Coordinates = new Point(request.Coordinates[0], request.Coordinates[1]),

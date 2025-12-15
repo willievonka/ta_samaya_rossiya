@@ -11,7 +11,7 @@ public class IndicatorsService : IIndicatorsService
     private readonly ILogger<IIndicatorsService> _logger;
     private readonly IImageService _imageService;
 
-    private const string FilePath = "map-cards"; 
+    private const string FilePath = "indicators"; 
     
     public IndicatorsService(IIndicatorsRepository indicatorsRepository, ILogger<IIndicatorsService> logger,
         IImageService imageService)
@@ -49,9 +49,12 @@ public class IndicatorsService : IIndicatorsService
             
         if (indicatorsRegionDto.Image != null)
         {
+            _logger.LogInformation("Starting save Indicators image");
             var fileUri = await _imageService.SaveImageAsync(layerRegionId, FilePath, indicatorsRegionDto.Image);
             indicators.ImagePath = fileUri;
         }
+        else _logger.LogError("Image is null");
+
         
         await _indicatorsRepository.AddAsync(indicators, ct);
         
@@ -104,11 +107,13 @@ public class IndicatorsService : IIndicatorsService
         
         if (indicatorsRegionDto.Image != null)
         { 
+            _logger.LogInformation("Starting update Indicators image");
             var fileUri = await _imageService.UpdateImageAsync(indicators.Id, indicators.ImagePath, FilePath,
                 indicatorsRegionDto.Image);
             
             indicators.ImagePath = fileUri;
         }
+        else _logger.LogError("Image is null");
         
         if (indicatorsRegionDto.IsActive != null) indicators.IsActive = indicatorsRegionDto.IsActive.Value;
         if (indicatorsRegionDto.Excursions != null) indicators.Excursions = indicatorsRegionDto.Excursions.Value;
@@ -139,6 +144,7 @@ public class IndicatorsService : IIndicatorsService
         
         if (indicators.ImagePath != null)
         { 
+            _logger.LogInformation("Starting delete Indicators image");
             await _imageService.DeleteImageAsync(indicators.ImagePath);
         }
         
