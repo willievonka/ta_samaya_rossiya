@@ -5,7 +5,7 @@ using WebApi.Controllers.AdminControllers.Map.Requests;
 namespace WebApi.Controllers.AdminControllers.LayerRegion.Request;
 
 public record UpdateLayerRegionRequest(
-    [Required] bool IsActive,
+    bool? IsActive,
     UpsertLayerRegionStyleRequest? Style = null,
     UpsertIndicatorsRequest? AnalyticsData = null
     );

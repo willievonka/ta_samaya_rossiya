@@ -1743,7 +1743,17 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="wwwroot\images\" />
       <Folder Include="wwwroot\images\map-cards\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019af837-84f8-7013-9bef-5b2d3fab0988.Image.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019af837-84f8-7013-9bef-5b2d3fab0988.Image.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019af837-858a-7c1a-bb2e-c66367333185.Image.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019af8af-5dd2-711b-a9d5-e395666ad662.Image.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019af8af-5f11-7293-ade3-bfd50c0e3d3f.Image.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019b1d2f-56aa-7b90-ad87-466ed39b3d61.Image.jpg" />
     </ItemGroup>
 
 </Project>

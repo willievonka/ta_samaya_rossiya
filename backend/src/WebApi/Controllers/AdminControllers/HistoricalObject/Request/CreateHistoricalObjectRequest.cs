@@ -3,7 +3,6 @@
 namespace WebApi.Controllers.AdminControllers.HistoricalObject.Request;
 
 public record CreateHistoricalObjectRequest(
-    Guid LayerRegionId,
     string Title,
     double[] Coordinates,
     int Year,

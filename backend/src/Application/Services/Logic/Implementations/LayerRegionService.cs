@@ -242,6 +242,8 @@ public class LayerRegionService : ILayerRegionService
             return false;
         }
         
+        //TODO добавить логику добавления пустого региона перед удалением
+        
         await _layerRegionRepository.DeleteByIdAsync(layerRegionId, ct);
        
         _logger.LogInformation("layer {layerRegionId} deleted", layerRegionId);

@@ -50,9 +50,11 @@ public class HistoricalObjectService : IHistoricalObjectService
 
         if (histObjectDto.Image != null)
         {
+            _logger.LogInformation("Starting save HistoricalObject image");
             var fileUri = await _imageService.SaveImageAsync(layerRegionId, FilePath, histObjectDto.Image);
             historicalObject.ImagePath = fileUri;
         }
+        else _logger.LogError("Image is null");
         
         await _historicalObjectRepository.AddAsync(historicalObject, ct);
         
@@ -84,11 +86,13 @@ public class HistoricalObjectService : IHistoricalObjectService
         
         if (histObjectDto.Image != null)
         { 
+            _logger.LogInformation("Starting update HistoricalObject image");
             var fileUri = await _imageService.UpdateImageAsync(histObject.Id, histObject.ImagePath, FilePath,
                 histObjectDto.Image);
             
             histObject.ImagePath = fileUri;
         }
+        else _logger.LogError("Image is null");
         
         if (histObjectDto.ExcursionUrl != null) histObject.ExcursionUrl = histObjectDto.ExcursionUrl;
         if (histObjectDto.Year != null) histObject.Year = histObjectDto.Year.Value;
@@ -151,6 +155,12 @@ public class HistoricalObjectService : IHistoricalObjectService
         {
             _logger.LogError("HistoricalObject {histObjectId} could not be found", histObjectId);
             return false;
+        }
+
+        if (histObject.ImagePath != null)
+        {
+            _logger.LogInformation("Starting delete HistoricalObject image");
+            await _imageService.DeleteImageAsync(histObject.ImagePath);
         }
         
         await _historicalObjectRepository.DeleteByIdAsync(histObjectId, ct);

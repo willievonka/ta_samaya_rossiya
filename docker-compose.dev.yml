@@ -38,7 +38,7 @@ services:
       - ./db/postgres-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_HOST=db
-      - POSTGRES_DB=ta-samaya-rossiya-db
+      - POSTGRES_DB=ta-samaya-rossiya
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=2018
       - POSTGRES_PORT=5432

@@ -57,7 +57,7 @@ public class HistoricalObjectController : ControllerBase
     public async Task<IActionResult> CreateHistoricalObject([FromRoute] Guid mapId, [FromRoute] Guid layerId, 
         [FromForm] CreateHistoricalObjectRequest request, CancellationToken ct)
     {
-        var dto = HistoricalObjectMapper.CreateHistoricalObjectRequestToDto(request);
+        var dto = HistoricalObjectMapper.CreateHistoricalObjectRequestToDto(request, layerId);
         
         var id = await _historicalObjectService.CreateHistoricalObjectAsync(layerId, dto, ct);
         
@@ -74,7 +74,7 @@ public class HistoricalObjectController : ControllerBase
     [HttpGet("{layerId:guid}/points")]
     [ProducesResponseType(typeof(List<HistoricalObjectResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetAllHistoricalObjectsByMapId([FromRoute] Guid mapId, [FromRoute] Guid layerId,
+    public async Task<IActionResult> GetAllHistoricalObjectsByLayerId([FromRoute] Guid mapId, [FromRoute] Guid layerId,
         CancellationToken ct)
     {
         var dtos = await _historicalObjectService.GetAllByLayerRegionIdAsync(layerId, ct);

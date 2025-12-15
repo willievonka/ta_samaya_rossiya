@@ -94,10 +94,12 @@ public class MapService : IMapService
         
         if (mapDto.BackgroundImage != null)
         { 
+            _logger.LogInformation("Starting save Map image");
             var fileUri = await _imageService.SaveImageAsync(id, FilePath, mapDto.BackgroundImage);
             map.BackgroundImage = fileUri;
             await _mapRepository.UpdateAsync(map, ct);
         }
+        else _logger.LogError("Image is null");
         
         _logger.LogInformation("Map {id} created", id);
         
@@ -125,6 +127,7 @@ public class MapService : IMapService
         
         if (map.BackgroundImage != null)
         { 
+            _logger.LogInformation("Starting delete Map image");
             await _imageService.DeleteImageAsync(map.BackgroundImage);
         }
         
@@ -191,11 +194,13 @@ public class MapService : IMapService
         
         if (mapDto.BackgroundImage != null)
         { 
+            _logger.LogInformation("Starting update Map image");
             var fileUri = await _imageService.UpdateImageAsync(map.Id, map.BackgroundImage, FilePath,
                 mapDto.BackgroundImage);
             
             map.BackgroundImage = fileUri;
         }
+        else _logger.LogError("Image is null");
         
         if (mapDto.Title != null) map.Title = mapDto.Title;
         if (mapDto.Description != null) map.Description = mapDto.Description;
@@ -237,6 +242,8 @@ public class MapService : IMapService
             _logger.LogError("Map {mapId} could not be found", mapId);
             return Guid.Empty;
         }
+        
+        //TODO добавить логику удаления пустого региона при создании
         
         var layerRegionId = await _layerRegionService.CreateLayerRegionAsync(map.Id, layerRegionDto, ct);
         

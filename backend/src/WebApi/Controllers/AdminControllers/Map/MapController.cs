@@ -49,7 +49,6 @@ public class MapController : ControllerBase
     {
         var cards = await _mapService.GetAllCardsASync(ct);
         
-        //TODO: 
         var response = MapMapper.MapsDtosToMapsCardsResponse(cards);
         
         return Ok(response);

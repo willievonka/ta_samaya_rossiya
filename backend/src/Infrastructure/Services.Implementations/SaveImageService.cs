@@ -6,18 +6,21 @@ namespace Infrastructure.Services.Implementations;
 public class SaveImageService : ISaveImageService
 {
     private readonly IWebHostEnvironment _environment;
-
+    private readonly ILogger<ISaveImageService> _logger;
+    
     private const string UploadsFolder = "images";
     
-    public SaveImageService(IWebHostEnvironment environment)
+    public SaveImageService(IWebHostEnvironment environment, ILogger<ISaveImageService> logger)
     {
         _environment = environment;
+        _logger = logger;
     }
 
     public async Task<string> SaveImageAsync(Guid entityId, string folder, IFormFile newFile)
     {
         if (newFile == null || newFile.Length == 0)
         {   
+            _logger.LogError("The file has not been transferred or is empty");
             throw new ArgumentException("The file has not been transferred or is empty");
         }
 
@@ -32,9 +35,8 @@ public class SaveImageService : ISaveImageService
             Directory.CreateDirectory(folderPath);
         }
         
-        var extension = Path.GetExtension(newFile.FileName);
-        var correctFileName = Regex.Replace(newFile.Name, @"\s+", "").Trim();
-        var fileName = $"{entityId.ToString()}.{correctFileName}{extension}";
+        var correctFileName = Regex.Replace(newFile.FileName, @"\s+", "").Trim();
+        var fileName = $"{entityId.ToString()}.{correctFileName}";
         var fullPath = Path.Combine(folderPath, fileName);
 
         var relativePath = Path.Combine(UploadsFolder, folder, fileName);
@@ -58,11 +60,13 @@ public class SaveImageService : ISaveImageService
         
         if (string.IsNullOrEmpty(fullPath))
         {
+            _logger.LogError("Invalid path");
             throw new ArgumentException("Invalid path");
         }
         
         if (!File.Exists(fullPath))
         {
+            _logger.LogError("File not found");
             throw new FileNotFoundException("File not found", path);
         }
         
