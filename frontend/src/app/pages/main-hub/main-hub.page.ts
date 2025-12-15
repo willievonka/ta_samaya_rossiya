@@ -11,7 +11,7 @@ import { PageHeaderComponent } from '../../components/page-header/page-header.co
     selector: 'main-hub-page',
     standalone: true,
     templateUrl: './main-hub.page.html',
-    styleUrl: './styles/main-hub.master.scss',
+    styleUrl: './styles/main-hub-page.master.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MainHubCardComponent,

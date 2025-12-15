@@ -8,5 +8,9 @@ export const routes: Routes = [
     {
         path: 'analytics-map',
         loadComponent: () => import('./pages/analytics-map/analytics-map.page').then(m => m.AnalyticsMapPageComponent)
+    },
+    {
+        path: 'map',
+        loadComponent: () => import('./pages/map/map.page').then(m => m.MapPageComponent)
     }
 ];
