@@ -8,35 +8,35 @@ import { IActiveLeafletLayer } from './interfaces/leaflet-layer.interface';
 import { Feature, GeoJsonProperties } from 'geojson';
 import { IMapZoomActions } from './interfaces/map-zoom-actions.interface';
 import { mapConfig } from './map.config';
+import { IMapPoint } from './interfaces/map-point.interface';
 
 @Component({
     selector: 'map',
     standalone: true,
-    template: `
-        @if(isLoading()) {
-            <p>ISLOADING</p>
-        }
-        <div class="map" #mapContainer></div>
-    `,
+    template: `<div class="map" #mapContainer></div>`,
     styleUrl: './styles/map.master.scss',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapComponent implements AfterViewInit {
+    /** Inputs */
     public readonly layers: InputSignal<IMapLayer[]> = input.required();
-    public readonly zoomActions: WritableSignal<IMapZoomActions | undefined> = signal(undefined);
+
+    /** Outputs */
     public readonly regionSelected: OutputEmitterRef<IMapLayerProperties | null> = output();
+    public readonly pointSelected: OutputEmitterRef<IMapPoint | null> = output();
 
-    protected readonly isLoading: WritableSignal<boolean> = signal(true);
+    /** Public fields*/
+    public readonly zoomActions: WritableSignal<IMapZoomActions | undefined> = signal(undefined);
 
-    private _map: Map | null = null;
-    private _activeLeaflerLayer: Path | null = null;
+    /** Private fields */
     private readonly _config: IMapConfig = mapConfig;
     private readonly _mapContainer: Signal<ElementRef<HTMLDivElement>> = viewChild.required('mapContainer');
+    private _map: Map | null = null;
+    private _activeLeafletLayer: Path | null = null;
 
     public ngAfterViewInit(): void {
         this.initMap();
         this.renderLayers(this.layers());
-        this.isLoading.set(false);
     }
 
     /** Снять выделение с активного слоя */
@@ -66,23 +66,6 @@ export class MapComponent implements AfterViewInit {
         this.setZoomActions();
     }
 
-    /**
-     * Рендер слоев карты
-     * @param layers
-     */
-    private renderLayers(layers: IMapLayer[]): void {
-        const mapInstance: Map | null = this._map;
-        if (!mapInstance) {
-            return;
-        }
-
-        layers.forEach(layer => {
-            const properties: GeoJsonProperties = this.getLayerProperties(layer);
-            geoJSON(layer.geoData, properties)
-                .addTo(mapInstance);
-        });
-    }
-
     /** Установить действия для зума */
     private setZoomActions(): void {
         const config: IMapConfig = this._config;
@@ -99,6 +82,23 @@ export class MapComponent implements AfterViewInit {
                 config.options.minZoom,
                 { animate: true }
             )
+        });
+    }
+
+    /**
+     * Отрисовать слои карты
+     * @param layers
+     */
+    private renderLayers(layers: IMapLayer[]): void {
+        const mapInstance: Map | null = this._map;
+        if (!mapInstance) {
+            return;
+        }
+
+        layers.forEach(layer => {
+            const properties: GeoJsonProperties = this.getLayerProperties(layer);
+            geoJSON(layer.geoData, properties)
+                .addTo(mapInstance);
         });
     }
 
@@ -145,11 +145,11 @@ export class MapComponent implements AfterViewInit {
     }
 
     /**
-     * Применяет стиль активного слоя
+     * Применить стиль активного слоя
      * @param leafletLayer
      */
     private applyActiveLayerStyle(leafletLayer: IActiveLeafletLayer): void {
-        const prev: Path | null = this._activeLeaflerLayer;
+        const prev: Path | null = this._activeLeafletLayer;
 
         if (prev && prev !== leafletLayer) {
             this.resetLayerStyle(prev);
@@ -171,11 +171,11 @@ export class MapComponent implements AfterViewInit {
             nativeElement.style.filter = 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.33))';
         }
 
-        this._activeLeaflerLayer = leafletLayer;
+        this._activeLeafletLayer = leafletLayer;
     }
 
     /**
-     * Сбрасывает стиль слоя к оригинальному
+     * Сбросить стиль слоя к оригинальному
      * @param leafletLayer
      */
     private resetLayerStyle(leafletLayer: IActiveLeafletLayer): void {
@@ -191,11 +191,11 @@ export class MapComponent implements AfterViewInit {
         }
     }
 
-    /** Очищает активный слой */
+    /** Очистить активный слой */
     private clearActiveLayer(): void {
-        if (this._activeLeaflerLayer) {
-            this.resetLayerStyle(this._activeLeaflerLayer);
-            this._activeLeaflerLayer = null;
+        if (this._activeLeafletLayer) {
+            this.resetLayerStyle(this._activeLeafletLayer);
+            this._activeLeafletLayer = null;
         }
     }
 }

@@ -1,0 +1,26 @@
+<div class="map">
+     @if (pageTitle(); as pageTitle) {
+        <page-header
+            class="map__header"
+            [title]="pageTitle"
+            [isDetached]="true"
+        />
+    }
+    @if (zoomActions(); as zoomActions) {
+        <map-zoom
+            class="map__zoom-controls"
+            [zoomActions]="zoomActions"
+        />
+    }
+    @if (mapLayers(); as mapLayers) {
+        <map
+            [layers]="mapLayers"
+        ></map>
+    }
+    @if (infoText(); as infoText) {
+        <map-info
+            class="map__info"
+            [text]="infoText"
+        />
+    }
+</div>
