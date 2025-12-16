@@ -57,7 +57,7 @@ public class LayerRegionController : ControllerBase
     public async Task<IActionResult> DeleteLayerRegion([FromRoute] Guid mapId,
         [FromQuery] Guid layerId, CancellationToken ct)
     {
-        var res = await _layerRegionService.DeleteLayerRegionAsync(layerId, ct);
+        var res = await _layerRegionService.DeleteLayerRegionAsync(layerId, mapId, ct);
         
         if (res) return NoContent();
         

@@ -23,24 +23,24 @@ public class RegionRepository : IRegionRepository
     public async Task<Region?> GetByIdAsync(Guid regionId, CancellationToken ct)
     {
         return await _context.Regions
-            .Include(r => r.Geometry)
             .AsNoTracking()
+            .Include(r => r.Geometry)
             .FirstOrDefaultAsync(r => r.Id == regionId, ct);
     }
 
     public async Task<Region?> GetByNameAsync(string name, CancellationToken ct)
     {
         return await _context.Regions
-            .Include(r => r.Geometry)
             .AsNoTracking()
+            .Include(r => r.Geometry)
             .FirstOrDefaultAsync(r => EF.Functions.ILike(r.Name, name), ct);
     }
 
     public async Task<List<Region>?> GetAllAsync(CancellationToken ct)
     {
         return await _context.Regions
-            .Include(r => r.Geometry)
             .AsNoTracking()
+            .Include(r => r.Geometry)
             .ToListAsync(ct);
     }
 

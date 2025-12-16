@@ -30,8 +30,8 @@ public class RegionGeometryRepository : IRegionGeometryRepository
     public Task<RegionGeometry?> GetByRegionAsync(Guid regionId, CancellationToken ct)
     {
         return _context.RegionGeometries
-            .Where(g => g.RegionId == regionId)
             .AsNoTracking()
+            .Where(g => g.RegionId == regionId)
             .FirstOrDefaultAsync(ct);
     }
 

@@ -30,8 +30,8 @@ public class HistoricalObjectRepository : IHistoricalObjectRepository
     public async Task<List<HistoricalObject>?> GetAllByLayerRegionIdAsync(Guid layerRegionId, CancellationToken ct)
     {
         return await _context.HistoricalObjects
-            .Where(o => o.LayerRegionId == layerRegionId)
             .AsNoTracking()
+            .Where(o => o.LayerRegionId == layerRegionId)
             .ToListAsync(ct);
     }
 

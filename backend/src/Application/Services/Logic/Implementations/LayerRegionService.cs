@@ -89,6 +89,14 @@ public class LayerRegionService : ILayerRegionService
     /// <returns></returns>
     public async Task<Guid> CreateLayerRegionAsync(Guid mapId, LayerRegionDto layerRegionDto, CancellationToken ct)
     {
+        var existLayerRegion = await _layerRegionRepository.GetNoActiveEmptyByNameAndMapIdAsync(layerRegionDto.Name, mapId, ct);
+
+        if (existLayerRegion != null)
+        {
+            _logger.LogInformation("Base Layer region with name {name} already exists, starting to delete this layer", layerRegionDto.Name);
+            await _layerRegionRepository.DeleteByIdAsync(existLayerRegion.Id, ct);
+        }
+        
         var region = await _regionRepository.GetByNameAsync(layerRegionDto.Name, ct);
 
         if (region == null)
@@ -229,24 +237,39 @@ public class LayerRegionService : ILayerRegionService
     /// Удаляет слой ррегиона по его Id
     /// </summary>
     /// <param name="layerRegionId">Id слоя региона</param>
+    /// <param name="mapId">Id карты</param>
     /// <param name="ct"></param>
     /// <returns></returns>
-    public async Task<bool> DeleteLayerRegionAsync(Guid layerRegionId, CancellationToken ct)
+    public async Task<bool> DeleteLayerRegionAsync(Guid layerRegionId, Guid mapId, CancellationToken ct)
     {
         _logger.LogInformation("Deleting layer region {layerRegionId}", layerRegionId);
 
-        var layerRegion = await _layerRegionRepository.GetHeaderByIdAsync(layerRegionId, ct);
+        var layerRegion = await _layerRegionRepository.GetWithRegionByIdAsync(layerRegionId, ct);
         if (layerRegion == null)
         {
             _logger.LogInformation("layer {layerRegionId} could not be deleted", layerRegionId);
             return false;
         }
         
-        //TODO добавить логику добавления пустого региона перед удалением
+        var regionName = layerRegion.Region.Name;
         
         await _layerRegionRepository.DeleteByIdAsync(layerRegionId, ct);
-       
         _logger.LogInformation("layer {layerRegionId} deleted", layerRegionId);
+        
+        var existLayerRegion = await _layerRegionRepository.GetNoActiveEmptyByNameAndMapIdAsync(regionName, mapId, ct);
+        if (existLayerRegion == null)
+        {
+            _logger.LogInformation("Start creating base Layer region with name {name}", regionName);
+            
+            var region = await _regionRepository.GetByNameAsync(regionName, ct);
+            await _layerRegionRepository.AddAsync(new LayerRegion
+            {
+                RegionId = region!.Id,
+                IsActive = false,
+                MapId = mapId
+            }, ct);
+        }
+        
         return true;
     }
 
