@@ -34,7 +34,7 @@ export class MapDataService {
                 geoData: feature.geometry,
                 properties: feature.properties as IMapLayerProperties
             })),
-            activeLayerColor: dto.activeLayerColor,
+            layerWithPointsColor: dto.activeLayerColor,
             pointColor: dto.pointColor
         };
     }

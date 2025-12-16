@@ -3,6 +3,6 @@ import { IDefaultMapPointOptions } from './map-point.interface';
 
 export interface IMapConfig {
     options: MapOptions;
-    defaultLayerStyle: PathOptions & { activeLayerColor: string };
+    defaultLayerStyle: PathOptions & { layerWithPointsColor: string };
     defaultPointOptions: IDefaultMapPointOptions;
 }

@@ -13,7 +13,7 @@ export const mapConfig: IMapConfig = {
         fillColor: '#B4B4B4',
         fillOpacity: 1,
         color: '#FFF',
-        activeLayerColor: '#3E56D5',
+        layerWithPointsColor: '#3E56D5',
         weight: 1
     },
     defaultPointOptions: {
