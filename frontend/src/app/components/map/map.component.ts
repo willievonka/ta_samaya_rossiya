@@ -10,7 +10,8 @@ import { MapRenderService } from './services/map-render.service';
     standalone: true,
     template: `<div class="map" #mapContainer></div>`,
     styleUrl: './styles/map.master.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [MapRenderService]
 })
 export class MapComponent implements AfterViewInit {
     /** Inputs */
@@ -40,7 +41,9 @@ export class MapComponent implements AfterViewInit {
         const renderer: MapRenderService = this._renderService;
         const mapInstance: Map = renderer.initMap(container, () => {
             renderer.resetActiveLayerSelection();
+            renderer.resetActivePointSelection();
             this.regionSelected.emit(null);
+            this.pointSelected.emit(null);
         });
 
         this.zoomActions.set(renderer.getZoomActions(mapInstance));
@@ -50,11 +53,25 @@ export class MapComponent implements AfterViewInit {
             this.layerWithPointsColor(),
             (props) => this.regionSelected.emit(props)
         );
-        renderer.renderPoints(this.points(), this.pointColor());
+        renderer.renderPoints(
+            this.points(),
+            this.pointColor(),
+            (point) => this.pointSelected.emit(point)
+        );
     }
 
     /** Снять выделение с активного слоя */
     public clearRegionSelection(): void {
         this._renderService.resetActiveLayerSelection();
+    }
+
+    /** Выделить точку активной */
+    public setPointSelection(point: IMapPoint): void {
+        this._renderService.setActivePointById(point.id, point.coordinates);
+    }
+
+    /** Снять выделение с активной точки */
+    public clearPointSelection(): void {
+        this._renderService.resetActivePointSelection();
     }
 }

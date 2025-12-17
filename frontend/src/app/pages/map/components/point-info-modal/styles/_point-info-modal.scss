@@ -1,7 +1,7 @@
 @use '../../../../../../common-styles/spacing-vars' as *;
 @use '../../../../../../common-styles/color-vars' as color;
 
-.analytics-map-modal {
+.point-info-modal {
     display: flex;
     flex-direction: column;
     position: relative;
@@ -40,20 +40,22 @@
         margin-bottom: $spacing-s;
     }
 
-    &__info-list {
+    &__info {
         display: flex;
-        justify-content: space-between;
-        gap: $spacing-xl;
-        margin-bottom: $spacing-m;
+        flex-direction: column;
+        padding: $spacing-l;
+        padding-top: 0;
+        gap: $spacing-m;
     }
 
-    &__info-item {
-        padding-right: $spacing-xl;
-        border-right: 1px solid color.$border-secondary;
+    &__description {
+        display: block;
+    }
 
-        &:last-child {
-            padding: 0;
-            border: 0;
-        }
+    &__excursion-link {
+        display: block;
+        margin: 0 auto;
+        font-weight: 600;
+        color: color.$bg-accent;
     }
 }

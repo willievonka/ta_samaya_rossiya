@@ -1,0 +1,93 @@
+@use '../../../../../../common-styles/spacing-vars' as *;
+@use '../../../../../../common-styles/color-vars' as color;
+
+.historical-line {
+    display: flex;
+    flex-direction: column;
+    width: 484px;
+    box-sizing: border-box;
+    border-radius: $spacing-m;
+    padding: $spacing-m;
+    background-color: color.$bg-primary;
+    box-shadow: -$spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
+
+    &__title {
+        margin: 0 auto;
+        margin-bottom: $spacing-m;
+        font-size: $spacing-2xl;
+        line-height: normal;
+        color: color.$text-primary;
+    }
+
+    &__item-list {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-s;
+        max-height: 247px;
+        overflow-y: hidden;
+
+        &:hover {
+            overflow-y: auto;
+        }
+    }
+
+    &__item {
+        display: grid;
+        grid-template-columns: $spacing-xl 4ch 1ch 1fr;
+        align-items: center;
+        column-gap: $spacing-s;
+        padding: $spacing-s;
+        border-radius: $spacing-m;
+
+        font-size: $spacing-2l;
+        font-weight: 600;
+        line-height: normal;
+        color: color.$text-secondary;
+
+        transition:
+            background-color 150ms ease,
+            color 150ms ease;
+
+        &:hover {
+            background-color: color.$bg-secondary;
+        }
+
+        &.is-active {
+            color: color.$bg-primary;
+            background-color: color.$bg-accent;
+
+            .historical-line__item-divider::before {
+                background-color: color.$bg-primary;
+            }
+        }
+    }
+
+    &__item-icon {
+        display: flex;
+        width: $spacing-xl;
+        height: $spacing-xl;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+        color: color.$bg-primary;
+        outline: 1px solid color.$bg-primary;
+
+        font-size: $spacing-m;
+        line-height: $spacing-m;
+    }
+
+    &__item-divider {
+        display: grid;
+        place-items: center;
+
+        &::before {
+            content: '';
+            width: $spacing-s;
+            height: $spacing-s;
+            border-radius: 50%;
+            background-color: color.$border;
+            transition: background-color 150ms ease;
+        }
+    }
+}

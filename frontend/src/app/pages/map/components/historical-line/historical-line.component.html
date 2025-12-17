@@ -1,0 +1,26 @@
+<div class="historical-line">
+    <h3 class="historical-line__title">Историческая линия</h3>
+    <div class="historical-line__item-list">
+        @for (item of items(); track item.id; let index = $index) {
+            <button
+                class="historical-line__item is-active"
+                [class.is-active]="index === activeItemIndex()"
+                (click)="setActiveItem(index)"
+            >
+                <div
+                    class="historical-line__item-icon"
+                    [style]="{ backgroundColor: iconColor() ?? '#C2121F' }"
+                >
+                    {{ index + 1 }}
+                </div>
+                <div class="historical-line__item-year">
+                    {{ item.year }}
+                </div>
+                <div class="historical-line__item-divider"></div>
+                <div class="historical-line__item-title">
+                    {{ item.title }}
+                </div>
+            </button>
+        }
+    </div>
+</div>

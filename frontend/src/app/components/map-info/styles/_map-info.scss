@@ -8,7 +8,7 @@
         position: relative;
         background-color: color.$bg-primary;
         border-radius: 50%;
-        box-shadow: -$spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
+        box-shadow: $spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
         cursor: pointer;
 
         &:hover + .map-info__modal {
@@ -22,12 +22,12 @@
         opacity: 0;
         pointer-events: none;
         position: absolute;
-        right: 100%;
+        left: 100%;
         bottom: 100%;
         padding: $spacing-xl;
         background-color: color.$bg-primary;
         border-radius: $spacing-m;
-        box-shadow: -$spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
+        box-shadow: $spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
         transform: translateY($spacing-s);
         transition: opacity 0.15s ease, transform 0.15s ease;
     }

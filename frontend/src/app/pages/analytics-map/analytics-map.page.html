@@ -18,10 +18,10 @@
             (regionSelected)="toggleModal($event)"
         ></map>
     }
-    @if (activeLayer()) {
+    @if (activeItem(); as activeLayer) {
         <analytics-map-modal
             class="analytics-map__modal"
-            [data]="activeLayer()!"
+            [data]="activeLayer"
             (closeModal)="toggleModal(null)"
             animate.enter="analytics-map__modal_enter"
             animate.leave="analytics-map__modal_leave"

@@ -1,7 +1,8 @@
 import { computed, Injectable, signal, Signal, WritableSignal } from '@angular/core';
 import { IMapConfig } from '../interfaces/map-config.interface';
 import { mapConfig } from '../map.config';
-import { divIcon, DivIcon, DomEvent, geoJSON, Layer, LeafletMouseEvent, map, Map, marker, PathOptions } from 'leaflet';
+import { divIcon, DivIcon, DomEvent, DomUtil, geoJSON, Layer, LeafletMouseEvent, map, Map as leafletMap, Marker, marker, PathOptions } from 'leaflet';
+import {  } from 'leaflet';
 import { customCoordsToLatLng } from '../utils/custom-coords-to-lat-lng.util';
 import { IMapZoomActions } from '../interfaces/map-zoom-actions.interface';
 import { IMapLayer, IMapLayerProperties } from '../interfaces/map-layer.interface';
@@ -12,11 +13,17 @@ import { IMapPoint } from '../interfaces/map-point.interface';
 
 @Injectable()
 export class MapRenderService {
-    public readonly mapInstance: Signal<Map | null> = computed(() => this._map());
+    public readonly mapInstance: Signal<leafletMap | null> = computed(() => this._map());
 
     private readonly _config: IMapConfig = mapConfig;
-    private readonly _map: WritableSignal<Map | null> = signal(null);
+    private readonly _map: WritableSignal<leafletMap | null> = signal(null);
     private readonly _activeLeafletLayer: WritableSignal<IActiveLeafletLayer | null> = signal(null);
+    private readonly _activeMarker: WritableSignal<Marker | null> = signal(null);
+    private readonly _activeMarkerId: WritableSignal<string | null> = signal(null);
+
+    private readonly _markersByPointId: Map<string, Marker> = new Map<string, Marker>();
+    private readonly _markerBaseZ: Map<string, number> = new Map<string, number>();
+    private readonly _activeMarkerBaseZ: WritableSignal<number | null> = signal<number | null>(null);
 
     /** Public Methods */
 
@@ -25,10 +32,10 @@ export class MapRenderService {
      * @param container
      * @param onMapClick
      */
-    public initMap(container: HTMLDivElement, onMapClick: () => void): Map {
+    public initMap(container: HTMLDivElement, onMapClick: () => void): leafletMap {
         const config: IMapConfig = this._config;
 
-        const mapInstance: Map = map(container, config.options)
+        const mapInstance: leafletMap = map(container, config.options)
             .setView(
                 customCoordsToLatLng(config.options.center as [number, number]),
                 config.options.minZoom
@@ -43,7 +50,7 @@ export class MapRenderService {
      * Получить действия для зума
      * @param mapInstance
      */
-    public getZoomActions(mapInstance: Map): IMapZoomActions {
+    public getZoomActions(mapInstance: leafletMap): IMapZoomActions {
         const config: IMapConfig = this._config;
 
         return {
@@ -68,7 +75,7 @@ export class MapRenderService {
         layerWithPointsColor: string | undefined,
         onLayerSelected: (props: IMapLayerProperties) => void
     ): void {
-        const mapInstance: Map | null = this._map();
+        const mapInstance: leafletMap | null = this._map();
         if (!mapInstance) {
             return;
         }
@@ -89,13 +96,33 @@ export class MapRenderService {
      * @param points
      * @param pointColor
      */
-    public renderPoints(points: IMapPoint[], pointColor?: string): void {
-        const mapInstance: Map | null = this._map();
+    public renderPoints(
+        points: IMapPoint[],
+        pointColor?: string,
+        onPointSelected?: (point: IMapPoint) => void
+    ): void {
+        const mapInstance: leafletMap | null = this._map();
         if (!mapInstance) {
             return;
         }
 
-        points.forEach((point, index) => this.renderPoint(point, mapInstance, index, pointColor));
+        points.forEach((point, index) =>
+            this.renderPoint(point, mapInstance, index, pointColor, onPointSelected)
+        );
+    }
+
+    /**
+     * Выделить точку как активную по id
+     * @param pointId
+     */
+    public setActivePointById(pointId: string, pointCoordinates: [number, number]): void {
+        const pointMarker: Marker | undefined = this._markersByPointId.get(pointId);
+        if (!pointMarker) {
+            return;
+        }
+
+        this.applyActivePointStyle(pointMarker, pointId);
+        this.panToActivePoint(pointCoordinates);
     }
 
     /** Сбросить выделение активного слоя */
@@ -107,6 +134,27 @@ export class MapRenderService {
 
         this.resetActiveLayerStyle(currentActiveLayer);
         this._activeLeafletLayer.set(null);
+    }
+
+    /** Сбросить выделение активной точки */
+    public resetActivePointSelection(): void {
+        const currentActivePoint: Marker | null = this._activeMarker();
+        const currentId: string | null = this._activeMarkerId();
+
+        if (currentActivePoint) {
+            const nativeElement: HTMLElement | undefined = currentActivePoint.getElement();
+            if (nativeElement) {
+                DomUtil.removeClass(nativeElement, 'map__point_is-active');
+            }
+
+            const originalZIndex: number = currentId
+                ? (this._markerBaseZ.get(currentId) ?? 0)
+                : 0;
+            currentActivePoint.setZIndexOffset(originalZIndex);
+        }
+
+        this._activeMarker.set(null);
+        this._activeMarkerId.set(null);
     }
 
     /** Private layer help methods */
@@ -233,9 +281,10 @@ export class MapRenderService {
      */
     private renderPoint(
         point: IMapPoint,
-        mapInstance: Map,
+        mapInstance: leafletMap,
         index: number,
-        pointColor?: string
+        pointColor?: string,
+        onPointSelected?: (point: IMapPoint) => void
     ): void {
         const color: string = pointColor || this._config.defaultPointOptions.color;
         const iconSize: number = this._config.defaultPointOptions.iconSize;
@@ -252,8 +301,62 @@ export class MapRenderService {
             iconAnchor: [ancorSize, ancorSize]
         });
 
-        marker(customCoordsToLatLng(point.coordinates, true), { icon })
+        const pointMarker: Marker = marker(customCoordsToLatLng(point.coordinates, true), { icon })
             .setZIndexOffset(-index)
             .addTo(mapInstance);
+
+        pointMarker.on({
+            click: (event: LeafletMouseEvent): void => {
+                DomEvent.stopPropagation(event);
+                onPointSelected?.(point);
+                this.applyActivePointStyle(pointMarker, point.id);
+                this.panToActivePoint(point.coordinates);
+            }
+        });
+
+        this._markerBaseZ.set(point.id, -index);
+        this._markersByPointId.set(point.id, pointMarker);
+    }
+
+    /**
+     * Применить стиль активной точки к leaflet-маркеру
+     * @param pointMarker
+     * @param pointId
+     */
+    private applyActivePointStyle(pointMarker: Marker, pointId: string): void {
+        const currentActiveId: string | null = this._activeMarkerId();
+        const currentActiveMarker: Marker | null = currentActiveId ? this._activeMarker() : null;
+
+        if (currentActiveId && currentActiveMarker && currentActiveMarker !== pointMarker) {
+            const currentNativeElement: HTMLElement | undefined = currentActiveMarker.getElement();
+            if (currentNativeElement) {
+                DomUtil.removeClass(currentNativeElement, 'map__point_is-active');
+            }
+
+            currentActiveMarker.setZIndexOffset(this._markerBaseZ.get(currentActiveId) ?? 0);
+        }
+
+        const nativeElement: HTMLElement | undefined = pointMarker.getElement();
+        if (nativeElement) {
+            DomUtil.addClass(nativeElement, 'map__point_is-active');
+        }
+
+        pointMarker.setZIndexOffset(10000);
+        this._activeMarker.set(pointMarker);
+        this._activeMarkerId.set(pointId);
+    }
+
+    /**
+     * Перемещение к активной точке
+     * @param pointCoordinates
+     */
+    private panToActivePoint(pointCoordinates: [number, number]): void {
+        this._map()?.panTo(
+            customCoordsToLatLng(pointCoordinates, true),
+            {
+                animate: true,
+                duration: 0.75
+            }
+        );
     }
 }
