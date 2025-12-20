@@ -4,6 +4,6 @@ export interface IMapModel {
     pageTitle: string;
     infoText: string;
     layers: IMapLayer[];
-    activeLayerColor?: string;
+    layerWithPointsColor?: string;
     pointColor?: string;
 }

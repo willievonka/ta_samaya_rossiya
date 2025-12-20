@@ -48,11 +48,30 @@
         left: $spacing-m;
     }
 
-    &__modal {
+    &__info {
         position: absolute;
         z-index: 500;
+        left: $spacing-m;
+        bottom: $spacing-m;
+    }
+
+    &__aside {
+        position: absolute;
+        z-index: 500;
+        top: $spacing-m;
         right: $spacing-m;
 
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-l;
+    }
+
+    &__modal,
+    &__historical-line {
+        position: static;
+    }
+
+    &__modal {
         &_enter {
             animation: fade-in 150ms ease-out;
         }
@@ -60,12 +79,5 @@
         &_leave {
             animation: fade-out 150ms ease-in;
         }
-    }
-
-    &__info {
-        position: absolute;
-        z-index: 500;
-        right: $spacing-m;
-        bottom: $spacing-m;
     }
 }

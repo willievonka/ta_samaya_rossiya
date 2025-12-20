@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MapModalBaseComponent } from '../../../../components/map-modal/map-modal.base.component';
 import { DeclOfNumPipe } from '../../../../pipes/decl-of-num.pipe';
+import { IMapLayerProperties } from '../../../../components/map/interfaces/map-layer.interface';
 
 @Component({
     selector: 'analytics-map-modal',
@@ -10,4 +11,4 @@ import { DeclOfNumPipe } from '../../../../pipes/decl-of-num.pipe';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [DeclOfNumPipe]
 })
-export class AnalyticsMapModalComponent extends MapModalBaseComponent {}
+export class AnalyticsMapModalComponent extends MapModalBaseComponent<IMapLayerProperties> {}

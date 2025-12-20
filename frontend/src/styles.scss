@@ -73,6 +73,16 @@ svg {
 
 /* Стили для карт */
 .map {
+    &__point {
+        filter: drop-shadow(0 spacing.$spacing-xs spacing.$spacing-xs rgba(0, 0, 0, 0.33));
+
+        &_is-active {
+            .map__point-icon {
+                border-radius: spacing.$spacing-s;
+            }
+        }
+    }
+
     &__point-icon {
         display: flex;
         width: spacing.$spacing-3xl;
@@ -86,5 +96,7 @@ svg {
         font-size: spacing.$spacing-2l;
         line-height: normal;
         font-weight: 800;
+
+        transition: border-radius 150ms ease;
     }
 }
