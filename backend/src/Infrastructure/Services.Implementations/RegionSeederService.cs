@@ -58,20 +58,19 @@ public class RegionSeederService : IRegionSeederService
             }
             else if (featureGeometry is Polygon polygon)
             {
-                geometry = new MultiPolygon(new [] { polygon });
+                geometry = new MultiPolygon([polygon]);
             }
             else
             {
                 _logger.LogError("Feature {Index} of {Total} has invalid type of geometry.", featureNumber, totalCount);
                 throw new Exception($"Feature {featureNumber} of {totalCount} has invalid type of geometry.");
             }
-
-            var gid0 = feature.Attributes["GID_0"]?.ToString();
+            
             var name = feature.Attributes["NL_NAME_1_FIXED"]?.ToString();
 
-            if (string.IsNullOrEmpty(gid0) || string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
             {
-                _logger.LogWarning("Feature {Index} of {Total} doesn't have \"NL_NAME_1_FIXED\" or \"GID_0\" properties.",
+                _logger.LogWarning("Feature {Index} of {Total} doesn't have \"NL_NAME_1_FIXED\" properties.",
                     featureNumber, totalCount);
             }
             
@@ -89,7 +88,6 @@ public class RegionSeederService : IRegionSeederService
     /// Geojson должен соответствовать следующим требованиям:
     ///                   обязательное наличие:
     /// "NL_NAME_1_FIXED" в свойствах, значения пойдут в Name региона
-    /// "GID_0" в свойствах, регион будет считаться Российским, если стоит значение UKR или RUS
     /// </summary>
     private async Task<FeatureCollection> ParseFeatureCollectionAsync(CancellationToken ct)
     {
