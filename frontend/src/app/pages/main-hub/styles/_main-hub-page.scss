@@ -11,10 +11,10 @@
     flex: 1;
     flex-direction: column;
     padding: $spacing-xl 94px;
-    padding-top: $spacing-m;
+    padding-top: 0;
 
     &__description {
-        margin-bottom: 44px;
+        margin-bottom: $spacing-xl;
     }
 
     &__content {

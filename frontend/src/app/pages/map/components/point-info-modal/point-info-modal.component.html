@@ -1,0 +1,42 @@
+@let content = data();
+<div class="point-info-modal">
+    <button
+        class="point-info-modal__close-button"
+        (click)="closeModal.emit()"
+    >
+        <svg
+            class="point-info-modal__close-icon"
+            width="8.6"
+            height="8.6"
+        >
+            <use href="/sprites/cross.svg" />
+        </svg>
+    </button>
+    <img
+        class="point-info-modal__image"
+        [src]="content.imagePath"
+        (error)="handleImageFallback($event, '/fallbacks/modal-default-image.png')"
+        alt="Изображение региона"
+    >
+    <h3 class="point-info-modal__title">
+        {{ content.title }}
+    </h3>
+    <div class="point-info-modal__info">
+        <span class="point-info-modal__description">
+            {{ content.description }}
+        </span>
+        @if (content.excursionUrl) {
+            <a
+                class="point-info-modal__excursion-link"
+                [href]="content.excursionUrl"
+                target="_blank"
+            >
+                Посмотреть видеоэкскурсию
+            </a>
+        } @else {
+            <span class="point-info-modal__excursion-link">
+                Уже снимаем видеоэкскурсию
+            </span>
+        }
+    </div>
+</div>
