@@ -1,5 +1,5 @@
 <div class="map">
-     @if (pageTitle(); as pageTitle) {
+     @if (model()?.pageTitle; as pageTitle) {
         <page-header
             class="map__header"
             [title]="pageTitle"
@@ -12,15 +12,15 @@
             [zoomActions]="zoomActions"
         />
     }
-    @if (mapLayers(); as mapLayers) {
+    @if (model()?.layers; as mapLayers) {
         <map
             [layers]="mapLayers"
-            [layerWithPointsColor]="layerWithPointsColor()"
-            [pointColor]="pointColor()"
-            (pointSelected)="this.toggleState($event)"
+            [layerWithPointsColor]="model()?.layerWithPointsColor"
+            [pointColor]="model()?.pointColor"
+            (pointSelected)="toggleState($event)"
         ></map>
     }
-    @if (infoText(); as infoText) {
+    @if (model()?.infoText; as infoText) {
         <map-info
             class="map__info"
             [text]="infoText"
@@ -32,7 +32,7 @@
                 class="map__historical-line"
                 [items]="mapInstance.points()"
                 [activeItem]="activeItem()"
-                [iconColor]="pointColor()"
+                [iconColor]="model()?.pointColor"
                 (itemSelected)="toggleState($event)"
             />
         }

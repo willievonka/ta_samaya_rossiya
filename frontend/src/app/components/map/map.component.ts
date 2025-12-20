@@ -1,9 +1,11 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, InputSignal, output, OutputEmitterRef, signal, Signal, viewChild, WritableSignal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, InputSignal, output, OutputEmitterRef, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { Map } from 'leaflet';
 import { IMapLayer, IMapLayerProperties } from './interfaces/map-layer.interface';
 import { IMapZoomActions } from './interfaces/map-zoom-actions.interface';
 import { IMapPoint } from './interfaces/map-point.interface';
 import { MapRenderService } from './services/map-render.service';
+import { MapLayerRenderService } from './services/map-layer-render.service';
+import { MapPointRenderService } from './services/map-point-render.service';
 
 @Component({
     selector: 'map',
@@ -11,67 +13,86 @@ import { MapRenderService } from './services/map-render.service';
     template: `<div class="map" #mapContainer></div>`,
     styleUrl: './styles/map.master.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [MapRenderService]
+    providers: [
+        MapRenderService,
+        MapLayerRenderService,
+        MapPointRenderService
+    ]
 })
 export class MapComponent implements AfterViewInit {
     /** Inputs */
-    public readonly layers: InputSignal<IMapLayer[]> = input.required();
-    public readonly layerWithPointsColor: InputSignal<string | undefined> = input();
-    public readonly pointColor: InputSignal<string | undefined> = input();
+    public readonly layers: InputSignal<IMapLayer[]> = input.required<IMapLayer[]>();
+    public readonly layerWithPointsColor: InputSignal<string | undefined> = input<string>();
+    public readonly pointColor: InputSignal<string | undefined> = input<string>();
 
     /** Outputs */
-    public readonly regionSelected: OutputEmitterRef<IMapLayerProperties | null> = output();
-    public readonly pointSelected: OutputEmitterRef<IMapPoint | null> = output();
+    public readonly regionSelected: OutputEmitterRef<IMapLayerProperties | null> = output<IMapLayerProperties | null>();
+    public readonly pointSelected: OutputEmitterRef<IMapPoint | null> = output<IMapPoint | null>();
 
-    /** Public fields*/
-    public readonly zoomActions: WritableSignal<IMapZoomActions | undefined> = signal(undefined);
+    /** Public fields */
+    public readonly zoomActions: WritableSignal<IMapZoomActions | undefined> = signal<IMapZoomActions | undefined>(undefined);
     public readonly points: Signal<IMapPoint[]> = computed(() => {
         const layers: IMapLayer[] = this.layers();
-        const all: IMapPoint[] = layers.flatMap(layer => layer.properties.points ?? []);
+        const allPoints: IMapPoint[] = layers.flatMap(layer => layer.properties.points ?? []);
 
-        return all.slice().sort((a, b) => a.year - b.year);
+        return allPoints.sort((a, b) => a.year - b.year);
     });
 
     /** Private fields */
-    private readonly _mapContainer: Signal<ElementRef<HTMLDivElement>> = viewChild.required('mapContainer');
+    private readonly _mapContainer: Signal<ElementRef<HTMLDivElement>> = viewChild.required<ElementRef<HTMLDivElement>>('mapContainer');
     private readonly _renderService: MapRenderService = inject(MapRenderService);
 
     public ngAfterViewInit(): void {
         const container: HTMLDivElement = this._mapContainer().nativeElement;
-        const renderer: MapRenderService = this._renderService;
-        const mapInstance: Map = renderer.initMap(container, () => {
-            renderer.resetActiveLayerSelection();
-            renderer.resetActivePointSelection();
-            this.regionSelected.emit(null);
-            this.pointSelected.emit(null);
-        });
+        const mapInstance: Map = this.initializeMap(container);
 
-        this.zoomActions.set(renderer.getZoomActions(mapInstance));
-
-        renderer.renderLayers(
-            this.layers(),
-            this.layerWithPointsColor(),
-            (props) => this.regionSelected.emit(props)
-        );
-        renderer.renderPoints(
-            this.points(),
-            this.pointColor(),
-            (point) => this.pointSelected.emit(point)
-        );
+        this.zoomActions.set(this._renderService.getZoomActions(mapInstance));
+        this.renderMapContent();
     }
 
-    /** Снять выделение с активного слоя */
+    /** Снять выделение со слоя */
     public clearRegionSelection(): void {
         this._renderService.resetActiveLayerSelection();
     }
 
-    /** Выделить точку активной */
+    /**
+     * Установить выделение точки
+     * @param point
+     */
     public setPointSelection(point: IMapPoint): void {
         this._renderService.setActivePointById(point.id, point.coordinates);
     }
 
-    /** Снять выделение с активной точки */
+    /** Снять выделение с точки */
     public clearPointSelection(): void {
         this._renderService.resetActivePointSelection();
+    }
+
+    /**
+     * Инициализировать карту
+     * @param container
+     */
+    private initializeMap(container: HTMLDivElement): Map {
+        return this._renderService.initMap(container, () => {
+            this._renderService.resetActiveLayerSelection();
+            this._renderService.resetActivePointSelection();
+            this.regionSelected.emit(null);
+            this.pointSelected.emit(null);
+        });
+    }
+
+    /** Отрисовать наполнение карты */
+    private renderMapContent(): void {
+        this._renderService.renderLayers(
+            this.layers(),
+            this.layerWithPointsColor(),
+            (props) => this.regionSelected.emit(props)
+        );
+
+        this._renderService.renderPoints(
+            this.points(),
+            this.pointColor(),
+            (point) => this.pointSelected.emit(point)
+        );
     }
 }

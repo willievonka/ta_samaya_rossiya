@@ -1,5 +1,5 @@
 <div class="analytics-map">
-    @if (pageTitle(); as pageTitle) {
+    @if (model()?.pageTitle; as pageTitle) {
         <page-header
             class="analytics-map__header"
             [title]="pageTitle"
@@ -12,7 +12,7 @@
             [zoomActions]="zoomActions"
         />
     }
-    @if (mapLayers(); as mapLayers) {
+    @if (model()?.layers; as mapLayers) {
         <map
             [layers]="mapLayers"
             (regionSelected)="toggleModal($event)"
@@ -27,7 +27,7 @@
             animate.leave="analytics-map__modal_leave"
         />
     }
-    @if (infoText(); as infoText) {
+    @if (model()?.infoText; as infoText) {
         <map-info
             class="analytics-map__info"
             [text]="infoText"
