@@ -23,7 +23,6 @@ export class MapRenderService {
 
     private readonly _markersByPointId: Map<string, Marker> = new Map<string, Marker>();
     private readonly _markerBaseZ: Map<string, number> = new Map<string, number>();
-    private readonly _activeMarkerBaseZ: WritableSignal<number | null> = signal<number | null>(null);
 
     /** Public Methods */
 
