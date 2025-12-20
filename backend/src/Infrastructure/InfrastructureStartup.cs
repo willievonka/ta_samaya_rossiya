@@ -1,5 +1,7 @@
 ﻿using Application.Services.Interfaces;
+using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Polly;
@@ -20,6 +22,26 @@ public static class InfrastructureStartup
             options.UseNpgsql(connectionString, postgresOptions => postgresOptions.UseNetTopologySuite());
             options.UseSnakeCaseNamingConvention();
         });
+        
+        return services;
+    }
+
+    public static IServiceCollection AddIdentityCore(this IServiceCollection services)
+    {
+        services.AddIdentityCore<Admin>(options =>
+        {
+            options.Password.RequireDigit = false;
+            options.Password.RequiredLength = 8;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequiredUniqueChars = 1;
+            
+            options.Lockout.MaxFailedAccessAttempts = 10;
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+        })
+        .AddEntityFrameworkStores<MapDbContext>()
+        .AddDefaultTokenProviders();
         
         return services;
     }
@@ -58,9 +80,11 @@ public static class InfrastructureStartup
 
             await combinedPolicy.ExecuteAsync(async () => await dbContext.Database.MigrateAsync());
 
-            var seeder = scope.ServiceProvider.GetRequiredService<IRegionSeederService>();
-            await seeder.SeedIfEmptyAsync();
-
+            var regionSeeder = scope.ServiceProvider.GetRequiredService<IRegionSeederService>();
+            await regionSeeder.SeedIfEmptyAsync();
+            
+            var adminSeeder = scope.ServiceProvider.GetRequiredService<IAdminSeederService>();
+            await adminSeeder.SeedIfNotExistAsync();
         }
         catch (Exception e)
         {

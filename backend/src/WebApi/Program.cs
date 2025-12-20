@@ -15,6 +15,9 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        DotNetEnv.Env.TraversePath().Load();
+        builder.Configuration.AddEnvironmentVariables();
+        
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
             .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
