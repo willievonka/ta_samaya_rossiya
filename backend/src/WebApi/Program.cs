@@ -1,11 +1,16 @@
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application;
 using Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using NetTopologySuite.IO.Converters;
+using WebApi.Middleware;
 
 namespace WebApi;
 
@@ -26,17 +31,10 @@ internal class Program
 
         builder.Host.UseSerilog();
         
-        builder.Services.AddInfrasctructureServices();
-        
+        AddAuthentication(builder.Services, builder.Configuration);
         ConfigureServices(builder.Services, builder.Configuration);
-        
-        builder.Services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Та САМАЯ Россия", Version = "v1" });
-            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-            c.IncludeXmlComments(xmlPath);
-        });
+
+        AddSwagger(builder.Services);
         
         var app = builder.Build();
 
@@ -50,6 +48,10 @@ internal class Program
 
     private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+        services.AddMemoryCache();
+        
+        services.AddInfrasctructureServices();
+        
         services.AddControllers()
             .AddJsonOptions(options =>
             {
@@ -75,6 +77,70 @@ internal class Program
         services.AddEndpointsApiExplorer();
     }
     
+    private static void AddAuthentication(IServiceCollection services, ConfigurationManager configuration)
+    {
+        services
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = configuration["Jwt:Issuer"],
+                    ValidAudience = configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)),
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+    }
+
+    private static void AddSwagger(IServiceCollection services)
+    {
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Та САМАЯ Россия", Version = "v1" });
+            
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            if (File.Exists(xmlPath)) 
+            {
+                c.IncludeXmlComments(xmlPath);
+            }
+
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = "Введите JWT токен: Bearer {ваш_токен}",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+            
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new List<string>()
+                }
+            });
+        });
+    }
+    
     private static void ConfigureMiddleware(WebApplication app)
     {
         app.UseSerilogRequestLogging();
@@ -82,6 +148,11 @@ internal class Program
         app.UseDefaultFiles();
         app.UseStaticFiles();
         app.UseRouting();
+        
+        app.UseAuthentication();
+        app.UseMiddleware<JwtBlacklistMiddleware>();
+        app.UseAuthorization();
+        
         app.MapControllers();
         
         if (app.Environment.IsDevelopment())

@@ -24,8 +24,12 @@ public static class InfrastructureExtensions
         services.AddScoped<IRegionSeederService, RegionSeederService>();
         services.AddScoped<ISaveImageService, SaveImageService>();
         services.AddScoped<IAdminSeederService, AdminSeederService>();
+        services.AddScoped<IAuthService, AuthService>();
         
         services.AddScoped<IAdminManager, AdminManager>();
+        
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddSingleton<IBlacklistService, BlacklistService>();
         
         return services;
     }

@@ -1,4 +1,5 @@
 ﻿using Application.Services.Logic.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Controllers.AdminControllers.LayerRegionStyle.Request;
 using WebApi.Controllers.AdminControllers.LayerRegionStyle.Response;
@@ -9,6 +10,7 @@ using WebApi.Controllers.AdminControllers.Mapper;
 namespace WebApi.Controllers.AdminControllers.LayerRegionStyle;
 
 [ApiController]
+[Authorize]
 [Route("api/admin/maps/{mapId:guid}/layers/{layerId:guid}/style")]
 public class LayerRegionStyleController : ControllerBase
 {

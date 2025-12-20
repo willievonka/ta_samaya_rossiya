@@ -25,16 +25,22 @@ public class AdminManager : IAdminManager
         });
     }
 
-    public async Task<bool> ValidateAdminCredentialsAsync(string email, string password)
+    public async Task<Guid?> ValidateAdminCredentialsAsync(string email, string password)
     {
         var admin = await _adminRepository.GetByEmailAsync(email);
 
         if (admin == null)
         {
             _logger.LogError("Admin with {email} doesn't exist", email);
-            return false;
+            return null;
         }
 
-        return Argon2.Verify(admin.PasswordHash, password);
+        if (Argon2.Verify(admin.PasswordHash, password))
+        {
+            return admin.Id;
+        }
+        
+        _logger.LogError("Invalid credentials");
+        return null;
     }
 }

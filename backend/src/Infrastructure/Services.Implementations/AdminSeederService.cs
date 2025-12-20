@@ -28,8 +28,8 @@ public class AdminSeederService : IAdminSeederService
 
         while (true)
         {
-            var email = _configuration[$"ADMIN_{index}_EMAIL"];
-            var password = _configuration[$"ADMIN_{index}_PASSWORD"];
+            var email = _configuration[$"ADMIN:{index}:EMAIL"];
+            var password = _configuration[$"ADMIN:{index}:PASSWORD"];
 
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
@@ -42,6 +42,7 @@ public class AdminSeederService : IAdminSeederService
             if (existingAdmin != null)
             {
                 _logger.LogError("Admin already exists for email {email}",  email);
+                index++;
                 continue;
             }
             
