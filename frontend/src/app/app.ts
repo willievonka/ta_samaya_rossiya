@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostListener, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -11,12 +11,6 @@ import { RouterOutlet } from '@angular/router';
 export class App implements AfterViewInit {
     private readonly _originalHeight: number = 952;
     private readonly _host: ElementRef<HTMLElement> = inject(ElementRef<HTMLElement>);
-
-    /** Ресайз в зависимости от высоты хоста */
-    @HostListener('window:resize')
-    public resizeHost(): void {
-        this.applyZoom();
-    }
 
     public ngAfterViewInit(): void {
         this.applyZoom();
