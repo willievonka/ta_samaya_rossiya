@@ -61,12 +61,12 @@
     }
 
     &.info-visible {
-        .main-hub-card__overlay {
+        .hub-card__overlay {
             opacity: 1;
             pointer-events: auto;
         }
 
-        .main-hub-card__title {
+        .hub-card__title {
             opacity: 0
         }
     }
