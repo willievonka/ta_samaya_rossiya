@@ -38,4 +38,10 @@
             transition: outline 20ms ease;
         }
     }
+
+    &__add-project-button-icon {
+        width: 225px;
+        height: 225px;
+        stroke: color.$text-secondary;
+    }
 }

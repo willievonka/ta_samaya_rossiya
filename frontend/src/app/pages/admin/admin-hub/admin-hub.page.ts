@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
 import { HubCardComponent } from '../../../components/hub-card/hub-card.component';
 import { PageHeaderComponent } from '../../../components/page-header/page-header.component';
-import { AuthService } from '../auth/services/auth.service';
+import { AuthService } from '../../../services/auth.service';
 import { HubService } from '../../../services/hub.service';
 import { Router } from '@angular/router';
 import { IHubCard } from '../../../components/hub-card/interfaces/hub-card.interface';
@@ -16,8 +16,7 @@ import { take } from 'rxjs';
     imports: [
         HubCardComponent,
         PageHeaderComponent
-    ],
-    providers: [AuthService]
+    ]
 })
 export class AdminHubPageComponent {
     protected readonly mapCardsList: WritableSignal<IHubCard[] | undefined> = signal(undefined);
