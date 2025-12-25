@@ -1,0 +1,55 @@
+<div class="auth-page">
+    <form class="auth-page__form" [formGroup]="authForm">
+        <div class="auth-page__form-header">
+            <a
+                class="auth-page__logo"
+                [routerLink]="'/'"
+            >
+                <svg width="207px" height="80px">
+                    <use href="/sprites/ta-samaya-rossiya-logo.svg" />
+                </svg>
+            </a>
+            <h1 class="auth-page__title">
+                Вход в админ-панель
+            </h1>
+        </div>
+        <tui-textfield>
+            <input
+                formControlName="login"
+                placeholder="Логин"
+                tuiTextfield
+            />
+        </tui-textfield>
+        <tui-error
+            formControlName="login"
+            [error]="[] | tuiFieldError | async"
+        />
+        <tui-textfield>
+            <input
+                formControlName="password"
+                placeholder="Пароль"
+                tuiTextfield
+                type="password"
+            />
+            <tui-icon tuiPassword />
+        </tui-textfield>
+        <tui-error
+            formControlName="password"
+            [error]="[] | tuiFieldError | async"
+        />
+        <button
+            size="l"
+            tuiButton
+            type="button"
+            (click)="authForm.markAllAsTouched()"
+        >
+            Войти
+        </button>
+        <tui-error
+            [formGroup]="authForm"
+            [error]="[] | tuiFieldError | async"
+        />
+    </form>
+</div>
+
+
