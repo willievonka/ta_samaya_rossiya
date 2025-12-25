@@ -1,0 +1,41 @@
+@use '../../../../../common-styles/spacing-vars' as *;
+@use '../../../../../common-styles/color-vars' as color;
+
+:host {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.admin-hub {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: $spacing-xl 94px;
+    padding-top: 0;
+
+    &__description {
+        margin-bottom: $spacing-xl;
+    }
+
+    &__content {
+        display: flex;
+        gap: $spacing-xl;
+        flex-wrap: wrap;
+    }
+
+    &__add-project-button {
+        display: flex;
+        width: 556px;
+        height: 312px;
+        border-radius: $spacing-m;
+        background-color: color.$bg-secondary;
+        justify-content: center;
+        align-items: center;
+
+        &:active {
+            outline: 3px solid color.$border;
+            transition: outline 20ms ease;
+        }
+    }
+}

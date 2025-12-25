@@ -1,0 +1,26 @@
+<page-header
+    [title]="'Панель администрирования'"
+    [isAdmin]="true"
+    (logout)="logout()"
+/>
+
+<div class="admin-hub">
+    <h2 class="admin-hub__description">Активные проекты</h2>
+
+    <div class="admin-hub__content">
+        @for (mapCard of mapCardsList(); track mapCard.id) {
+            <hub-card
+                [data]="mapCard"
+                (click)="navigateToEditMap(mapCard)"
+            />
+        }
+        <button
+            class="admin-hub__add-project-button"
+            type="button"
+        >
+            <svg>
+                <use href="/sprites/plus.svg" />
+            </svg>
+        </button>
+    </div>
+</div>

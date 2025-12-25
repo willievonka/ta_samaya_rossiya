@@ -16,6 +16,22 @@
         margin-right: $spacing-xl;
     }
 
+    &__title {
+        align-self: baseline;
+    }
+
+    &__logout {
+        display: flex;
+        margin: auto 0;
+        margin-left: auto;
+    }
+
+    &__logout-icon {
+        width: $spacing-3xl;
+        height: $spacing-3xl;
+        fill: color.$text-primary;
+    }
+
     &.is-detached {
         padding: $spacing-xl;
         border-radius: $spacing-xl;

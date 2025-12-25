@@ -4,11 +4,24 @@
 >
     <a
         class="page-header__logo-link"
-        [routerLink]="'/'"
+        [routerLink]="isAdmin() ? '/admin/main' : '/'"
     >
         <svg class="page-header__logo">
             <use href="/sprites/ta-samaya-rossiya-logo.svg" />
         </svg>
     </a>
-    <h1>{{ title() }}</h1>
+    <h1 class="page-header__title">
+        {{ title() }}
+    </h1>
+    @if (isAdmin()) {
+        <button
+            class="page-header__logout"
+            type="button"
+            (click)="logout.emit()"
+        >
+            <svg class="page-header__logout-icon">
+                <use href="/sprites/logout.svg" />
+            </svg>
+        </button>
+    }
 </div>

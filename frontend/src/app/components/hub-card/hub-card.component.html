@@ -1,6 +1,6 @@
 @let content = data();
 <button
-    class="main-hub-card"
+    class="hub-card"
     type="button"
     [class.title-on-top]="content.isAnalytics"
     [class.info-visible]="isInfoState()"
@@ -8,22 +8,22 @@
     (mouseleave)="isInfoState.set(false)"
 >
     <h3
-        class="main-hub-card__title"
+        class="hub-card__title"
         [class.main-hub-card__title_on-top]="content.isAnalytics"
     >
         {{ content.title }}
     </h3>
 
     <div
-        class="main-hub-card__image"
+        class="hub-card__image"
         [style.background-image]="'url(' + content.backgroundImagePath + ')'"
     ></div>
 
-    <div class="main-hub-card__overlay">
+    <div class="hub-card__overlay">
         <h3 class="main-hub-card__title_on-top">
             {{ content.title }}
         </h3>
-        <span class="main-hub-card__description">
+        <span class="hub-card__description">
             {{ content.description }}
         </span>
     </div>

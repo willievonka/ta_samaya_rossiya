@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, InputSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -12,4 +12,7 @@ import { RouterLink } from '@angular/router';
 export class PageHeaderComponent {
     public readonly title: InputSignal<string> = input.required();
     public readonly isDetached: InputSignal<boolean> = input(false);
+    public readonly isAdmin: InputSignal<boolean> = input(false);
+
+    public readonly logout: OutputEmitterRef<void> = output();
 }
