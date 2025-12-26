@@ -2,7 +2,7 @@ import { Injectable, signal, WritableSignal } from '@angular/core';
 import { divIcon, DivIcon, Marker, marker, LeafletMouseEvent, DomEvent, DomUtil, Map as LeafletMap } from 'leaflet';
 import { IDefaultMapPointOptions, IMapPoint } from '../interfaces/map-point.interface';
 import { customCoordsToLatLng } from '../utils/custom-coords-to-lat-lng.util';
-import { mapConfig } from '../map.config';
+import { mapConfig } from '../configs/map.config';
 
 @Injectable()
 export class MapPointRenderService {

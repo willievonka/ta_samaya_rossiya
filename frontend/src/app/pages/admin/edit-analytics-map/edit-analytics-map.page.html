@@ -15,6 +15,7 @@
     @if (model()?.layers; as mapLayers) {
         <map
             [layers]="mapLayers"
+            [config]="config"
         ></map>
     }
 </div>

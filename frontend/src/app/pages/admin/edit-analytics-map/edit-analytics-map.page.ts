@@ -5,6 +5,8 @@ import { PageHeaderComponent } from '../../../components/page-header/page-header
 import { MapZoomComponent } from '../../../components/map-zoom/map-zoom.component';
 import { MapComponent } from '../../../components/map/map.component';
 import { IPageHeaderOptions } from '../../../components/page-header/interfaces/page-header-options.interface';
+import { IMapConfig } from '../../../components/map/interfaces/map-config.interface';
+import { editMapConfig } from '../../../components/map/configs/edit-map.config';
 
 @Component({
     selector: 'edit-analytics-map-page',
@@ -26,4 +28,5 @@ export class EditAnalyticsMapPageComponent extends MapPageBaseComponent<IMapLaye
             showLogoutIcon: false
         }
     };
+    protected readonly config: IMapConfig = editMapConfig;
 }

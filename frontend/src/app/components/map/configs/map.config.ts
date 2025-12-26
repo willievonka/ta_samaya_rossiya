@@ -1,4 +1,4 @@
-import { IMapConfig } from './interfaces/map-config.interface';
+import { IMapConfig } from '../interfaces/map-config.interface';
 
 export const mapConfig: IMapConfig = {
     options: {
