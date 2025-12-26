@@ -6,6 +6,7 @@ import { MapDataService } from '../map/services/map-data.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IMapModel } from '../map/models/map.model';
 import { distinctUntilChanged, map, switchMap } from 'rxjs';
+import { IPageHeaderOptions } from '../page-header/interfaces/page-header-options.interface';
 
 @Directive({
     standalone: true
@@ -15,6 +16,9 @@ export abstract class MapPageBaseComponent<TData> {
     protected readonly mapInstance: Signal<MapComponent | undefined> = viewChild(MapComponent);
     protected readonly zoomActions: Signal<IMapZoomActions | undefined> = computed(() => this.mapInstance()?.zoomActions());
     protected readonly model: Signal<IMapModel | undefined> = computed(() => this._mapData());
+    protected readonly headerOptions: IPageHeaderOptions = {
+        isDetached: true
+    };
 
     private readonly _mapDataService: MapDataService = inject(MapDataService);
     private readonly _route: ActivatedRoute = inject(ActivatedRoute);

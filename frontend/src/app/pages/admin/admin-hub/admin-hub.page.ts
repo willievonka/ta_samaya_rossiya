@@ -6,6 +6,7 @@ import { HubService } from '../../../services/hub.service';
 import { Router } from '@angular/router';
 import { IHubCard } from '../../../components/hub-card/interfaces/hub-card.interface';
 import { take } from 'rxjs';
+import { IPageHeaderOptions } from '../../../components/page-header/interfaces/page-header-options.interface';
 
 @Component({
     selector: 'admin-hub-page',
@@ -20,6 +21,12 @@ import { take } from 'rxjs';
 })
 export class AdminHubPageComponent {
     protected readonly mapCardsList: WritableSignal<IHubCard[] | undefined> = signal(undefined);
+    protected readonly headerOptions: IPageHeaderOptions = {
+        adminState: {
+            changeRedirect: true,
+            showLogoutIcon: true
+        }
+    };
 
     private readonly _authService: AuthService = inject(AuthService);
     private readonly _hubService: HubService = inject(HubService);
