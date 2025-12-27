@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TuiTextfield, TuiButton, TuiIcon, TuiError } from '@taiga-ui/core';
-import { TuiFieldErrorPipe, TuiPassword, tuiValidationErrorsProvider } from '@taiga-ui/kit';
+import { TuiFieldErrorPipe, TuiPassword } from '@taiga-ui/kit';
 import { IAuthModel } from './interfaces/auth-model.interface';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
@@ -24,14 +24,6 @@ import { take } from 'rxjs';
         TuiError,
         TuiFieldErrorPipe,
         RouterLink
-    ],
-    providers: [
-        tuiValidationErrorsProvider({
-            required: 'Поле обязательно для заполнения',
-            email: 'Неверный формат электронной почты',
-            invalidCredits: 'Неверный email или пароль',
-            serverError: 'Сервис временно недоступен. Попробуйте позже'
-        })
     ]
 })
 export class AuthPageComponent {

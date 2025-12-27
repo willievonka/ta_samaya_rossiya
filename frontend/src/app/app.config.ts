@@ -8,6 +8,7 @@ import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { of } from 'rxjs';
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { tuiValidationErrorsProvider } from '@taiga-ui/kit';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -17,6 +18,12 @@ export const appConfig: ApplicationConfig = {
         provideRouter(routes),
         provideHttpClient(withInterceptors([authInterceptor])),
         provideEventPlugins(),
-        { provide: TUI_LANGUAGE, useValue: of(TUI_RUSSIAN_LANGUAGE) }
+        { provide: TUI_LANGUAGE, useValue: of(TUI_RUSSIAN_LANGUAGE) },
+        tuiValidationErrorsProvider({
+            required: 'Поле обязательно для заполнения',
+            email: 'Неверный формат электронной почты',
+            invalidCredits: 'Неверный email или пароль',
+            serverError: 'Сервис временно недоступен. Попробуйте позже'
+        })
     ]
 };

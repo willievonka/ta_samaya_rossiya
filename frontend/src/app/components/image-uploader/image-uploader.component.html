@@ -1,0 +1,43 @@
+@if (!fileControl.value) {
+    <label class="image-uploader" tuiInputFiles>
+        <input
+            [accept]="fileType()"
+            tuiInputFiles
+            [formControl]="fileControl"
+            (blur)="onTouched()"
+        />
+    </label>
+}
+<tui-files>
+    @if (fileControl.value | tuiFileRejected: {accept: fileType()} | async; as file) {
+        <tui-file
+            size="l"
+            state="error"
+            [file]="file"
+            (remove)="removeFile()"
+        />
+    }
+    @if (loadedFile$ | async; as file) {
+        <tui-file
+            size="l"
+            [file]="file"
+            (remove)="removeFile()"
+        />
+    }
+    @if (failedFile$ | async; as file) {
+        <tui-file
+            size="l"
+            state="error"
+            [file]="file"
+            (remove)="removeFile()"
+        />
+    }
+    @if (loadingFile$ | async; as file) {
+        <tui-file
+            size="l"
+            state="loading"
+            [file]="file"
+            (remove)="removeFile()"
+        />
+    }
+</tui-files>

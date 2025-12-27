@@ -1,19 +1,62 @@
 <div class="edit-analytics-map-modal">
     <h2 class="edit-analytics-map-modal__title">Настройки</h2>
     <form [formGroup]="settingsForm">
+        <div class="edit-analytics-map-modal__field_title">
+            <label tuiLabel>
+                <span class="edit-analytics-map-modal__label_title">Название проекта</span>
+                <tui-textfield>
+                    <input
+                        formControlName="title"
+                        tuiTextfield
+                        placeholder="Укажите название"
+                    />
+                </tui-textfield>
+                <tui-error
+                    class="edit-analytics-map-modal__error_title"
+                    formControlName="title"
+                    [error]="[] | tuiFieldError | async"
+                />
+            </label>
+        </div>
         <tui-accordion class="edit-analytics-map-modal__accordion" size="l">
             <button tuiAccordion appearance="" tuiCell>
                 Карточка
             </button>
             <tui-expand class="edit-analytics-map-modal__accordion-item">
-                <div>
-                    <tui-textfield tuiTextfieldSize="m">
-                        <input
-                            formControlName="cardDescription"
-                            tuiTextfield
-                        />
-                    </tui-textfield>
+                <div class="edit-analytics-map-modal__group">
+                    <div class="edit-analytics-map-modal__card-preview-wrapper">
+                        <span>Предпросмотр карточки</span>
+                        <div class="edit-analytics-map-modal__card-preview">
+                            <span class="edit-analytics-map-modal__card-preview-title">
+                                {{ settingsForm.controls['title'].value || 'Ta самая Россия' }}
+                            </span>
+                            <div
+                                class="edit-analytics-map-modal__card-preview-image"
+                                [style.background-image]="cardPreviewBackgroundImage$ | async"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div class="edit-analytics-map-modal__image-uploader">
+                        <span>Фоновое изображение</span>
+                        <image-uploader formControlName="cardBackgroundImage"/>
+                        <span class="edit-analytics-map-modal__image-uploader-hint">
+                            Файл в формате SVG,<br>
+                            с разрешением 556x266 px
+                        </span>
+                    </div>
                 </div>
+
+                <label tuiLabel>
+                    <span class="edit-analytics-map-modal__label">Описание</span>
+                    <tui-textfield style="margin-bottom: 4px;">
+                        <textarea
+                            formControlName="cardDescription"
+                            tuiTextarea
+                            placeholder="Укажите описание"
+                        ></textarea>
+                    </tui-textfield>
+                </label>
             </tui-expand>
 
             <button tuiAccordion appearance="" tuiCell>
