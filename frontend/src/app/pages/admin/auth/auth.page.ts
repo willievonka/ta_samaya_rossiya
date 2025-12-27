@@ -47,12 +47,12 @@ export class AuthPageComponent {
 
     /** Войти в аккаунт */
     protected login(): void {
-        const email: string = this.authForm.controls['email'].value;
-        const password: string = this.authForm.controls['password'].value;
-
         this.authForm.markAllAsTouched();
 
         if (this.authForm.valid) {
+            const email: string = this.authForm.controls['email'].value;
+            const password: string = this.authForm.controls['password'].value;
+
             this._authService.login(email, password)
                 .pipe(take(1))
                 .subscribe({
