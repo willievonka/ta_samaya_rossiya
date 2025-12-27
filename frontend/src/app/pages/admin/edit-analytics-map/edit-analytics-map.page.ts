@@ -7,6 +7,7 @@ import { MapComponent } from '../../../components/map/map.component';
 import { IPageHeaderOptions } from '../../../components/page-header/interfaces/page-header-options.interface';
 import { IMapConfig } from '../../../components/map/interfaces/map-config.interface';
 import { editMapConfig } from '../../../components/map/configs/edit-map.config';
+import { EditAnalyticsMapModalComponent } from './components/edit-analytics-map-modal/edit-analytics-map-modal.component';
 
 @Component({
     selector: 'edit-analytics-map-page',
@@ -17,7 +18,8 @@ import { editMapConfig } from '../../../components/map/configs/edit-map.config';
     imports: [
         PageHeaderComponent,
         MapComponent,
-        MapZoomComponent
+        MapZoomComponent,
+        EditAnalyticsMapModalComponent
     ]
 })
 export class EditAnalyticsMapPageComponent extends MapPageBaseComponent<IMapLayerProperties>{
