@@ -13,30 +13,41 @@
                 Вход в админ-панель
             </h1>
         </div>
-        <tui-textfield>
-            <input
+        <div class="auth-page__field">
+            <tui-textfield>
+                <input
+                    formControlName="email"
+                    placeholder="Электронная почта"
+                    tuiTextfield
+                />
+            </tui-textfield>
+            <tui-error
+                class="auth-page__error"
                 formControlName="email"
-                placeholder="Электронная почта"
-                tuiTextfield
+                [error]="[] | tuiFieldError | async"
             />
-        </tui-textfield>
-        <tui-error
-            formControlName="email"
-            [error]="[] | tuiFieldError | async"
-        />
-        <tui-textfield>
-            <input
+        </div>
+        <div class="auth-page__field">
+            <tui-textfield>
+                <input
+                    formControlName="password"
+                    placeholder="Пароль"
+                    tuiTextfield
+                    type="password"
+                />
+                <tui-icon tuiPassword />
+            </tui-textfield>
+            <tui-error
+                class="auth-page__error"
                 formControlName="password"
-                placeholder="Пароль"
-                tuiTextfield
-                type="password"
+                [error]="[] | tuiFieldError | async"
             />
-            <tui-icon tuiPassword />
-        </tui-textfield>
-        <tui-error
-            formControlName="password"
-            [error]="[] | tuiFieldError | async"
-        />
+            <tui-error
+                class="auth-page__error"
+                [formGroup]="authForm"
+                [error]="[] | tuiFieldError | async"
+            />
+        </div>
         <button
             size="l"
             tuiButton
@@ -45,11 +56,5 @@
         >
             Войти
         </button>
-        <tui-error
-            [formGroup]="authForm"
-            [error]="[] | tuiFieldError | async"
-        />
     </form>
 </div>
-
-

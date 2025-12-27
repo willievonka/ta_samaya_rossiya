@@ -27,7 +27,10 @@ import { take } from 'rxjs';
     ],
     providers: [
         tuiValidationErrorsProvider({
-            required: 'Поле обязательно для заполнения'
+            required: 'Поле обязательно для заполнения',
+            email: 'Неверный формат электронной почты',
+            invalidCredits: 'Неверный email или пароль',
+            serverError: 'Сервис временно недоступен. Попробуйте позже'
         })
     ]
 })
@@ -52,7 +55,16 @@ export class AuthPageComponent {
         if (this.authForm.valid) {
             this._authService.login(email, password)
                 .pipe(take(1))
-                .subscribe(() => this._router.navigate(['admin']));
+                .subscribe({
+                    next: () => this._router.navigate(['admin']),
+                    error: (error) => {
+                        if (error?.status === 401 || error?.status === 403) {
+                            this.authForm.setErrors({ invalidCredits: true });
+                        } else {
+                            this.authForm.setErrors({ serverError: true });
+                        }
+                    }
+                });
         }
     }
 }
