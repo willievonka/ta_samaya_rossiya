@@ -10,5 +10,5 @@ public record UpdateMapRequest(
     string? ActiveLayerColor,
     string? PointColor,
     IFormFile? BackgroundImage,
-    IEnumerable<CreateLayerRegionRequest>? Regions
+    IEnumerable<UpsertLayerRegionRequest>? Regions
     );

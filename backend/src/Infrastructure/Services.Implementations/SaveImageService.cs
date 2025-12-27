@@ -62,13 +62,11 @@ public class SaveImageService : ISaveImageService
         if (string.IsNullOrEmpty(fullPath))
         {
             _logger.LogError("Invalid path");
-            throw new ArgumentException("Invalid path");
         }
         
         if (!File.Exists(fullPath))
         {
             _logger.LogError("File not found");
-            throw new FileNotFoundException("File not found", path);
         }
         
         await Task.Run(()=> File.Delete(fullPath));

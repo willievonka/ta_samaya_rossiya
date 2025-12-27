@@ -8,7 +8,6 @@ using WebApi.Controllers.AdminControllers.Mapper;
 namespace WebApi.Controllers.AdminControllers.Map;
 
 [ApiController]
-[Authorize]
 [Route("api/admin/maps")]
 public class AdminMapController : ControllerBase
 {

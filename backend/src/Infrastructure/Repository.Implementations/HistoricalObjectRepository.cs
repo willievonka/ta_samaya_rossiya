@@ -35,14 +35,22 @@ public class HistoricalObjectRepository : IHistoricalObjectRepository
             .ToListAsync(ct);
     }
 
+    public async Task<List<Guid>> GetAllIdsByLayerRegionIdAsync(Guid layerRegionId, CancellationToken ct)
+    {
+        return await _context.HistoricalObjects
+            .AsNoTracking()
+            .Where(o => o.LayerRegionId == layerRegionId)
+            .Select(o => o.Id)
+            .ToListAsync(ct);
+    }
+
     public async Task UpdateAsync(HistoricalObject histObject, CancellationToken ct)
     {
         var existing = await _context.HistoricalObjects
-            .AsNoTracking()
             .FirstOrDefaultAsync(o => o.Id == histObject.Id, ct);
         if (existing != null)
         {
-            _context.HistoricalObjects.Update(histObject);
+            _context.Entry(existing).CurrentValues.SetValues(histObject);
             await _context.SaveChangesAsync(ct);
         }
     }
@@ -50,7 +58,6 @@ public class HistoricalObjectRepository : IHistoricalObjectRepository
     public async Task DeleteByIdAsync(Guid histObjectId, CancellationToken ct)
     {
         var existing = await _context.HistoricalObjects
-            .AsNoTracking()
             .FirstOrDefaultAsync(o => o.Id == histObjectId, ct);
         if (existing != null)
         {

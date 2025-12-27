@@ -47,11 +47,10 @@ public class RegionRepository : IRegionRepository
     public async Task UpdateAsync(Region region, CancellationToken ct)
     {
         var existingRegion = await _context.Regions
-            .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == region.Id, ct);
         if (existingRegion != null)
         {
-            _context.Regions.Update(region);
+            _context.Entry(existingRegion).CurrentValues.SetValues(region);
             await _context.SaveChangesAsync(ct);
         }
     }
@@ -59,7 +58,6 @@ public class RegionRepository : IRegionRepository
     public async Task DeleteByIdAsync(Guid regionId, CancellationToken ct)
     {
         var existingRegion = await _context.Regions
-            .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == regionId, ct);
         if (existingRegion != null)
         {

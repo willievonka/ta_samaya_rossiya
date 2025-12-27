@@ -37,11 +37,10 @@ public class MapRepository : IMapRepository
     public async Task UpdateAsync(Map map, CancellationToken ct)
     {
         var existing = await _context.Maps
-            .AsNoTracking()
             .FirstOrDefaultAsync(m => m.Id == map.Id, ct);
         if (existing != null)
         {
-            _context.Maps.Update(map);
+            _context.Entry(existing).CurrentValues.SetValues(map);
             await _context.SaveChangesAsync(ct);
         }
     }

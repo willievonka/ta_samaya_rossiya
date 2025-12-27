@@ -11,7 +11,7 @@ public class HistoricalObjectDto
     /// <summary>
     /// Координаты точки объекта на карте
     /// </summary>
-    public Point Coordinates { get; set; }
+    public Point? Coordinates { get; set; }
     
     /// <summary>
     /// Год исторического объекта 

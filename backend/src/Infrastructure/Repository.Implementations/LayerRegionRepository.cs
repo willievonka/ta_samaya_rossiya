@@ -53,6 +53,15 @@ public class LayerRegionRepository : ILayerRegionRepository
             .FirstOrDefaultAsync(lr => lr.Id == regionId, ct);
     }
 
+    public async Task<List<Guid>> GetAllIdsByMapIdAsync(Guid mapId, CancellationToken ct)
+    {
+        return await _context.LayerRegions
+            .AsNoTracking()
+            .Where(lr => lr.MapId == mapId)
+            .Select(lr => lr.Id)
+            .ToListAsync(ct);
+    }
+
     public async Task<List<LayerRegion>?> GetAllWithRegionAndGeometryByMapIdAsync(Guid mapId, CancellationToken ct)
     {
         return await _context.LayerRegions
@@ -77,11 +86,10 @@ public class LayerRegionRepository : ILayerRegionRepository
     public async Task UpdateAsync(LayerRegion layerRegion, CancellationToken ct)
     {
         var existing = await _context.LayerRegions
-            .AsNoTracking()
             .FirstOrDefaultAsync(lr => lr.Id == layerRegion.Id, ct);
         if (existing != null)
         {
-            _context.LayerRegions.Update(layerRegion);
+            _context.Entry(existing).CurrentValues.SetValues(layerRegion);
             await _context.SaveChangesAsync(ct);
         }
     }
@@ -89,7 +97,6 @@ public class LayerRegionRepository : ILayerRegionRepository
     public async Task DeleteByIdAsync(Guid regionId, CancellationToken ct)
     {
         var existing = await _context.LayerRegions
-            .AsNoTracking()
             .FirstOrDefaultAsync(lr => lr.Id == regionId, ct);
         if (existing != null)
         {

@@ -79,7 +79,7 @@ public class LayerRegionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateLayerRegion([FromRoute] Guid mapId, [FromQuery] Guid layerId,
-        [FromForm] UpdateLayerRegionRequest request, CancellationToken ct)
+        [FromForm] UpsertLayerRegionRequest request, CancellationToken ct)
     {
         var dto = LayerRegionMapper.UpdateLayerRegionRequestToDto(request);
         

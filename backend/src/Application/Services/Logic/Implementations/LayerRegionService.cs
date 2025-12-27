@@ -127,6 +127,14 @@ public class LayerRegionService : ILayerRegionService
         {
             await _layerRegionStyleService.AddAsync(newLayerRegion.Id, layerRegionDto.Style, ct);
         }
+
+        if (layerRegionDto.HistoricalObjects != null)
+        {
+            foreach (var historicalObjectDto in layerRegionDto.HistoricalObjects)
+            {
+                await _historicalObjectService.CreateHistoricalObjectAsync(newLayerRegion.Id, historicalObjectDto, ct);
+            }
+        }
         
         return newLayerRegion.Id;
     }
@@ -173,6 +181,13 @@ public class LayerRegionService : ILayerRegionService
         return regionsDtos;
     }
 
+    public async Task<List<Guid>> GetAllIdsByMapIdAsync(Guid mapId, CancellationToken ct)
+    {
+        var ids = await _layerRegionRepository.GetAllIdsByMapIdAsync(mapId, ct);
+        
+        return ids;
+    }
+
     /// <summary>
     /// Обновляет слой региона полностью со всеми зависимыми сущностями.
     /// Обновятся только не null значения. Остальные свойства сохраняться прежними.
@@ -204,13 +219,36 @@ public class LayerRegionService : ILayerRegionService
                 ? await _indicatorsService.CreateIndicatorsAsync(layerRegionId, layerRegionDto.Indicators, ct) 
                 : await _indicatorsService.UpdateIndicatorsAsync(layerRegionId, layerRegionDto.Indicators, ct);
         }
+        else
+        {
+            await _indicatorsService.DeleteIndicatorsAsync(layerRegionId, ct);
+        }
 
         if (layerRegionDto.HistoricalObjects != null)
         {
+            _logger.LogInformation("Starting update LayerRegion HistoricalObjects.");
+            
+            var existingHistObjIds = await _historicalObjectService.GetAllIdsByLayerRegionIdAsync(layerRegionId, ct);
+            var idsForUpdating = layerRegionDto.HistoricalObjects!.Select(x => x.Id!.Value).ToList();
+            var idsForDeleting = existingHistObjIds.Except(idsForUpdating).ToList();
+
+            foreach (var id in idsForDeleting)
+            {
+                await _historicalObjectService.DeleteHistoricalObjectAsync(id, ct);
+            }
+            
             foreach (var historicalObjectDto in layerRegionDto.HistoricalObjects)
-            { 
-                await _historicalObjectService.UpdateHistoricalObjectAsync(historicalObjectDto.Id!.Value,
-                    historicalObjectDto, ct);
+            {
+                if (historicalObjectDto.Id != Guid.Empty)
+                {
+                    await _historicalObjectService.UpdateHistoricalObjectAsync(
+                        historicalObjectDto.Id!.Value,
+                        historicalObjectDto, ct);
+                }
+                else 
+                {
+                    await _historicalObjectService.CreateHistoricalObjectAsync(layerRegionId, historicalObjectDto, ct);
+                }
             }
         }
         
@@ -226,6 +264,10 @@ public class LayerRegionService : ILayerRegionService
             {
                 await _layerRegionStyleService.UpdateAsync(layerRegionId, layerRegionDto.Style, ct);
             }
+        }
+        else
+        {
+            await _layerRegionStyleService.DeleteByLayerIdAsync(layerRegionId, ct);
         }
         
         await _layerRegionRepository.UpdateAsync(layerRegion, ct);
@@ -307,9 +349,9 @@ public class LayerRegionService : ILayerRegionService
         return regionsDtos;
     }
 
-    public async Task AddNewHistoricalObjectsAsync(List<HistoricalObjectDto> objectDtos, CancellationToken ct)
+    public async Task AddNewHistoricalObjectsAsync(List<HistoricalObjectDto>? objectDtos, CancellationToken ct)
     {
-        if (objectDtos.Count == 0)
+        if (objectDtos == null || objectDtos.Count == 0)
         {
             _logger.LogError("No historical objects to add");
             return;

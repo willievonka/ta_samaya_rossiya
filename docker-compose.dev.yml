@@ -23,7 +23,7 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "8080:8080"
-    volumes:
+    volumes:mdс
       - ./backend:/app
     env_file:
       - ./backend/.env

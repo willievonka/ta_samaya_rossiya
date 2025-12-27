@@ -172,6 +172,7 @@ public class MapService : IMapService
 
     /// <summary>
     /// Обновляет карту, обновятся только не null значения. Остальные свойства сохраняться прежними.
+    /// Принимается полный Snapshot карты, недостающие элементы удаляются, новые добавляются, старые обновляются
     /// </summary>
     /// <param name="mapDto"></param>
     /// <param name="ct"></param>
@@ -213,9 +214,25 @@ public class MapService : IMapService
         
         if (mapDto.Regions != null)
         {
+            _logger.LogInformation("Starting update Map LayerRegions.");
+            
+            var existingRegionsIds = await _layerRegionService.GetAllIdsByMapIdAsync(map.Id, ct);
+            var idsForUpdating = mapDto.Regions.Select(x => x.Id!.Value).ToList();
+            var idsForDeleting = existingRegionsIds.Except(idsForUpdating).ToList();
+
+            foreach (var id in idsForDeleting)
+            {
+                await _layerRegionService.DeleteLayerRegionAsync(id, map.Id, ct);
+            }
+            
             foreach (var regionDto in mapDto.Regions)
             {
-                await _layerRegionService.UpdateLayerRegionAsync(regionDto.Id!.Value, regionDto, ct);
+                var layerRegionId = await _layerRegionService.UpdateLayerRegionAsync(regionDto.Id!.Value, regionDto, ct);
+
+                if (layerRegionId == Guid.Empty)
+                {
+                    await _layerRegionService.CreateLayerRegionAsync(map.Id, regionDto, ct);
+                }
             }
         }
         

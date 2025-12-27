@@ -128,17 +128,17 @@ public class IndicatorsService : IIndicatorsService
     /// <summary>
     /// Удаляет показатели слоя региона
     /// </summary>
-    /// <param name="indicatorsId">Id показателей региона</param>
+    /// <param name="layerRegionId">Id показателей региона</param>
     /// <param name="ct"></param>
     /// <returns></returns>
-    public async Task<bool> DeleteIndicatorsAsync(Guid indicatorsId, CancellationToken ct)
+    public async Task<bool> DeleteIndicatorsAsync(Guid layerRegionId, CancellationToken ct)
     {
-        _logger.LogInformation("Deleting Indicators {indicatorsId}", indicatorsId);
+        _logger.LogInformation("Deleting Indicators {indicatorsId}", layerRegionId);
         
-        var indicators = await _indicatorsRepository.GetByIdAsync(indicatorsId, ct);
+        var indicators = await _indicatorsRepository.GetByLayerRegionAsync(layerRegionId, ct);
         if (indicators == null)
         {
-            _logger.LogInformation("Indicators {indicatorsId} could not be deleted", indicatorsId);
+            _logger.LogInformation("Indicators {indicatorsId} could not be deleted", layerRegionId);
             return false;
         }
         
@@ -148,9 +148,9 @@ public class IndicatorsService : IIndicatorsService
             await _imageService.DeleteImageAsync(indicators.ImagePath);
         }
         
-        await _indicatorsRepository.DeleteByIdAsync(indicatorsId, ct);
+        await _indicatorsRepository.DeleteByLayerIdAsync(layerRegionId, ct);
        
-        _logger.LogInformation("Indicators {indicatorsId} deleted", indicatorsId);
+        _logger.LogInformation("Indicators {indicatorsId} deleted", layerRegionId);
         return true;
     }
 }
