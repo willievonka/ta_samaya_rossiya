@@ -4,8 +4,8 @@
     <h2 class="main-hub__description">Тематические экскурсии на карте</h2>
 
     <div class="main-hub__content">
-        @for (mapCard of mapCardList(); track mapCard.id) {
-            <main-hub-card
+        @for (mapCard of mapCardsList(); track mapCard.id) {
+            <hub-card
                 [data]="mapCard"
                 (click)="navigateToMap(mapCard)"
             />

@@ -1,11 +1,9 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, WritableSignal } from '@angular/core';
-import { IMainHubCard } from './interfaces/main-hub-card.interface';
-import { MainHubCardComponent } from './components/main-hub-card/main-hub-card.component';
-import { MainHubService } from './services/main-hub.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
-import { tap } from 'rxjs';
+import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
+import { HubCardComponent } from '../../components/hub-card/hub-card.component';
 import { PageHeaderComponent } from '../../components/page-header/page-header.component';
+import { IHubCard } from '../../components/hub-card/interfaces/hub-card.interface';
+import { HubService } from '../../services/hub.service';
+import { take } from 'rxjs';
 
 @Component({
     selector: 'main-hub-page',
@@ -14,17 +12,13 @@ import { PageHeaderComponent } from '../../components/page-header/page-header.co
     styleUrl: './styles/main-hub-page.master.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        MainHubCardComponent,
+        HubCardComponent,
         PageHeaderComponent
-    ],
-    providers: [MainHubService]
+    ]
 })
 export class MainHubPageComponent {
-    protected readonly mapCardList: WritableSignal<IMainHubCard[] | undefined> = signal(undefined);
-
-    private readonly _mainHubService: MainHubService = inject(MainHubService);
-    private readonly _destroyRef: DestroyRef = inject(DestroyRef);
-    private readonly _router: Router = inject(Router);
+    protected readonly mapCardsList: WritableSignal<IHubCard[] | undefined> = signal(undefined);
+    private readonly _hubService: HubService = inject(HubService);
 
     constructor() {
         this.loadMapCardList();
@@ -34,20 +28,14 @@ export class MainHubPageComponent {
      * Редирект на страницу карты
      * @param card
      */
-    protected navigateToMap(card: IMainHubCard): void {
-        const path: string = card.isAnalytics ? 'analytics-map' : 'map';
-        this._router.navigate([path], {
-            queryParams: { id: card.id }
-        });
+    protected navigateToMap(card: IHubCard): void {
+        this._hubService.navigateToMap(card);
     }
 
     /** Загрузить список карточек карт */
     private loadMapCardList(): void {
-        this._mainHubService.getMapCardList()
-            .pipe(
-                tap(list => this.mapCardList.set(list)),
-                takeUntilDestroyed(this._destroyRef)
-            )
-            .subscribe();
+        this._hubService.getMapCardsList()
+            .pipe(take(1))
+            .subscribe(list => this.mapCardsList.set(list));
     }
 }

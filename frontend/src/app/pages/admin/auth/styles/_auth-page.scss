@@ -1,0 +1,49 @@
+@use '../../../../../common-styles/spacing-vars' as *;
+@use '../../../../../common-styles/color-vars' as color;
+
+:host {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.auth-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-l;
+        padding: $spacing-3xl;
+        border-radius: $spacing-xl;
+        box-shadow: $spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
+    }
+
+    &__form-header {
+        display: flex;
+        gap: $spacing-m;
+        margin-bottom: $spacing-xl;
+    }
+
+    &__logo {
+        width: 207px;
+        height: $spacing-8xl;
+    }
+
+    &__title {
+        font-size: 44px;
+        line-height: normal;
+        align-self: center;
+    }
+}
+
+::ng-deep {
+    tui-hint {
+        background-color: color.$bg-secondary !important;
+    }
+}
+

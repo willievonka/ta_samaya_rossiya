@@ -4,7 +4,7 @@ import { IMapConfig } from '../interfaces/map-config.interface';
 import { IMapZoomActions } from '../interfaces/map-zoom-actions.interface';
 import { IMapLayer, IMapLayerProperties } from '../interfaces/map-layer.interface';
 import { IMapPoint } from '../interfaces/map-point.interface';
-import { mapConfig } from '../map.config';
+import { mapConfig } from '../configs/map.config';
 import { customCoordsToLatLng } from '../utils/custom-coords-to-lat-lng.util';
 import { MapLayerRenderService } from './map-layer-render.service';
 import { MapPointRenderService } from './map-point-render.service';
@@ -13,7 +13,7 @@ import { MapPointRenderService } from './map-point-render.service';
 export class MapRenderService {
     public readonly mapInstance: Signal<LeafletMap | null> = computed(() => this._mapInstance());
 
-    private readonly _config: IMapConfig = mapConfig;
+    private _config: IMapConfig = mapConfig;
     private readonly _mapInstance: WritableSignal<LeafletMap | null> = signal<LeafletMap | null>(null);
     private readonly _layerRenderer: MapLayerRenderService = inject(MapLayerRenderService);
     private readonly _pointRenderer: MapPointRenderService = inject(MapPointRenderService);
@@ -23,7 +23,10 @@ export class MapRenderService {
      * @param container
      * @param onMapClick
      */
-    public initMap(container: HTMLDivElement, onMapClick: () => void): LeafletMap {
+    public initMap(container: HTMLDivElement, onMapClick: () => void, config?: IMapConfig,): LeafletMap {
+        if (config) {
+            this._config = config;
+        }
         const { options }: IMapConfig = this._config;
 
         const instance: LeafletMap = map(container, options)

@@ -1,5 +1,5 @@
-@use '../../../../../../common-styles/spacing-vars' as *;
-@use '../../../../../../common-styles/color-vars' as color;
+@use '../../../../common-styles/spacing-vars' as *;
+@use '../../../../common-styles/color-vars' as color;
 
 :host:active {
     outline: 3px solid color.$border;
@@ -7,7 +7,7 @@
     transition: outline 20ms ease;
 }
 
-.main-hub-card {
+.hub-card {
     position: relative;
     display: flex;
     width: 556px;
@@ -61,12 +61,12 @@
     }
 
     &.info-visible {
-        .main-hub-card__overlay {
+        .hub-card__overlay {
             opacity: 1;
             pointer-events: auto;
         }
 
-        .main-hub-card__title {
+        .hub-card__title {
             opacity: 0
         }
     }

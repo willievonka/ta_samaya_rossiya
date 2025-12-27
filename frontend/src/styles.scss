@@ -38,11 +38,13 @@ h3 {
 
 /** Текст */
 span {
+    font-size: spacing.$spacing-l;
     font-weight: 600;
     color: color.$text-secondary;
 }
 
 a {
+    font-size: spacing.$spacing-l;
     text-decoration: none;
     color: color.$text-secondary;
     fill: currentColor;
@@ -99,4 +101,10 @@ svg {
 
         transition: border-radius 150ms ease;
     }
+}
+
+/* taiga-ui */
+:root {
+    --tui-font-text: "Manrope", sans-serif;
+    --tui-font-heading: "Manrope", sans-serif;
 }

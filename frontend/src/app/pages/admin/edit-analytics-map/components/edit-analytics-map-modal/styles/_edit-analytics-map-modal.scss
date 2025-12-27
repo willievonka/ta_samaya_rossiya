@@ -1,0 +1,37 @@
+@use '../../../../../../../common-styles/color-vars' as color;
+@use '../../../../../../../common-styles/spacing-vars' as *;
+
+.edit-analytics-map-modal {
+    display: flex;
+    flex-direction: column;
+    width: 600px;
+    box-sizing: border-box;
+    border-radius: $spacing-xl;
+    background-color: color.$bg-primary;
+    box-shadow: -$spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
+
+    &__title {
+        color: color.$text-primary;
+        margin: $spacing-xl;
+        margin-bottom: $spacing-m;
+    }
+
+    &__accordion {
+        border-radius: 0;
+    }
+
+    &__accordion-item {
+        box-shadow: none;
+    }
+
+    [tuiCell] {
+        padding: $spacing-s $spacing-xl;
+        font-size: 20px;
+        line-height: normal;
+        font-weight: 700;
+    }
+
+    &__save-button {
+        margin: $spacing-xl;
+    }
+}

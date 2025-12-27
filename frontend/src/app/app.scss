@@ -8,6 +8,19 @@
 }
 
 .app {
+    &__tui-wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+
+        ::ng-deep {
+            .t-root-content {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+    }
+
     &__content-wrapper {
         display: flex;
         flex: 1;

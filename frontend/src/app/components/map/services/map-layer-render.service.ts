@@ -4,7 +4,7 @@ import { IMapLayer, IMapLayerProperties } from '../interfaces/map-layer.interfac
 import { IActiveLeafletLayer } from '../interfaces/leaflet-layer.interface';
 import { customCoordsToLatLng } from '../utils/custom-coords-to-lat-lng.util';
 import { makeBrighterColor } from '../utils/make-brighter-color.util';
-import { mapConfig } from '../map.config';
+import { mapConfig } from '../configs/map.config';
 import { Feature, GeoJsonProperties } from 'geojson';
 
 @Injectable()
