@@ -38,8 +38,9 @@ export class AdminHubPageComponent {
 
     /** Разлогин и выход в клиентское приложение */
     protected logout(): void {
-        this._authService.logout();
-        this._router.navigate(['/']);
+        this._authService.logout()
+            .pipe(take(1))
+            .subscribe(() => this._router.navigate(['/']));
     }
 
     /**

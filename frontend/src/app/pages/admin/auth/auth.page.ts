@@ -6,6 +6,7 @@ import { IAuthModel } from './interfaces/auth-model.interface';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
+import { take } from 'rxjs';
 
 @Component({
     selector: 'auth-page',
@@ -33,7 +34,7 @@ import { AuthService } from '../../../services/auth.service';
 export class AuthPageComponent {
     protected readonly authForm: FormGroup = new FormGroup<IAuthModel>(
         {
-            'login': new FormControl<string | null>(null, [Validators.required]),
+            'email': new FormControl<string | null>(null, [Validators.required, Validators.email]),
             'password': new FormControl<string | null>(null, [Validators.required])
         },
         Validators.required
@@ -43,14 +44,15 @@ export class AuthPageComponent {
 
     /** Войти в аккаунт */
     protected login(): void {
-        const login: string = this.authForm.controls['login'].value;
+        const email: string = this.authForm.controls['email'].value;
         const password: string = this.authForm.controls['password'].value;
 
         this.authForm.markAllAsTouched();
 
         if (this.authForm.valid) {
-            this._authService.login(login, password);
-            this._router.navigate(['admin']);
+            this._authService.login(email, password)
+                .pipe(take(1))
+                .subscribe(() => this._router.navigate(['admin']));
         }
     }
 }

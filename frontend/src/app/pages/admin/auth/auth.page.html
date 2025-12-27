@@ -15,13 +15,13 @@
         </div>
         <tui-textfield>
             <input
-                formControlName="login"
-                placeholder="Логин"
+                formControlName="email"
+                placeholder="Электронная почта"
                 tuiTextfield
             />
         </tui-textfield>
         <tui-error
-            formControlName="login"
+            formControlName="email"
             [error]="[] | tuiFieldError | async"
         />
         <tui-textfield>
