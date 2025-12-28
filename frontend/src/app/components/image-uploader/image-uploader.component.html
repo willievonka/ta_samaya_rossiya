@@ -1,5 +1,9 @@
 @if (!fileControl.value) {
-    <label class="image-uploader" tuiInputFiles>
+    <label
+        class="image-uploader"
+        tuiInputFiles
+        [class.image-uploader_size-m]="size() === 'm'"
+    >
         <input
             [accept]="fileType()"
             tuiInputFiles
@@ -11,7 +15,7 @@
 <tui-files>
     @if (fileControl.value | tuiFileRejected: {accept: fileType()} | async; as file) {
         <tui-file
-            size="l"
+            [size]="size()"
             state="error"
             [file]="file"
             (remove)="removeFile()"
@@ -19,14 +23,14 @@
     }
     @if (loadedFile$ | async; as file) {
         <tui-file
-            size="l"
+            [size]="size()"
             [file]="file"
             (remove)="removeFile()"
         />
     }
     @if (failedFile$ | async; as file) {
         <tui-file
-            size="l"
+            [size]="size()"
             state="error"
             [file]="file"
             (remove)="removeFile()"
@@ -34,7 +38,7 @@
     }
     @if (loadingFile$ | async; as file) {
         <tui-file
-            size="l"
+            [size]="size()"
             state="loading"
             [file]="file"
             (remove)="removeFile()"

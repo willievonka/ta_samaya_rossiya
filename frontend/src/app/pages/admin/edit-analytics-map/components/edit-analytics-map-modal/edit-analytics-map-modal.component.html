@@ -83,6 +83,14 @@
                 </div>
 
                 <span>Список активных регионов</span>
+                <button
+                    type="button"
+                    tuiButton
+                    size="m"
+                    (click)="toggleRegionSettingsModal(true)"
+                >
+                    Добавить регион
+                </button>
             </tui-expand>
         </tui-accordion>
 
@@ -96,3 +104,12 @@
         </button>
     </form>
 </div>
+
+@if (isModalOpen()) {
+    <add-region
+        class="edit-analytics-map-modal__region-settings-modal"
+        [form]="addRegionForm"
+        [regionsList]="regionsList"
+        (closeModal)="toggleRegionSettingsModal(false)"
+    />
+}

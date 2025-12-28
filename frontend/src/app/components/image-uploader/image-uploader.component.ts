@@ -27,6 +27,7 @@ import { BehaviorSubject, distinctUntilChanged, Observable, of, Subject, switchM
 export class ImageUploaderComponent implements ControlValueAccessor {
     public readonly fileControl: FormControl<TuiFileLike | null> = new FormControl<TuiFileLike | null>(null);
     public readonly fileType: InputSignal<string> = input('image/svg+xml');
+    public readonly size: InputSignal<'m' | 'l'> = input<'m' | 'l'>('l');
 
     protected readonly failedFile$: Subject<TuiFileLike | null> = new Subject<TuiFileLike | null>();
     protected readonly loadingFile$: BehaviorSubject<TuiFileLike | null> = new BehaviorSubject<TuiFileLike | null>(null);

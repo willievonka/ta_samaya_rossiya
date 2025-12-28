@@ -1,7 +1,12 @@
 @use '../../../../../../../common-styles/color-vars' as color;
 @use '../../../../../../../common-styles/spacing-vars' as *;
 
+:host {
+    position: relative;
+}
+
 .edit-analytics-map-modal {
+    position: relative;
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -66,6 +71,7 @@
     &__image-uploader {
         display: flex;
         flex-direction: column;
+        width: 258px;
         gap: $spacing-s;
     }
 
@@ -112,9 +118,16 @@
         background-size: cover;
     }
 
+    &__region-settings-modal {
+        position: absolute;
+        top: 35%;
+        right: 624px;
+        width: 520px;
+    }
+
     &__save-button {
         margin: $spacing-xl;
-        margin-top: $spacing-s;
+        margin-top: $spacing-8xl;
         align-self: flex-start;
     }
 }

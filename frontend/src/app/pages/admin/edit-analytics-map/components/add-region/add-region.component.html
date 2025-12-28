@@ -1,0 +1,75 @@
+@let addRegionForm = form();
+<div class="add-region__wrapper">
+    <button
+        class="add-region__close-button"
+        (click)="closeModal.emit()"
+    >
+        <svg width="8.6" height="8.6">
+            <use href="/sprites/cross.svg" />
+        </svg>
+    </button>
+    <form class="add-region" [formGroup]="addRegionForm">
+        <form-field
+            [control]="addRegionForm.controls.regionName"
+            label="Название региона"
+            placeholder="Укажите название"
+            [errorClass]="errorClass()"
+        />
+
+        <div>
+            <span class="add-region__image-uploader-title">
+                Изображение региона
+            </span>
+            <image-uploader
+                class="add-region__image-uploader"
+                [formControl]="addRegionForm.controls.image"
+                fileType="image/png"
+                size="m"
+            />
+            <span class="add-region__image-uploader-hint">
+                Файл в формате PNG, с разрешением 484x256 px
+            </span>
+        </div>
+
+        <form-field
+            [control]="addRegionForm.controls.color"
+            [color]="true"
+            label="Цвет региона"
+            placeholder="Укажите цвет"
+            [errorClass]="errorClass()"
+        />
+
+        <div class="add-region__group">
+            <form-field
+                [control]="addRegionForm.controls.partnersCount"
+                [numeric]="true"
+                label="Число партнёров"
+                placeholder="Укажите число"
+                [errorClass]="errorClass()"
+            />
+            <form-field
+                [control]="addRegionForm.controls.excursionsCount"
+                [numeric]="true"
+                label="Число экскурсий"
+                placeholder="Укажите число"
+                [errorClass]="errorClass()"
+            />
+            <form-field
+                [control]="addRegionForm.controls.membersCount"
+                [numeric]="true"
+                label="Число участников"
+                placeholder="Укажите число"
+                [errorClass]="errorClass()"
+            />
+        </div>
+
+        <button
+            class="add-region__button"
+            type="submit"
+            tuiButton
+            size="m"
+        >
+            Добавить
+        </button>
+    </form>
+</div>

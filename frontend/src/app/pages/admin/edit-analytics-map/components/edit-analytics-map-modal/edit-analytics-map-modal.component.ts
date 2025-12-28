@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, signal, WritableSignal } from '@angular/core';
 import { EditMapModalBaseComponent } from '../../../../../components/edit-map-modal/edit-map-modal.base.component';
 import { TuiAccordion } from '@taiga-ui/experimental';
 import { TuiCell } from '@taiga-ui/layout';
@@ -11,6 +11,8 @@ import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 import { distinctUntilChanged, map, Observable, startWith } from 'rxjs';
 import { FormFieldComponent } from '../../../../../components/form-field/form-field.component';
 import { IAnalyticsMapSettingsForm } from './interfaces/analytics-map-settings-form.interface';
+import { IAddRegionForm } from '../add-region/interfaces/add-region-form.interface';
+import { AddRegionComponent } from '../add-region/add-region.component';
 
 @Component({
     selector: 'edit-analytics-map-modal',
@@ -26,16 +28,30 @@ import { IAnalyticsMapSettingsForm } from './interfaces/analytics-map-settings-f
         TuiTextfield,
         TuiButton,
         ImageUploaderComponent,
-        FormFieldComponent
+        FormFieldComponent,
+        AddRegionComponent
     ]
 })
 export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent implements OnDestroy {
+    protected readonly isModalOpen: WritableSignal<boolean> = signal(false);
+
     protected readonly settingsForm: FormGroup<IAnalyticsMapSettingsForm> = new FormGroup<IAnalyticsMapSettingsForm>({
         title: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
         cardBackgroundImage: new FormControl<TuiFileLike | null>(null),
         cardDescription: new FormControl<string>('', { nonNullable: true }),
         mapInfo: new FormControl<string>('', { nonNullable: true })
     });
+
+    protected readonly addRegionForm: FormGroup<IAddRegionForm> = new FormGroup<IAddRegionForm>({
+        regionName: new FormControl<string>('', { nonNullable: true }),
+        image: new FormControl<TuiFileLike | null>(null),
+        color: new FormControl<string>('', { nonNullable: true }),
+        partnersCount: new FormControl<number>(0, { nonNullable: true }),
+        excursionsCount: new FormControl<number>(0, { nonNullable: true }),
+        membersCount: new FormControl<number>(0, { nonNullable: true })
+    });
+
+    protected readonly regionsList: string[] = ['Свердловская область', 'Курганская область'];
 
     protected readonly cardPreviewBackgroundImage$: Observable<SafeStyle | null> =
         this.settingsForm.controls.cardBackgroundImage.valueChanges
@@ -52,7 +68,18 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
         this.revokeObjectUrl();
     }
 
-    /** Собрать стиль background-image из файла */
+    /**
+     * Открыть/закрыть модалку настроек региона
+     * @param isOpen
+     */
+    protected toggleRegionSettingsModal(isOpen: boolean): void {
+        this.isModalOpen.set(isOpen);
+    }
+
+    /**
+     * Собрать стиль background-image из файла
+     * @param file
+     */
     private buildBgStyle(file: TuiFileLike | null): SafeStyle | null {
         this.revokeObjectUrl();
 

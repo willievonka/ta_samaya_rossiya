@@ -4,13 +4,25 @@
         {{ label() }}
     </span>
 
-    <tui-textfield>
+    <tui-textfield [tuiTextfieldSize]="size()">
         @if (multiline()) {
             <textarea
                 tuiTextarea
                 [formControl]="control()"
                 [placeholder]="placeholder()"
             ></textarea>
+        } @else if (numeric()) {
+            <input
+                tuiInputNumber
+                [formControl]="control()"
+                [placeholder]="placeholder()"
+            />
+        } @else if (color()) {
+            <input
+                tuiInputColor
+                [formControl]="control()"
+                [placeholder]="placeholder()"
+            />
         } @else {
             <input
                 tuiTextfield
