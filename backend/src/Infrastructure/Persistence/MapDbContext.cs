@@ -17,6 +17,7 @@ public class MapDbContext : DbContext
     public DbSet<LayerRegion> LayerRegions => Set<LayerRegion>();
     public DbSet<RegionGeometry> RegionGeometries => Set<RegionGeometry>();
     public DbSet<LayerRegionStyle> LayerRegionStyles => Set<LayerRegionStyle>();
+    public DbSet<Admin> Admins => Set<Admin>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -97,6 +98,9 @@ public class MapDbContext : DbContext
         
         modelBuilder.Entity<LayerRegionStyle>()
             .HasKey(rls => rls.Id);
+        
+        modelBuilder.Entity<Admin>()
+            .HasKey(a => a.Id);
     }
     
     private void AddAutoGeneratingId(ModelBuilder modelBuilder)
@@ -126,6 +130,10 @@ public class MapDbContext : DbContext
             .ValueGeneratedOnAdd();
         
         modelBuilder.Entity<LayerRegionStyle>()
+            .Property(x => x.Id)
+            .ValueGeneratedOnAdd();
+        
+        modelBuilder.Entity<Admin>()
             .Property(x => x.Id)
             .ValueGeneratedOnAdd();
     }

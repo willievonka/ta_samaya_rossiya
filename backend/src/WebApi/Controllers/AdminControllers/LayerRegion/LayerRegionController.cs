@@ -1,4 +1,5 @@
 ﻿using Application.Services.Logic.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Controllers.AdminControllers.LayerRegion.Request;
 using WebApi.Controllers.AdminControllers.Map.Requests;
@@ -7,6 +8,7 @@ using WebApi.Controllers.AdminControllers.Mapper;
 namespace WebApi.Controllers.AdminControllers.LayerRegion;
 
 [ApiController]
+[Authorize]
 [Route("api/admin/maps/{mapId:guid}/layers")]
 public class LayerRegionController : ControllerBase
 {
@@ -57,7 +59,7 @@ public class LayerRegionController : ControllerBase
     public async Task<IActionResult> DeleteLayerRegion([FromRoute] Guid mapId,
         [FromQuery] Guid layerId, CancellationToken ct)
     {
-        var res = await _layerRegionService.DeleteLayerRegionAsync(layerId, ct);
+        var res = await _layerRegionService.DeleteLayerRegionAsync(layerId, mapId, ct);
         
         if (res) return NoContent();
         

@@ -243,8 +243,6 @@ public class MapService : IMapService
             return Guid.Empty;
         }
         
-        //TODO добавить логику удаления пустого региона при создании
-        
         var layerRegionId = await _layerRegionService.CreateLayerRegionAsync(map.Id, layerRegionDto, ct);
         
         _logger.LogInformation("Layer region {name} created", layerRegionDto.Name);

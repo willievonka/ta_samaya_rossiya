@@ -1,4 +1,5 @@
 ﻿using Application.Services.Logic.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Controllers.AdminControllers.HistoricalObject.Request;
 using WebApi.Controllers.AdminControllers.HistoricalObject.Response;
@@ -7,6 +8,7 @@ using WebApi.Controllers.AdminControllers.Mapper;
 namespace WebApi.Controllers.AdminControllers.HistoricalObject;
 
 [ApiController]
+[Authorize]
 [Route("api/admin/maps/{mapId:guid}/layers")]
 public class HistoricalObjectController : ControllerBase
 {

@@ -1,4 +1,5 @@
 ﻿using Application.Services.Logic.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Controllers.AdminControllers.Map.Requests;
 using WebApi.Controllers.AdminControllers.Map.Responses;
@@ -7,12 +8,13 @@ using WebApi.Controllers.AdminControllers.Mapper;
 namespace WebApi.Controllers.AdminControllers.Map;
 
 [ApiController]
+[Authorize]
 [Route("api/admin/maps")]
-public class MapController : ControllerBase
+public class AdminMapController : ControllerBase
 {
     private readonly IMapService _mapService;
     
-    public MapController(IMapService mapService)
+    public AdminMapController(IMapService mapService)
     {
         _mapService = mapService;
     }

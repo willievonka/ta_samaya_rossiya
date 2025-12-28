@@ -1,7 +1,9 @@
-﻿using Application.Services.Interfaces;
+﻿using Application.Services.Auth.Interfaces;
+using Application.Services.Interfaces;
 using Domain.Repository.Interfaces;
 using Infrastructure.Repository.Implementations;
 using Infrastructure.Services.Implementations;
+using Infrastructure.Services.Implementations.Auth;
 
 namespace Infrastructure;
 
@@ -17,8 +19,18 @@ public static class InfrastructureExtensions
         services.AddScoped<IHistoricalObjectRepository, HistoricalObjectRepository>();
         services.AddScoped<ILayerRegionStyleRepository, LayerRegionStyleRepository>();
         services.AddScoped<IHistoricalObjectRepository, HistoricalObjectRepository>();
+        services.AddScoped<IAdminRepository, AdminRepository>();
+        
         services.AddScoped<IRegionSeederService, RegionSeederService>();
         services.AddScoped<ISaveImageService, SaveImageService>();
+        services.AddScoped<IAdminSeederService, AdminSeederService>();
+        services.AddScoped<IAuthService, AuthService>();
+        
+        services.AddScoped<IAdminManager, AdminManager>();
+        
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddSingleton<IBlacklistService, BlacklistService>();
+        
         return services;
     }
 }

@@ -20,6 +20,24 @@ public class LayerRegionRepository : ILayerRegionRepository
         await _context.SaveChangesAsync(ct);
     }
 
+    public async Task<LayerRegion?> GetNoActiveEmptyByNameAndMapIdAsync(string name, Guid mapId, CancellationToken ct)
+    {
+        return await _context.LayerRegions
+            .AsNoTracking()
+            .Include(lr => lr.Region)
+            .Include(lr => lr.Indicators)
+            .Include(lr => lr.Style)
+            .Include(lr => lr.HistoricalObjects)
+            .Where(lr =>
+                lr.MapId == mapId &&
+                EF.Functions.ILike(lr.Region.Name, name) &&
+                !lr.IsActive &&
+                lr.Indicators == null &&
+                lr.Style == null &&
+                (lr.HistoricalObjects == null || !lr.HistoricalObjects.Any()))
+            .FirstOrDefaultAsync(ct);
+    }
+
     public async Task<LayerRegion?> GetHeaderByIdAsync(Guid regionId, CancellationToken ct)
     {
         return await _context.LayerRegions
@@ -27,24 +45,32 @@ public class LayerRegionRepository : ILayerRegionRepository
             .FirstOrDefaultAsync(lr => lr.Id == regionId, ct);
     }
 
+    public async Task<LayerRegion?> GetWithRegionByIdAsync(Guid regionId, CancellationToken ct)
+    {
+        return await _context.LayerRegions
+            .AsNoTracking()
+            .Include(lr => lr.Region)
+            .FirstOrDefaultAsync(lr => lr.Id == regionId, ct);
+    }
+
     public async Task<List<LayerRegion>?> GetAllWithRegionAndGeometryByMapIdAsync(Guid mapId, CancellationToken ct)
     {
         return await _context.LayerRegions
+            .AsNoTracking()
             .Include(lr => lr.Region)
                 .ThenInclude(r => r.Geometry)
             .Where(lr => lr.MapId == mapId)
-            .AsNoTracking()
             .ToListAsync(ct);
     }
 
     public async Task<List<LayerRegion>?> GetAllActiveWithRegionAndGeometryByMapAsync(Guid mapId, CancellationToken ct)
     {
         return await _context.LayerRegions
+            .AsNoTracking()
             .Include(lr => lr.Region)
                 .ThenInclude(r => r.Geometry)
             .Where(lr => lr.MapId == mapId)
             .Where(lr => lr.IsActive)
-            .AsNoTracking()
             .ToListAsync(ct);
     }
 

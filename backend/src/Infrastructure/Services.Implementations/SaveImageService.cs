@@ -35,8 +35,9 @@ public class SaveImageService : ISaveImageService
             Directory.CreateDirectory(folderPath);
         }
         
-        var correctFileName = Regex.Replace(newFile.FileName, @"\s+", "").Trim();
-        var fileName = $"{entityId.ToString()}.{correctFileName}";
+        var correctFileName = Guid.NewGuid().ToString();
+        var extension = Path.GetExtension(newFile.FileName);
+        var fileName = $"{entityId.ToString()}.{correctFileName}{extension}";
         var fullPath = Path.Combine(folderPath, fileName);
 
         var relativePath = Path.Combine(UploadsFolder, folder, fileName);
