@@ -39,6 +39,7 @@ export class AuthPageComponent {
 
     /** Войти в аккаунт */
     protected login(): void {
+        this.authForm.updateValueAndValidity();
         this.authForm.markAllAsTouched();
         this.authForm.setErrors(null);
 

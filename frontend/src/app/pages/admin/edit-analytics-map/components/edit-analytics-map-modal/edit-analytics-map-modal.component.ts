@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, InputSignal, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { EditMapModalBaseComponent } from '../../../../../components/edit-map-modal/edit-map-modal.base.component';
 import { TuiAccordion } from '@taiga-ui/experimental';
 import { TuiCell } from '@taiga-ui/layout';
-import { TuiButton, TuiTextfield } from '@taiga-ui/core';
+import { TuiButton, TuiIcon, TuiTextfield } from '@taiga-ui/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TuiFileLike } from '@taiga-ui/kit';
 import { AsyncPipe } from '@angular/common';
@@ -13,6 +13,8 @@ import { FormFieldComponent } from '../../../../../components/form-field/form-fi
 import { IAnalyticsMapSettingsForm } from './interfaces/analytics-map-settings-form.interface';
 import { IAddRegionForm } from '../add-region/interfaces/add-region-form.interface';
 import { AddRegionComponent } from '../add-region/add-region.component';
+import { IMapLayerProperties } from '../../../../../components/map/interfaces/map-layer.interface';
+import { IMapModel } from '../../../../../components/map/models/map.model';
 
 @Component({
     selector: 'edit-analytics-map-modal',
@@ -27,13 +29,18 @@ import { AddRegionComponent } from '../add-region/add-region.component';
         TuiCell,
         TuiTextfield,
         TuiButton,
+        TuiIcon,
         ImageUploaderComponent,
         FormFieldComponent,
         AddRegionComponent
     ]
 })
-export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent implements OnDestroy {
+export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent implements OnInit, OnDestroy {
+    public readonly model: InputSignal<IMapModel> = input.required();
+
     protected readonly isModalOpen: WritableSignal<boolean> = signal(false);
+    protected readonly regionsList: WritableSignal<string[]> = signal([]);
+    protected readonly activeRegionsList: WritableSignal<IMapLayerProperties[]> = signal([]);
 
     protected readonly settingsForm: FormGroup<IAnalyticsMapSettingsForm> = new FormGroup<IAnalyticsMapSettingsForm>({
         title: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
@@ -51,18 +58,29 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
         membersCount: new FormControl<number>(0, { nonNullable: true, validators: [Validators.required] })
     });
 
-    protected readonly regionsList: string[] = ['Свердловская область', 'Курганская область'];
-
     protected readonly cardPreviewBackgroundImage$: Observable<SafeStyle | null> =
         this.settingsForm.controls.cardBackgroundImage.valueChanges
             .pipe(
                 startWith(this.settingsForm.controls.cardBackgroundImage.value),
-                distinctUntilChanged(),
+                map(file => file as File | null),
+                distinctUntilChanged((a, b) =>
+                    (a?.name === b?.name) && (a?.size === b?.size) && (a?.lastModified === b?.lastModified)
+                ),
                 map(file => this.buildBgStyle(file))
             );
 
     private _objectUrl: string | null = null;
     private readonly _sanitizer: DomSanitizer = inject(DomSanitizer);
+
+    public ngOnInit(): void {
+        const props: IMapLayerProperties[] = this.model().layers
+            .map(l => l.properties)
+            .slice()
+            .sort((a, b) => a.regionName.localeCompare(b.regionName, 'ru', { sensitivity: 'base' }));
+
+        this.regionsList.set(props.map(p => p.regionName));
+        this.activeRegionsList.set(props.filter(p => p.isActive));
+    }
 
     public ngOnDestroy(): void {
         this.revokeObjectUrl();

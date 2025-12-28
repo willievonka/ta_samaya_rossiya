@@ -16,9 +16,10 @@
             [config]="config"
         ></map>
     }
-    @if (true) {
+    @if (model(); as model) {
         <edit-analytics-map-modal
             class="edit-analytics-map__modal"
+            [model]="model"
         />
     }
 </div>

@@ -1,27 +1,22 @@
 @let addRegionForm = form();
+@let regions = regionsList();
+
 <div class="add-region__wrapper">
     <button
         class="add-region__close-button"
+        type="button"
         (click)="close()"
     >
         <svg width="8.6" height="8.6">
             <use href="/sprites/cross.svg" />
         </svg>
     </button>
-    <form class="add-region" [formGroup]="addRegionForm">
-        <!-- <form-field
-            [control]="addRegionForm.controls.regionName"
-            label="Название региона"
-            placeholder="Укажите название"
-            [errorClass]="errorClass()"
-        /> -->
-
+    <form class="add-region" [formGroup]="addRegionForm" (ngSubmit)="saveRegion()">
         <select-autocomplete
             [control]="addRegionForm.controls.regionName"
-            [itemsList]="regionsList()"
+            [itemsList]="regions"
             label="Название региона"
             placeholder="Укажите название"
-            [errorClass]="errorClass()"
         />
 
         <div>
@@ -44,7 +39,6 @@
             [color]="true"
             label="Цвет региона"
             placeholder="Укажите цвет"
-            [errorClass]="errorClass()"
         />
 
         <div class="add-region__group">
@@ -53,21 +47,18 @@
                 [numeric]="true"
                 label="Число партнёров"
                 placeholder="Укажите число"
-                [errorClass]="errorClass()"
             />
             <form-field
                 [control]="addRegionForm.controls.excursionsCount"
                 [numeric]="true"
                 label="Число экскурсий"
                 placeholder="Укажите число"
-                [errorClass]="errorClass()"
             />
             <form-field
                 [control]="addRegionForm.controls.membersCount"
                 [numeric]="true"
                 label="Число участников"
                 placeholder="Укажите число"
-                [errorClass]="errorClass()"
             />
         </div>
 
@@ -76,7 +67,6 @@
             type="submit"
             tuiButton
             size="m"
-            (click)="saveRegion()"
         >
             Сохранить
         </button>

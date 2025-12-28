@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, InputSignal } from '@angular/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { TuiDataList, TuiError, TuiLabel, TuiScrollable, TuiTextfield } from '@taiga-ui/core';
+import { TuiDataList, TuiError, TuiLabel, TuiScrollable, TuiScrollbar, TuiTextfield } from '@taiga-ui/core';
 import { TuiChevron, TuiComboBox, TuiFieldErrorPipe, TuiFilterByInputPipe } from '@taiga-ui/kit';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
@@ -23,7 +23,8 @@ import { AsyncPipe } from '@angular/common';
         TuiTextfield,
         TuiLabel,
         TuiError,
-        TuiFieldErrorPipe
+        TuiFieldErrorPipe,
+        TuiScrollbar
     ]
 })
 export class SelectAutocompleteComponent {
@@ -31,5 +32,4 @@ export class SelectAutocompleteComponent {
     public readonly control: InputSignal<FormControl> = input.required();
     public readonly itemsList: InputSignal<string[]> = input.required();
     public readonly placeholder: InputSignal<string> = input('');
-    public readonly errorClass: InputSignal<string> = input('');
 }

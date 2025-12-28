@@ -22,19 +22,19 @@ import { SelectAutocompleteComponent } from '../../../../../components/select-au
 })
 export class AddRegionComponent {
     public readonly form: InputSignal<FormGroup<IAddRegionForm>> = input.required();
-    public readonly errorClass: InputSignal<string> = input('');
     public readonly regionsList: InputSignal<string[]> = input.required();
     public readonly closeModal: OutputEmitterRef<void> = output();
     public readonly regionSaved: OutputEmitterRef<void> = output();
 
     /** Закрыть модалку */
     protected close(): void {
-        this.form().reset();
         this.closeModal.emit();
+        this.form().reset();
     }
 
     /** Сохранить регион */
     protected saveRegion(): void {
+        this.form().updateValueAndValidity();
         this.form().markAllAsTouched();
         if (this.form().invalid) {
             return;

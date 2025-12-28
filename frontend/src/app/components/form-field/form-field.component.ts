@@ -30,5 +30,4 @@ export class FormFieldComponent {
     public readonly multiline: InputSignal<boolean> = input(false);
     public readonly numeric: InputSignal<boolean> = input(false);
     public readonly color: InputSignal<boolean> = input(false);
-    public readonly errorClass: InputSignal<string> = input('');
 }
