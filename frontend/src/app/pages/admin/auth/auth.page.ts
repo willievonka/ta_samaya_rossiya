@@ -2,11 +2,13 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TuiTextfield, TuiButton, TuiIcon, TuiError } from '@taiga-ui/core';
 import { TuiFieldErrorPipe, TuiPassword } from '@taiga-ui/kit';
-import { IAuthModel } from './interfaces/auth-model.interface';
+import { IAuthForm, IAuthFormErrors } from './interfaces/auth-form.interface';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { take } from 'rxjs';
+
+
 
 @Component({
     selector: 'auth-page',
@@ -27,36 +29,37 @@ import { take } from 'rxjs';
     ]
 })
 export class AuthPageComponent {
-    protected readonly authForm: FormGroup = new FormGroup<IAuthModel>(
-        {
-            'email': new FormControl<string | null>(null, [Validators.required, Validators.email]),
-            'password': new FormControl<string | null>(null, [Validators.required])
-        },
-        Validators.required
-    );
+    protected readonly authForm: FormGroup<IAuthForm> = new FormGroup<IAuthForm>({
+        email: new FormControl<string>('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
+        password: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] })
+    });
+
     private readonly _authService: AuthService = inject(AuthService);
     private readonly _router: Router = inject(Router);
 
     /** Войти в аккаунт */
     protected login(): void {
         this.authForm.markAllAsTouched();
+        this.authForm.setErrors(null);
 
-        if (this.authForm.valid) {
-            const email: string = this.authForm.controls['email'].value;
-            const password: string = this.authForm.controls['password'].value;
-
-            this._authService.login(email, password)
-                .pipe(take(1))
-                .subscribe({
-                    next: () => this._router.navigate(['admin']),
-                    error: (error) => {
-                        if (error?.status === 401 || error?.status === 403) {
-                            this.authForm.setErrors({ invalidCredits: true });
-                        } else {
-                            this.authForm.setErrors({ serverError: true });
-                        }
-                    }
-                });
+        if (this.authForm.invalid) {
+            return;
         }
+
+        const { email, password }: { email: string; password: string } = this.authForm.getRawValue();
+
+        this._authService.login(email, password)
+            .pipe(take(1))
+            .subscribe({
+                next: () => this._router.navigate(['admin']),
+                error: (error) => {
+                    const errors: IAuthFormErrors =
+                        (error?.status === 401 || error?.status === 403)
+                            ? { invalidCredits: true }
+                            : { serverError: true };
+
+                    this.authForm.setErrors(errors);
+                }
+            });
     }
 }

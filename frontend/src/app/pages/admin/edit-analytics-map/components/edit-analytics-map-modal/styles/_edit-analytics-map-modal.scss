@@ -4,7 +4,8 @@
 .edit-analytics-map-modal {
     display: flex;
     flex-direction: column;
-    width: 600px;
+    width: 100%;
+    max-width: 600px;
     box-sizing: border-box;
     border-radius: $spacing-xl;
     background-color: color.$bg-primary;
@@ -16,11 +17,21 @@
         margin-bottom: $spacing-l;
     }
 
+    &__form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__section {
+        margin: 0 $spacing-xl;
+        margin-bottom: $spacing-xs;
+    }
+
     &__accordion {
         border-radius: 0;
     }
 
-    [tuiCell] {
+    &__accordion-button {
         padding: $spacing-s $spacing-xl;
         padding-right: $spacing-2xl;
         font-size: 20px;
@@ -34,21 +45,22 @@
     }
 
     &__field {
-        &_title {
-            margin: 0 $spacing-xl;
-        }
+        width: 100%;
     }
 
     &__error {
-        &_title {
-            font-size: 14px;
-        }
+        font-size: 14px;
     }
 
-    &__group {
+    &__row {
         display: flex;
+        width: 100%;
         gap: $spacing-l;
         margin-bottom: $spacing-l;
+
+        &_last {
+            margin-bottom: $spacing-xs;
+        }
     }
 
     &__image-uploader {
@@ -59,7 +71,7 @@
 
     &__image-uploader-hint {
         display: block;
-        padding: $spacing-m;
+        padding: 13px;
         border-radius: 10px;
         background-color: color.$bg-secondary;
         font-size: 14px;
@@ -71,6 +83,7 @@
         display: flex;
         flex-direction: column;
         gap: $spacing-s;
+        min-width: 278px;
     }
 
     &__card-preview {
@@ -81,6 +94,7 @@
         height: 156px;
         background-color: color.$bg-secondary;
         border-radius: $spacing-s;
+        overflow: hidden;
     }
 
     &__card-preview-title {
@@ -92,17 +106,15 @@
     }
 
     &__card-preview-image {
-        width: 100%;
-        height: 100%;
+        flex: 1;
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
-        border-bottom-left-radius: $spacing-s;
-        border-bottom-right-radius: $spacing-s;
     }
 
     &__save-button {
         margin: $spacing-xl;
         margin-top: $spacing-s;
+        align-self: flex-start;
     }
 }

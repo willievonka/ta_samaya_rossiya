@@ -1,0 +1,28 @@
+<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
+<label tuiLabel class="form-field">
+    <span class="form-field__label">
+        {{ label() }}
+    </span>
+
+    <tui-textfield>
+        @if (multiline()) {
+            <textarea
+                tuiTextarea
+                [formControl]="control()"
+                [placeholder]="placeholder()"
+            ></textarea>
+        } @else {
+            <input
+                tuiTextfield
+                [formControl]="control()"
+                [placeholder]="placeholder()"
+            />
+        }
+    </tui-textfield>
+
+    <tui-error
+        [class]="errorClass()"
+        [formControl]="control()"
+        [error]="[] | tuiFieldError | async"
+    />
+</label>

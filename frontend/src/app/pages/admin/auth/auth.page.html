@@ -13,24 +13,26 @@
                 Вход в админ-панель
             </h1>
         </div>
+
         <div class="auth-page__field">
             <tui-textfield>
                 <input
-                    formControlName="email"
+                    [formControl]="authForm.controls.email"
                     placeholder="Электронная почта"
                     tuiTextfield
                 />
             </tui-textfield>
             <tui-error
                 class="auth-page__error"
-                formControlName="email"
+                [formControl]="authForm.controls.email"
                 [error]="[] | tuiFieldError | async"
             />
         </div>
+
         <div class="auth-page__field">
             <tui-textfield>
                 <input
-                    formControlName="password"
+                    [formControl]="authForm.controls.password"
                     placeholder="Пароль"
                     tuiTextfield
                     type="password"
@@ -39,15 +41,18 @@
             </tui-textfield>
             <tui-error
                 class="auth-page__error"
-                formControlName="password"
+                [formControl]="authForm.controls.password"
                 [error]="[] | tuiFieldError | async"
             />
-            <tui-error
-                class="auth-page__error"
-                [formGroup]="authForm"
-                [error]="[] | tuiFieldError | async"
-            />
+            @if (authForm.errors) {
+                <tui-error
+                    class="auth-page__error"
+                    [formGroup]="authForm"
+                    [error]="[] | tuiFieldError | async"
+                />
+            }
         </div>
+
         <button
             size="l"
             tuiButton

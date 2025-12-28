@@ -1,34 +1,36 @@
 <div class="edit-analytics-map-modal">
     <h2 class="edit-analytics-map-modal__title">Настройки</h2>
-    <form [formGroup]="settingsForm">
-        <div class="edit-analytics-map-modal__field_title">
-            <label tuiLabel>
-                <span class="edit-analytics-map-modal__label_title">Название проекта</span>
-                <tui-textfield>
-                    <input
-                        formControlName="title"
-                        tuiTextfield
-                        placeholder="Укажите название"
-                    />
-                </tui-textfield>
-                <tui-error
-                    class="edit-analytics-map-modal__error_title"
-                    formControlName="title"
-                    [error]="[] | tuiFieldError | async"
-                />
-            </label>
+
+    <form class="edit-analytics-map-modal__form" [formGroup]="settingsForm">
+        <div class="edit-analytics-map-modal__section">
+            <form-field
+                class="edit-analytics-map-modal__field"
+                label="Название проекта"
+                placeholder="Укажите название"
+                [control]="settingsForm.controls.title"
+                errorClass="edit-analytics-map-modal__error"s
+            />
         </div>
+
         <tui-accordion class="edit-analytics-map-modal__accordion" size="l">
-            <button tuiAccordion appearance="" tuiCell>
+            <button
+                class="edit-analytics-map-modal__accordion-button"
+                tuiAccordion
+                tuiCell
+                appearance=""
+                type="button"
+            >
                 Карточка
             </button>
+
             <tui-expand class="edit-analytics-map-modal__accordion-item">
-                <div class="edit-analytics-map-modal__group">
+                <div class="edit-analytics-map-modal__row">
                     <div class="edit-analytics-map-modal__card-preview-wrapper">
                         <span>Предпросмотр карточки</span>
+
                         <div class="edit-analytics-map-modal__card-preview">
                             <span class="edit-analytics-map-modal__card-preview-title">
-                                {{ settingsForm.controls['title'].value || 'Ta самая Россия' }}
+                                {{ (settingsForm.controls.title.value || '').trim() || 'Та самая Россия' }}
                             </span>
                             <div
                                 class="edit-analytics-map-modal__card-preview-image"
@@ -39,42 +41,48 @@
 
                     <div class="edit-analytics-map-modal__image-uploader">
                         <span>Фоновое изображение</span>
-                        <image-uploader formControlName="cardBackgroundImage"/>
+                        <image-uploader formControlName="cardBackgroundImage" />
+
                         <span class="edit-analytics-map-modal__image-uploader-hint">
-                            Файл в формате SVG,<br>
+                            Файл в формате SVG,<br />
                             с разрешением 556x266 px
                         </span>
                     </div>
                 </div>
 
-                <label tuiLabel>
-                    <span class="edit-analytics-map-modal__label">Описание</span>
-                    <tui-textfield style="margin-bottom: 4px;">
-                        <textarea
-                            formControlName="cardDescription"
-                            tuiTextarea
-                            placeholder="Укажите описание"
-                        ></textarea>
-                    </tui-textfield>
-                </label>
+                <div class="edit-analytics-map-modal__row_last">
+                    <form-field
+                        class="edit-analytics-map-modal__field"
+                        label="Описание"
+                        placeholder="Укажите описание"
+                        [control]="settingsForm.controls.cardDescription"
+                        [multiline]="true"
+                    />
+                </div>
             </tui-expand>
 
-            <button tuiAccordion appearance="" tuiCell>
+            <button
+                class="edit-analytics-map-modal__accordion-button"
+                tuiAccordion
+                tuiCell
+                appearance=""
+                type="button"
+            >
                 Карта
             </button>
-            <tui-expand class="edit-analytics-map-modal__accordion-item">
-                <div>
-                    Абвгд
-                </div>
-            </tui-expand>
 
-            <button tuiAccordion appearance="" tuiCell>
-                Активные регионы
-            </button>
             <tui-expand class="edit-analytics-map-modal__accordion-item">
-                <div>
-                    Абвгд
+                <div class="edit-analytics-map-modal__row">
+                    <form-field
+                        class="edit-analytics-map-modal__field"
+                        label="Описание"
+                        placeholder="Укажите описание"
+                        [control]="settingsForm.controls.mapInfo"
+                        [multiline]="true"
+                    />
                 </div>
+
+                <span>Список активных регионов</span>
             </tui-expand>
         </tui-accordion>
 
