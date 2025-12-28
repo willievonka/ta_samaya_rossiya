@@ -4,6 +4,7 @@ import { IAddRegionForm } from './interfaces/add-region-form.interface';
 import { FormFieldComponent } from '../../../../../components/form-field/form-field.component';
 import { ImageUploaderComponent } from '../../../../../components/image-uploader/image-uploader.component';
 import { TuiButton } from '@taiga-ui/core';
+import { SelectAutocompleteComponent } from '../../../../../components/select-autocomplete/select-autocomplete.component';
 
 @Component({
     selector: 'add-region',
@@ -15,6 +16,7 @@ import { TuiButton } from '@taiga-ui/core';
         ReactiveFormsModule,
         FormFieldComponent,
         ImageUploaderComponent,
+        SelectAutocompleteComponent,
         TuiButton
     ]
 })
@@ -23,4 +25,22 @@ export class AddRegionComponent {
     public readonly errorClass: InputSignal<string> = input('');
     public readonly regionsList: InputSignal<string[]> = input.required();
     public readonly closeModal: OutputEmitterRef<void> = output();
+    public readonly regionSaved: OutputEmitterRef<void> = output();
+
+    /** Закрыть модалку */
+    protected close(): void {
+        this.form().reset();
+        this.closeModal.emit();
+    }
+
+    /** Сохранить регион */
+    protected saveRegion(): void {
+        this.form().markAllAsTouched();
+        if (this.form().invalid) {
+            return;
+        }
+
+        this.regionSaved.emit();
+        this.form().reset();
+    }
 }

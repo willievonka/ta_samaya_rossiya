@@ -43,12 +43,12 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
     });
 
     protected readonly addRegionForm: FormGroup<IAddRegionForm> = new FormGroup<IAddRegionForm>({
-        regionName: new FormControl<string>('', { nonNullable: true }),
+        regionName: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
         image: new FormControl<TuiFileLike | null>(null),
-        color: new FormControl<string>('', { nonNullable: true }),
-        partnersCount: new FormControl<number>(0, { nonNullable: true }),
-        excursionsCount: new FormControl<number>(0, { nonNullable: true }),
-        membersCount: new FormControl<number>(0, { nonNullable: true })
+        color: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
+        partnersCount: new FormControl<number>(0, { nonNullable: true, validators: [Validators.required] }),
+        excursionsCount: new FormControl<number>(0, { nonNullable: true, validators: [Validators.required] }),
+        membersCount: new FormControl<number>(0, { nonNullable: true, validators: [Validators.required] })
     });
 
     protected readonly regionsList: string[] = ['Свердловская область', 'Курганская область'];

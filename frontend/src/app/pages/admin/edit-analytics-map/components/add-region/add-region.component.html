@@ -2,15 +2,23 @@
 <div class="add-region__wrapper">
     <button
         class="add-region__close-button"
-        (click)="closeModal.emit()"
+        (click)="close()"
     >
         <svg width="8.6" height="8.6">
             <use href="/sprites/cross.svg" />
         </svg>
     </button>
     <form class="add-region" [formGroup]="addRegionForm">
-        <form-field
+        <!-- <form-field
             [control]="addRegionForm.controls.regionName"
+            label="Название региона"
+            placeholder="Укажите название"
+            [errorClass]="errorClass()"
+        /> -->
+
+        <select-autocomplete
+            [control]="addRegionForm.controls.regionName"
+            [itemsList]="regionsList()"
             label="Название региона"
             placeholder="Укажите название"
             [errorClass]="errorClass()"
@@ -64,12 +72,13 @@
         </div>
 
         <button
-            class="add-region__button"
+            class="add-region__save-button"
             type="submit"
             tuiButton
             size="m"
+            (click)="saveRegion()"
         >
-            Добавить
+            Сохранить
         </button>
     </form>
 </div>

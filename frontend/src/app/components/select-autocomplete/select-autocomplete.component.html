@@ -1,0 +1,44 @@
+<label class="select-autocomplete" tuiLabel>
+    <span class="select-autocomplete__label">
+        {{ label() }}
+    </span>
+
+    <tui-textfield tuiChevron>
+        <input
+            tuiComboBox
+            [placeholder]="placeholder()"
+            [formControl]="control()"
+        />
+
+        <ng-container *tuiTextfieldDropdown>
+            @let items = itemsList() | tuiFilterByInput;
+            <cdk-virtual-scroll-viewport
+                tuiScrollable
+                [itemSize]="44"
+                [minBufferPx]="44 * 5"
+                [maxBufferPx]="44 * 10"
+                [style.height.px]="(items?.length || 1) * (44 + 4) + 8"
+            >
+                <tui-data-list>
+                    <button
+                        *cdkVirtualFor="let item of items"
+                        new
+                        tuiOption
+                        type="button"
+                        [value]="item"
+                    >
+                        {{ item }}
+                    </button>
+                </tui-data-list>
+            </cdk-virtual-scroll-viewport>
+        </ng-container>
+    </tui-textfield>
+
+    <tui-error
+        [class]="errorClass()"
+        [formControl]="control()"
+        [error]="[] | tuiFieldError | async"
+    />
+</label>
+
+
