@@ -161,6 +161,6 @@
         [form]="addRegionForm"
         [regionsList]="allRegions()"
         (closeModal)="toggleRegionSettingsModal(false)"
-        (regionSaved)="toggleRegionSettingsModal(false)"
+        (regionSaved)="saveActiveRegionListItem()"
     />
 }

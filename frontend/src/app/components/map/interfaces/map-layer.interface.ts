@@ -18,6 +18,7 @@ export interface IMapLayerProperties {
 
 export interface IAnalyticsMapLayerProperties {
     imagePath: string;
+    imageFile?: File | null;
     partnersCount: number;
     excursionsCount: number;
     membersCount: number;

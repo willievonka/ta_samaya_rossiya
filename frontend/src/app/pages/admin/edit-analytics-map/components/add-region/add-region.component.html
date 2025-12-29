@@ -5,13 +5,13 @@
     <button
         class="add-region__close-button"
         type="button"
-        (click)="close()"
+        (click)="closeModal.emit()"
     >
         <svg width="8.6" height="8.6">
             <use href="/sprites/cross.svg" />
         </svg>
     </button>
-    <form class="add-region" [formGroup]="addRegionForm" (ngSubmit)="saveRegion()">
+    <form class="add-region" [formGroup]="addRegionForm" (ngSubmit)="regionSaved.emit()">
         <select-autocomplete
             [control]="addRegionForm.controls.regionName"
             [itemsList]="regions"

@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, input, InputSignal, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, InputSignal, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { EditMapModalBaseComponent } from '../../../../../components/edit-map-modal/edit-map-modal.base.component';
 import { TuiAccordion } from '@taiga-ui/experimental';
 import { TuiCell } from '@taiga-ui/layout';
 import { TuiButton, TuiError, TuiIcon, TuiScrollbar, TuiTextfield } from '@taiga-ui/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TuiFileLike } from '@taiga-ui/kit';
+import { FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { TuiFileLike, tuiValidationErrorsProvider } from '@taiga-ui/kit';
 import { AsyncPipe } from '@angular/common';
 import { ImageUploaderComponent } from '../../../../../components/image-uploader/image-uploader.component';
 import { SafeStyle } from '@angular/platform-browser';
@@ -18,6 +18,7 @@ import { IMapModel } from '../../../../../components/map/models/map.model';
 import { IHubCard } from '../../../../../components/hub-card/interfaces/hub-card.interface';
 import { FileService } from '../../../../../services/file.service';
 import { TuiAnimated } from '@taiga-ui/cdk/directives/animated';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'edit-analytics-map-modal',
@@ -39,6 +40,11 @@ import { TuiAnimated } from '@taiga-ui/cdk/directives/animated';
         ImageUploaderComponent,
         FormFieldComponent,
         AddRegionComponent
+    ],
+    providers: [
+        tuiValidationErrorsProvider({
+            regionAlreadyExists: 'Регион уже добавлен в список'
+        })
     ]
 })
 export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent implements OnInit, OnDestroy {
@@ -78,10 +84,20 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
             );
 
     private _revokePreview: (() => void) | null = null;
+    private _editingRegionName: string | null = null;
+
     private readonly _fileService: FileService = inject(FileService);
+    private readonly _destroyRef: DestroyRef = inject(DestroyRef);
 
     public ngOnInit(): void {
         this.init();
+
+        this.addRegionForm.controls.regionName.valueChanges
+            .pipe(
+                tap(() => this.clearControlError(this.addRegionForm.controls.regionName, 'regionAlreadyExists')),
+                takeUntilDestroyed(this._destroyRef)
+            )
+            .subscribe();
     }
 
     public ngOnDestroy(): void {
@@ -96,7 +112,10 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
     protected toggleRegionSettingsModal(isOpen: boolean): void {
         this.isModalOpen.set(isOpen);
 
-        if (!isOpen) {
+        if (isOpen) {
+            this._editingRegionName = null;
+        } else {
+            this.addRegionForm.reset();
             this.showEditingDeleteError.set(false);
         }
     }
@@ -105,8 +124,58 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
      * Сохранить активный регион в список
      * @param item
      */
-    protected saveActiveRegionListItem(item: IMapLayerProperties): void {
-        console.log('Save region', item);
+    protected saveActiveRegionListItem(): void {
+        const form: FormGroup<IAddRegionForm> = this.addRegionForm;
+        form.updateValueAndValidity();
+        form.markAllAsTouched();
+        if (form.invalid) {
+            return;
+        }
+
+        const controls: IAddRegionForm = form.controls;
+        const regionName: string = controls.regionName.value.trim();
+
+        if (!this._editingRegionName) {
+            const exists: boolean = this.activeRegionsList().some(r => r.regionName.trim() === regionName);
+
+            if (exists) {
+                controls.regionName.setErrors({ regionAlreadyExists: true });
+                controls.regionName.markAsTouched();
+
+                return;
+            }
+        }
+
+        const imageFile: File | null = controls.image.value as File | null;
+
+        const nextItem: IMapLayerProperties = {
+            regionName,
+            isActive: true,
+            style: {
+                ...(this.activeRegionsList().find(r => r.regionName === this._editingRegionName)?.style ?? {}),
+                fillColor: controls.color.value
+            },
+            analyticsData: {
+                partnersCount: controls.partnersCount.value,
+                excursionsCount: controls.excursionsCount.value,
+                membersCount: controls.membersCount.value,
+                imageFile,
+                imagePath: ''
+            }
+        } as IMapLayerProperties;
+
+        if (this._editingRegionName) {
+            const prevName: string = this._editingRegionName;
+
+            this.activeRegionsList.update(list =>
+                list.map(item => item.regionName === prevName ? nextItem : item)
+            );
+        } else {
+            this.activeRegionsList.update(list => [...list, nextItem]);
+        }
+
+        this._editingRegionName = null;
+        this.toggleRegionSettingsModal(false);
     }
 
     /**
@@ -115,6 +184,7 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
      */
     protected editActiveRegionListItem(item: IMapLayerProperties): void {
         this.showEditingDeleteError.set(false);
+        this._editingRegionName = item.regionName;
 
         this.addRegionForm.patchValue({
             regionName: item.regionName,
@@ -124,16 +194,21 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
             membersCount: item.analyticsData?.membersCount ?? 0
         });
 
-        const imageUrl: string | undefined = item.analyticsData?.imagePath?.trim();
-        if (!imageUrl) {
-            this.addRegionForm.controls.image.setValue(null);
+        const storedFile: File | null = (item.analyticsData?.imageFile as File | null) ?? null;
+        if (storedFile) {
+            this.addRegionForm.controls.image.setValue(storedFile);
             this.isModalOpen.set(true);
 
             return;
         }
 
-        const file: File | null = this._fileService.getCachedFileByUrl(imageUrl);
-        this.addRegionForm.controls.image.setValue(file);
+        const imageUrl: string | undefined = item.analyticsData?.imagePath?.trim();
+        if (imageUrl) {
+            const cached: File | null = this._fileService.getCachedFileByUrl(imageUrl);
+            this.addRegionForm.controls.image.setValue(cached);
+        } else {
+            this.addRegionForm.controls.image.setValue(null);
+        }
 
         this.isModalOpen.set(true);
     }
@@ -229,5 +304,22 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
         this._revokePreview = revoke;
 
         return style;
+    }
+
+    /**
+     * Убрать ошибку из контрола по ключу
+     * @param control
+     * @param key
+     * @returns
+     */
+    private clearControlError(control: FormControl<string>, key: string): void {
+        const errors: ValidationErrors | null = control.errors;
+        if (!errors || !errors[key]) {
+            return;
+        }
+
+        delete errors[key];
+
+        control.setErrors(Object.keys(errors).length ? errors : null);
     }
 }

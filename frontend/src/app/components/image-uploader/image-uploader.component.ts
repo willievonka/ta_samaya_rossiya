@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, forwardRef, input, InputSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, forwardRef, inject, input, InputSignal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { TuiFileLike, TuiFiles } from '@taiga-ui/kit';
-import { BehaviorSubject, distinctUntilChanged, Observable, of, Subject, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subject, switchMap, tap } from 'rxjs';
 
 @Component({
     selector: 'image-uploader',
@@ -31,16 +32,30 @@ export class ImageUploaderComponent implements ControlValueAccessor {
 
     protected readonly failedFile$: Subject<TuiFileLike | null> = new Subject<TuiFileLike | null>();
     protected readonly loadingFile$: BehaviorSubject<TuiFileLike | null> = new BehaviorSubject<TuiFileLike | null>(null);
-    protected readonly loadedFile$: Observable<TuiFileLike | null> =
+    protected readonly loadedFile$: BehaviorSubject<TuiFileLike | null> = new BehaviorSubject<TuiFileLike | null>(null);
+
+    private readonly _destroyRef: DestroyRef = inject(DestroyRef);
+    private _isWritingValue: boolean = false;
+
+    constructor () {
         this.fileControl.valueChanges
             .pipe(
-                distinctUntilChanged(),
-                switchMap((file) => this.processFile(file))
-            );
+                switchMap(file => this._isWritingValue ? of(file) : this.processFile(file)),
+                takeUntilDestroyed(this._destroyRef)
+            )
+            .subscribe();
+    }
 
     /** @inheritdoc */
     public writeValue(value: TuiFileLike | null): void {
-        this.fileControl.setValue(value);
+        this._isWritingValue = true;
+
+        this.fileControl.setValue(value, { emitEvent: false });
+        this.failedFile$.next(null);
+        this.loadingFile$.next(null);
+        this.loadedFile$.next(value);
+
+        this._isWritingValue = false;
     }
 
     /** @inheritdoc */
@@ -75,6 +90,7 @@ export class ImageUploaderComponent implements ControlValueAccessor {
 
         if (!file) {
             this.loadingFile$.next(null);
+            this.loadedFile$.next(null);
             this.onChange(null);
 
             return of(null);
@@ -87,11 +103,13 @@ export class ImageUploaderComponent implements ControlValueAccessor {
                 tap({
                     next: (loaded: TuiFileLike | null) => {
                         this.loadingFile$.next(null);
+                        this.loadedFile$.next(loaded);
                         this.onTouched();
                         this.onChange(loaded);
                     },
                     error: () => {
                         this.loadingFile$.next(null);
+                        this.loadedFile$.next(null);
                         this.failedFile$.next(file);
                         this.onTouched();
                         this.onChange(null);
