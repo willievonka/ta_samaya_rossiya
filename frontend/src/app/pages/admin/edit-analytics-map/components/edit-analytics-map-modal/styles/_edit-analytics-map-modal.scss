@@ -11,6 +11,7 @@
     flex-direction: column;
     width: 100%;
     max-width: 600px;
+    height: 880px;
     box-sizing: border-box;
     border-radius: $spacing-xl;
     background-color: color.$bg-primary;
@@ -29,7 +30,7 @@
 
     &__section {
         margin: 0 $spacing-xl;
-        margin-bottom: $spacing-xs;
+        margin-bottom: $spacing-m;
     }
 
     &__accordion {
@@ -46,7 +47,7 @@
 
     &__accordion-item {
         box-shadow: none;
-        padding: 0 $spacing-xl;
+        padding: $spacing-m $spacing-xl;
     }
 
     &__field {
@@ -118,16 +119,62 @@
         background-size: cover;
     }
 
+    &__regions-list-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-m;
+    }
+
+    &__regions-list {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-s;
+        max-height: 220px;
+    }
+
+    &__regions-list-item-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-xs;
+    }
+
+    &__regions-list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: color.$bg-secondary;
+        padding: $spacing-m;
+        border-radius: $spacing-m;
+    }
+
+    &__regions-list-item-actions {
+        display: flex;
+        gap: $spacing-m;
+    }
+
+    &__regions-list-item-error {
+        &.tui-enter,
+        &.tui-leave {
+            animation-name: tuiFade, tuiSlide;
+        }
+    }
+
     &__region-settings-modal {
         position: absolute;
-        top: 35%;
         right: 624px;
+        bottom: 0;
         width: 520px;
     }
 
     &__save-button {
         margin: $spacing-xl;
-        margin-top: $spacing-8xl;
+        margin-top: auto;
         align-self: flex-start;
+    }
+}
+
+::ng-deep {
+    tui-hint {
+        background-color: color.$bg-secondary !important;
     }
 }

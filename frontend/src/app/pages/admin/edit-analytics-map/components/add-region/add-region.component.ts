@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { IAddRegionForm } from './interfaces/add-region-form.interface';
+import { IAddRegionForm } from '../../interfaces/add-region-form.interface';
 import { FormFieldComponent } from '../../../../../components/form-field/form-field.component';
 import { ImageUploaderComponent } from '../../../../../components/image-uploader/image-uploader.component';
 import { TuiButton } from '@taiga-ui/core';
@@ -34,13 +34,15 @@ export class AddRegionComponent {
 
     /** Сохранить регион */
     protected saveRegion(): void {
-        this.form().updateValueAndValidity();
-        this.form().markAllAsTouched();
-        if (this.form().invalid) {
+        const form: FormGroup<IAddRegionForm> = this.form();
+
+        form.updateValueAndValidity();
+        form.markAllAsTouched();
+        if (form.invalid) {
             return;
         }
 
         this.regionSaved.emit();
-        this.form().reset();
+        this.close();
     }
 }

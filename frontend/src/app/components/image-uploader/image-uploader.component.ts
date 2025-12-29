@@ -40,7 +40,7 @@ export class ImageUploaderComponent implements ControlValueAccessor {
 
     /** @inheritdoc */
     public writeValue(value: TuiFileLike | null): void {
-        this.fileControl.setValue(value, { emitEvent: false });
+        this.fileControl.setValue(value);
     }
 
     /** @inheritdoc */

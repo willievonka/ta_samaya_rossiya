@@ -81,39 +81,58 @@
                     />
                 </div>
 
-                <div>
-                    <span>Список активных регионов</span>
-                    <div>
-                        @for (region of activeRegionsList(); track region.regionName) {
-                            <div>
-                                <span>
-                                    {{ region.regionName }}
-                                </span>
-                                <button
-                                    type="button"
-                                >
-                                    <tui-icon
-                                        icon="@tui.pencil"
-                                        [style.font-size.rem]="1"
-                                        [style.color]="'var(--tui-background-accent-1)'"
-                                    />
-                                </button>
-                                <button
-                                    type="button"
-                                >
-                                    <tui-icon
-                                        icon="@tui.trash"
-                                        [style.font-size.rem]="1"
-                                        [style.color]="'var(--tui-background-accent-1)'"
-                                    />
-                                </button>
-                            </div>
-                        }
-                    </div>
+                <div class="edit-analytics-map-modal__regions-list-wrapper">
+                    <span class="edit-analytics-map-modal__regions-list-title">
+                        Список активных регионов
+                    </span>
+                    <tui-scrollbar>
+                        <div class="edit-analytics-map-modal__regions-list">
+                            @for (region of activeRegionsList(); track region.regionName) {
+                                <div class="edit-analytics-map-modal__regions-list-item-wrapper">
+                                    <div class="edit-analytics-map-modal__regions-list-item">
+                                        <span class="edit-analytics-map-modal__regions-list-item-title">
+                                            {{ region.regionName }}
+                                        </span>
+                                        <div class="edit-analytics-map-modal__regions-list-item-actions">
+                                            <button
+                                                type="button"
+                                                (click)="editActiveRegionListItem(region)"
+                                            >
+                                                <tui-icon
+                                                    icon="@tui.pencil"
+                                                    [style.font-size.rem]="1"
+                                                    [style.color]="'var(--tui-background-accent-1)'"
+                                                />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                (click)="deleteActiveRegionListItem(region)"
+                                            >
+                                                <tui-icon
+                                                    icon="@tui.trash"
+                                                    [style.font-size.rem]="1"
+                                                    [style.color]="'var(--tui-text-negative)'"
+                                                />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    @if (
+                                        showEditingDeleteError() &&
+                                        addRegionForm.controls.regionName.value === region.regionName
+                                    ) {
+                                        <div class="edit-analytics-map-modal__regions-list-item-error" tuiAnimated>
+                                            <tui-error error="Регион редактируется" />
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </tui-scrollbar>
 
                     <button
                         type="button"
                         tuiButton
+                        appearance="outline"
                         size="m"
                         (click)="toggleRegionSettingsModal(true)"
                     >
@@ -124,23 +143,23 @@
 
             </tui-expand>
         </tui-accordion>
-
-        <button
-            class="edit-analytics-map-modal__save-button"
-            type="submit"
-            tuiButton
-            size="m"
-        >
-            Сохранить
-        </button>
     </form>
+
+    <button
+        class="edit-analytics-map-modal__save-button"
+        type="submit"
+        tuiButton
+        size="m"
+    >
+        Сохранить
+    </button>
 </div>
 
 @if (isModalOpen()) {
     <add-region
         class="edit-analytics-map-modal__region-settings-modal"
         [form]="addRegionForm"
-        [regionsList]="regionsList()"
+        [regionsList]="allRegions()"
         (closeModal)="toggleRegionSettingsModal(false)"
         (regionSaved)="toggleRegionSettingsModal(false)"
     />

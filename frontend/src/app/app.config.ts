@@ -9,6 +9,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { of } from 'rxjs';
 import { authInterceptor } from './interceptors/auth.interceptor';
 import { tuiValidationErrorsProvider } from '@taiga-ui/kit';
+import { tuiScrollbarOptionsProvider } from '@taiga-ui/core';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -24,6 +25,9 @@ export const appConfig: ApplicationConfig = {
             email: 'Неверный формат электронной почты',
             invalidCredits: 'Неверный email или пароль',
             serverError: 'Сервис временно недоступен. Попробуйте позже'
+        }),
+        tuiScrollbarOptionsProvider({
+            mode: 'hover'
         })
     ]
 };

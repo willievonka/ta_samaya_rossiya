@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment, IEnvironment } from '../../environments';
 import { IHubCard } from '../components/hub-card/interfaces/hub-card.interface';
-import { Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class HubService {
@@ -19,6 +19,17 @@ export class HubService {
     }
 
     /**
+     * Получить карточку по id
+     * @param id
+     */
+    public getMapCardById(id: string): Observable<IHubCard | null> {
+        return this.getMapCardsList()
+            .pipe(
+                map(list => list.find(card => card.id === id) ?? null)
+            );
+    }
+
+    /**
      * Перейти на страницу карты
      * @param card
      * @param edit
@@ -28,6 +39,11 @@ export class HubService {
             ? (card.isAnalytics ? 'admin/edit-analytics-map' : 'admin/edit-map')
             : (card.isAnalytics ? 'analytics-map' : 'map');
 
-        this._router.navigate([path], { queryParams: { id: card.id } });
+        const extras: NavigationExtras = {
+            queryParams: { id: card.id },
+            ...(edit ? { state: { card } } : {})
+        };
+
+        this._router.navigate([path], extras);
     }
 }
