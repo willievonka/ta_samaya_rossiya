@@ -142,9 +142,9 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
                     return EMPTY;
                 }),
             )
-            .subscribe({
-                complete: () => this.isModalOpen.set(true)
-            });
+            .subscribe();
+
+        this.isModalOpen.set(true);
     }
 
     /**
