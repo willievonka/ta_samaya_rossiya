@@ -2,19 +2,22 @@ import { ChangeDetectionStrategy, Component, inject, input, InputSignal, OnDestr
 import { EditMapModalBaseComponent } from '../../../../../components/edit-map-modal/edit-map-modal.base.component';
 import { TuiAccordion } from '@taiga-ui/experimental';
 import { TuiCell } from '@taiga-ui/layout';
-import { TuiButton, TuiIcon, TuiTextfield } from '@taiga-ui/core';
+import { TuiButton, TuiError, TuiIcon, TuiScrollbar, TuiTextfield } from '@taiga-ui/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TuiFileLike } from '@taiga-ui/kit';
 import { AsyncPipe } from '@angular/common';
 import { ImageUploaderComponent } from '../../../../../components/image-uploader/image-uploader.component';
-import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
-import { distinctUntilChanged, map, Observable, startWith } from 'rxjs';
+import { SafeStyle } from '@angular/platform-browser';
+import { catchError, distinctUntilChanged, EMPTY, map, Observable, startWith, take, tap } from 'rxjs';
 import { FormFieldComponent } from '../../../../../components/form-field/form-field.component';
-import { IAnalyticsMapSettingsForm } from './interfaces/analytics-map-settings-form.interface';
-import { IAddRegionForm } from '../add-region/interfaces/add-region-form.interface';
+import { IAnalyticsMapSettingsForm } from '../../interfaces/analytics-map-settings-form.interface';
+import { IAddRegionForm } from '../../interfaces/add-region-form.interface';
 import { AddRegionComponent } from '../add-region/add-region.component';
 import { IMapLayerProperties } from '../../../../../components/map/interfaces/map-layer.interface';
 import { IMapModel } from '../../../../../components/map/models/map.model';
+import { IHubCard } from '../../../../../components/hub-card/interfaces/hub-card.interface';
+import { FileService } from '../../../../../services/file.service';
+import { TuiAnimated } from '@taiga-ui/cdk/directives/animated';
 
 @Component({
     selector: 'edit-analytics-map-modal',
@@ -30,6 +33,9 @@ import { IMapModel } from '../../../../../components/map/models/map.model';
         TuiTextfield,
         TuiButton,
         TuiIcon,
+        TuiScrollbar,
+        TuiError,
+        TuiAnimated,
         ImageUploaderComponent,
         FormFieldComponent,
         AddRegionComponent
@@ -37,10 +43,12 @@ import { IMapModel } from '../../../../../components/map/models/map.model';
 })
 export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent implements OnInit, OnDestroy {
     public readonly model: InputSignal<IMapModel> = input.required();
+    public readonly card: InputSignal<IHubCard | null> = input.required();
 
     protected readonly isModalOpen: WritableSignal<boolean> = signal(false);
-    protected readonly regionsList: WritableSignal<string[]> = signal([]);
+    protected readonly allRegions: WritableSignal<string[]> = signal([]);
     protected readonly activeRegionsList: WritableSignal<IMapLayerProperties[]> = signal([]);
+    protected readonly showEditingDeleteError: WritableSignal<boolean> = signal(false);
 
     protected readonly settingsForm: FormGroup<IAnalyticsMapSettingsForm> = new FormGroup<IAnalyticsMapSettingsForm>({
         title: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
@@ -69,21 +77,16 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
                 map(file => this.buildBgStyle(file))
             );
 
-    private _objectUrl: string | null = null;
-    private readonly _sanitizer: DomSanitizer = inject(DomSanitizer);
+    private _revokePreview: (() => void) | null = null;
+    private readonly _fileService: FileService = inject(FileService);
 
     public ngOnInit(): void {
-        const props: IMapLayerProperties[] = this.model().layers
-            .map(l => l.properties)
-            .slice()
-            .sort((a, b) => a.regionName.localeCompare(b.regionName, 'ru', { sensitivity: 'base' }));
-
-        this.regionsList.set(props.map(p => p.regionName));
-        this.activeRegionsList.set(props.filter(p => p.isActive));
+        this.init();
     }
 
     public ngOnDestroy(): void {
-        this.revokeObjectUrl();
+        this._revokePreview?.();
+        this._revokePreview = null;
     }
 
     /**
@@ -92,6 +95,102 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
      */
     protected toggleRegionSettingsModal(isOpen: boolean): void {
         this.isModalOpen.set(isOpen);
+
+        if (!isOpen) {
+            this.showEditingDeleteError.set(false);
+        }
+    }
+
+    /**
+     * Сохранить активный регион в список
+     * @param item
+     */
+    protected saveActiveRegionListItem(item: IMapLayerProperties): void {
+        console.log('Save region', item);
+    }
+
+    /**
+     * Редактировать активный регион из списка
+     * @param item
+     */
+    protected editActiveRegionListItem(item: IMapLayerProperties): void {
+        this.showEditingDeleteError.set(false);
+        this.addRegionForm.patchValue({
+            regionName: item.regionName,
+            color: item.style?.fillColor ?? '',
+            partnersCount: item.analyticsData?.partnersCount ?? 0,
+            excursionsCount: item.analyticsData?.excursionsCount ?? 0,
+            membersCount: item.analyticsData?.membersCount ?? 0
+        });
+
+        const imageUrl: string | undefined = item.analyticsData?.imagePath?.trim();
+        if (!imageUrl) {
+            this.addRegionForm.controls.image.setValue(null);
+            this.isModalOpen.set(true);
+
+            return;
+        }
+
+        const fileName: string | null = this._fileService.getFileNameFromUrl(imageUrl) ?? 'region-image';
+        this._fileService.downloadAsFile(imageUrl, fileName)
+            .pipe(
+                take(1),
+                tap(file => this.addRegionForm.controls.image.setValue(file)),
+                catchError(() => {
+                    this.addRegionForm.controls.image.setValue(null);
+
+                    return EMPTY;
+                }),
+            )
+            .subscribe({
+                complete: () => this.isModalOpen.set(true)
+            });
+    }
+
+    /**
+     * Удалить активный регион из списка
+     * @param item
+     */
+    protected deleteActiveRegionListItem(item: IMapLayerProperties): void {
+        const editingName: string = this.addRegionForm.controls.regionName.value;
+        if (editingName === item.regionName) {
+            this.showEditingDeleteError.set(true);
+
+            return;
+        }
+
+        this.showEditingDeleteError.set(false);
+        this.activeRegionsList.update(list =>
+            list.filter(region => region.regionName !== item.regionName)
+        );
+    }
+
+    /** Инициализация настроек */
+    private init(): void {
+        const model: IMapModel = this.model();
+
+        const props: IMapLayerProperties[] = model.layers
+            .map(l => l.properties)
+            .slice()
+            .sort((a, b) => a.regionName.localeCompare(b.regionName, 'ru', { sensitivity: 'base' }));
+        this.allRegions.set(props.map(p => p.regionName));
+        this.activeRegionsList.set(props.filter(p => p.isActive));
+
+        const settingsControls: IAnalyticsMapSettingsForm = this.settingsForm.controls;
+        settingsControls.title.setValue(model.pageTitle);
+        settingsControls.mapInfo.setValue(model.infoText);
+
+        const card: IHubCard | null = this.card();
+        settingsControls.cardDescription.setValue(card?.description ?? '');
+
+        const url: string | undefined = card?.backgroundImagePath?.trim();
+        if (url) {
+            const fileName: string | null = this._fileService.getFileNameFromUrl(url) ?? 'card-background.svg';
+
+            this._fileService.downloadAsFile(url, fileName, 'image/svg+xml')
+                .pipe(take(1))
+                .subscribe((file) => settingsControls.cardBackgroundImage.setValue(file));
+        }
     }
 
     /**
@@ -99,22 +198,12 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
      * @param file
      */
     private buildBgStyle(file: TuiFileLike | null): SafeStyle | null {
-        this.revokeObjectUrl();
+        this._revokePreview?.();
+        this._revokePreview = null;
 
-        if (!file) {
-            return null;
-        }
-        const nativeFile: File = file as File;
-        this._objectUrl = URL.createObjectURL(nativeFile);
+        const { style, revoke }: { style: SafeStyle | null, revoke: () => void } = this._fileService.buildBackgroundImagePreview(file);
+        this._revokePreview = revoke;
 
-        return this._sanitizer.bypassSecurityTrustStyle(`url("${this._objectUrl}")`);
-    }
-
-    /** Сбросить objectUrl */
-    private revokeObjectUrl(): void {
-        if (this._objectUrl) {
-            URL.revokeObjectURL(this._objectUrl);
-            this._objectUrl = null;
-        }
+        return style;
     }
 }
