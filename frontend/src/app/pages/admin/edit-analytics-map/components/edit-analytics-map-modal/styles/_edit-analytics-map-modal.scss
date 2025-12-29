@@ -155,7 +155,7 @@
     &__regions-list-item-error {
         &.tui-enter,
         &.tui-leave {
-            animation-name: tuiFade, tuiSlide;
+            animation-name: tuiFade;
         }
     }
 
