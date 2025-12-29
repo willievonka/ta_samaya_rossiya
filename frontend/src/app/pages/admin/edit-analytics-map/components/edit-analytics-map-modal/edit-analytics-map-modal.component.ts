@@ -8,7 +8,7 @@ import { TuiFileLike } from '@taiga-ui/kit';
 import { AsyncPipe } from '@angular/common';
 import { ImageUploaderComponent } from '../../../../../components/image-uploader/image-uploader.component';
 import { SafeStyle } from '@angular/platform-browser';
-import { catchError, distinctUntilChanged, EMPTY, map, Observable, startWith, take, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, forkJoin, map, Observable, of, startWith, take, tap } from 'rxjs';
 import { FormFieldComponent } from '../../../../../components/form-field/form-field.component';
 import { IAnalyticsMapSettingsForm } from '../../interfaces/analytics-map-settings-form.interface';
 import { IAddRegionForm } from '../../interfaces/add-region-form.interface';
@@ -115,6 +115,7 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
      */
     protected editActiveRegionListItem(item: IMapLayerProperties): void {
         this.showEditingDeleteError.set(false);
+
         this.addRegionForm.patchValue({
             regionName: item.regionName,
             color: item.style?.fillColor ?? '',
@@ -131,18 +132,8 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
             return;
         }
 
-        const fileName: string | null = this._fileService.getFileNameFromUrl(imageUrl) ?? 'region-image';
-        this._fileService.downloadAsFile(imageUrl, fileName)
-            .pipe(
-                take(1),
-                tap(file => this.addRegionForm.controls.image.setValue(file)),
-                catchError(() => {
-                    this.addRegionForm.controls.image.setValue(null);
-
-                    return EMPTY;
-                }),
-            )
-            .subscribe();
+        const file: File | null = this._fileService.getCachedFileByUrl(imageUrl);
+        this.addRegionForm.controls.image.setValue(file);
 
         this.isModalOpen.set(true);
     }
@@ -159,6 +150,11 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
             return;
         }
 
+        const imageUrl: string | undefined = item.analyticsData?.imagePath?.trim();
+        if (imageUrl) {
+            this._fileService.removeCachedFileByUrl(imageUrl);
+        }
+
         this.showEditingDeleteError.set(false);
         this.activeRegionsList.update(list =>
             list.filter(region => region.regionName !== item.regionName)
@@ -173,8 +169,10 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
             .map(l => l.properties)
             .slice()
             .sort((a, b) => a.regionName.localeCompare(b.regionName, 'ru', { sensitivity: 'base' }));
+
         this.allRegions.set(props.map(p => p.regionName));
-        this.activeRegionsList.set(props.filter(p => p.isActive));
+        const active: IMapLayerProperties[] = props.filter(p => p.isActive);
+        this.activeRegionsList.set(active);
 
         const settingsControls: IAnalyticsMapSettingsForm = this.settingsForm.controls;
         settingsControls.title.setValue(model.pageTitle);
@@ -183,13 +181,39 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
         const card: IHubCard | null = this.card();
         settingsControls.cardDescription.setValue(card?.description ?? '');
 
-        const url: string | undefined = card?.backgroundImagePath?.trim();
-        if (url) {
-            const fileName: string | null = this._fileService.getFileNameFromUrl(url) ?? 'card-background.svg';
+        const preloadTasks: Array<Observable<unknown>> = [];
 
-            this._fileService.downloadAsFile(url, fileName, 'image/svg+xml')
-                .pipe(take(1))
-                .subscribe((file) => settingsControls.cardBackgroundImage.setValue(file));
+        const cardUrl: string | undefined = card?.backgroundImagePath?.trim();
+        if (cardUrl) {
+            const cardFileName: string = this._fileService.getFileNameFromUrl(cardUrl) ?? 'card-background.svg';
+
+            preloadTasks.push(
+                this._fileService.downloadAsFile(cardUrl, cardFileName, 'image/svg+xml').pipe(
+                    take(1),
+                    tap(file => settingsControls.cardBackgroundImage.setValue(file)),
+                    catchError(() => of(null))
+                )
+            );
+        }
+
+        active.forEach(region => {
+            const url: string | undefined = region.analyticsData?.imagePath?.trim();
+            if (!url) {
+                return;
+            }
+
+            const name: string = this._fileService.getFileNameFromUrl(url) ?? `${region.regionName}.png`;
+
+            preloadTasks.push(
+                this._fileService.downloadAsFile(url, name).pipe(
+                    take(1),
+                    catchError(() => of(null))
+                )
+            );
+        });
+
+        if (preloadTasks.length) {
+            forkJoin(preloadTasks).pipe(take(1)).subscribe();
         }
     }
 

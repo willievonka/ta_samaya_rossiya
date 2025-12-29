@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 import { TuiFileLike } from '@taiga-ui/kit';
-import { catchError, map, Observable, shareReplay, throwError } from 'rxjs';
+import { catchError, map, Observable, of, shareReplay, tap, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class FileService {
     private readonly _http: HttpClient = inject(HttpClient);
     private readonly _sanitizer: DomSanitizer = inject(DomSanitizer);
-    private readonly _downloadCache: Map<string, Observable<File>> = new Map<string, Observable<File>>();
+    private readonly _fileCache: Map<string, File> = new Map<string, File>();
+    private readonly _inFlight: Map<string, Observable<File>> = new Map<string, Observable<File>>();
 
     /**
      * Скачать файл по ссылке
@@ -18,27 +19,58 @@ export class FileService {
      * @param mime
      */
     public downloadAsFile(url: string, fileName: string, mime?: string): Observable<File> {
-        const cacheKey: string = `${url}||${fileName}||${mime ?? ''}`;
+        const normalizedUrl: string = url.trim();
 
-        const cached: Observable<File> | undefined = this._downloadCache.get(cacheKey);
-        if (cached) {
-            return cached;
+        const cachedFile: File | undefined = this._fileCache.get(normalizedUrl);
+        if (cachedFile) {
+            return of(cachedFile);
         }
 
-        const request$: Observable<File> = this._http.get(url, { responseType: 'blob' })
+        const cachedRequest$: Observable<File> | undefined = this._inFlight.get(normalizedUrl);
+        if (cachedRequest$) {
+            return cachedRequest$;
+        }
+
+        const request$: Observable<File> = this._http.get(normalizedUrl, { responseType: 'blob' })
             .pipe(
                 map(blob => new File([blob], fileName, { type: mime ?? blob.type })),
-                shareReplay(1),
+                tap(file => this._fileCache.set(normalizedUrl, file)),
+                shareReplay({ bufferSize: 1, refCount: true }),
                 catchError(err => {
-                    this._downloadCache.delete(cacheKey);
+                    this._inFlight.delete(normalizedUrl);
 
                     return throwError(() => err);
+                }),
+                tap({
+                    next: () => this._inFlight.delete(normalizedUrl),
+                    error: () => {}
                 })
             );
 
-        this._downloadCache.set(cacheKey, request$);
+        this._inFlight.set(normalizedUrl, request$);
 
         return request$;
+    }
+
+    /**
+     * Достать файл из кэша по url
+     * @param url
+     */
+    public getCachedFileByUrl(url: string): File | null {
+        const normalizedUrl: string = url.trim();
+
+        return this._fileCache.get(normalizedUrl) ?? null;
+    }
+
+    /**
+     * Удалить файл из кэша по url
+     * @param url
+     */
+    public removeCachedFileByUrl(url: string): void {
+        const normalizedUrl: string = url.trim();
+
+        this._fileCache.delete(normalizedUrl);
+        this._inFlight.delete(normalizedUrl);
     }
 
     /**
