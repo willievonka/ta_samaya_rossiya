@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 import { TuiFileLike } from '@taiga-ui/kit';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, shareReplay, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class FileService {
     private readonly _http: HttpClient = inject(HttpClient);
     private readonly _sanitizer: DomSanitizer = inject(DomSanitizer);
+    private readonly _downloadCache: Map<string, Observable<File>> = new Map<string, Observable<File>>();
 
     /**
      * Скачать файл по ссылке
@@ -17,10 +18,27 @@ export class FileService {
      * @param mime
      */
     public downloadAsFile(url: string, fileName: string, mime?: string): Observable<File> {
-        return this._http.get(url, { responseType: 'blob' })
+        const cacheKey: string = `${url}||${fileName}||${mime ?? ''}`;
+
+        const cached: Observable<File> | undefined = this._downloadCache.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
+
+        const request$: Observable<File> = this._http.get(url, { responseType: 'blob' })
             .pipe(
-                map(blob => new File([blob], fileName, { type: mime ?? blob.type }))
+                map(blob => new File([blob], fileName, { type: mime ?? blob.type })),
+                shareReplay(1),
+                catchError(err => {
+                    this._downloadCache.delete(cacheKey);
+
+                    return throwError(() => err);
+                })
             );
+
+        this._downloadCache.set(cacheKey, request$);
+
+        return request$;
     }
 
     /**
