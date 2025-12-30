@@ -43,6 +43,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     ],
     providers: [
         tuiValidationErrorsProvider({
+            required: 'Поле обязательно для заполнения',
             regionAlreadyExists: 'Регион уже добавлен в список'
         })
     ]
@@ -51,9 +52,9 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
     public readonly model: InputSignal<IMapModel> = input.required();
     public readonly card: InputSignal<IHubCard | null> = input.required();
 
-    protected readonly isModalOpen: WritableSignal<boolean> = signal(false);
+    protected readonly isRegionModalOpen: WritableSignal<boolean> = signal(false);
     protected readonly allRegions: WritableSignal<string[]> = signal([]);
-    protected readonly activeRegionsList: WritableSignal<IMapLayerProperties[]> = signal([]);
+    protected readonly activeRegions: WritableSignal<IMapLayerProperties[]> = signal([]);
     protected readonly showEditingDeleteError: WritableSignal<boolean> = signal(false);
 
     protected readonly settingsForm: FormGroup<IAnalyticsMapSettingsForm> = new FormGroup<IAnalyticsMapSettingsForm>({
@@ -76,113 +77,73 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
         this.settingsForm.controls.cardBackgroundImage.valueChanges
             .pipe(
                 startWith(this.settingsForm.controls.cardBackgroundImage.value),
-                map(file => file as File | null),
-                distinctUntilChanged((a, b) =>
-                    (a?.name === b?.name) && (a?.size === b?.size) && (a?.lastModified === b?.lastModified)
-                ),
+                distinctUntilChanged(this.compareFiles),
                 map(file => this.buildBgStyle(file))
             );
 
-    private _revokePreview: (() => void) | null = null;
     private _editingRegionName: string | null = null;
+    private _revokePreview: (() => void) | null = null;
 
     private readonly _fileService: FileService = inject(FileService);
     private readonly _destroyRef: DestroyRef = inject(DestroyRef);
 
     public ngOnInit(): void {
-        this.init();
-
-        this.addRegionForm.controls.regionName.valueChanges
-            .pipe(
-                tap(() => this.clearControlError(this.addRegionForm.controls.regionName, 'regionAlreadyExists')),
-                takeUntilDestroyed(this._destroyRef)
-            )
-            .subscribe();
+        this.initModel();
+        this.listenRegionNameChanges();
     }
 
     public ngOnDestroy(): void {
         this._revokePreview?.();
-        this._revokePreview = null;
     }
 
-    /**
-     * Открыть/закрыть модалку настроек региона
-     * @param isOpen
-     */
-    protected toggleRegionSettingsModal(isOpen: boolean): void {
-        this.isModalOpen.set(isOpen);
+    // ---------------------------
+    // Region modal
+    // ---------------------------
 
-        if (isOpen) {
-            this._editingRegionName = null;
-        } else {
-            this.addRegionForm.reset();
-            this.showEditingDeleteError.set(false);
-        }
+    /** Открыть модалку редактирования региона */
+    protected openRegionModal(): void {
+        this._editingRegionName = null;
+        this.isRegionModalOpen.set(true);
     }
 
-    /**
-     * Сохранить активный регион в список
-     * @param item
-     */
-    protected saveActiveRegionListItem(): void {
-        const form: FormGroup<IAddRegionForm> = this.addRegionForm;
-        form.updateValueAndValidity();
-        form.markAllAsTouched();
-        if (form.invalid) {
+    /** Закрыть модалку редактирования региона */
+    protected closeRegionModal(): void {
+        this.addRegionForm.reset();
+        this.showEditingDeleteError.set(false);
+        this.isRegionModalOpen.set(false);
+    }
+
+    // ---------------------------
+    // Region CRUD
+    // ---------------------------
+
+    /** Сохранить регион */
+    protected saveRegion(): void {
+        if (!this.validateRegionForm()) {
             return;
         }
 
-        const controls: IAddRegionForm = form.controls;
-        const regionName: string = controls.regionName.value.trim();
+        const region: IMapLayerProperties = this.buildRegionFromForm();
 
-        if (!this._editingRegionName) {
-            const exists: boolean = this.activeRegionsList().some(r => r.regionName.trim() === regionName);
-
-            if (exists) {
-                controls.regionName.setErrors({ regionAlreadyExists: true });
-                controls.regionName.markAsTouched();
-
-                return;
-            }
-        }
-
-        const imageFile: File | null = controls.image.value as File | null;
-
-        const nextItem: IMapLayerProperties = {
-            regionName,
-            isActive: true,
-            style: {
-                ...(this.activeRegionsList().find(r => r.regionName === this._editingRegionName)?.style ?? {}),
-                fillColor: controls.color.value
-            },
-            analyticsData: {
-                partnersCount: controls.partnersCount.value,
-                excursionsCount: controls.excursionsCount.value,
-                membersCount: controls.membersCount.value,
-                imageFile,
-                imagePath: ''
-            }
-        } as IMapLayerProperties;
-
-        if (this._editingRegionName) {
-            const prevName: string = this._editingRegionName;
-
-            this.activeRegionsList.update(list =>
-                list.map(item => item.regionName === prevName ? nextItem : item)
-            );
-        } else {
-            this.activeRegionsList.update(list => [...list, nextItem]);
-        }
+        this.activeRegions.update(list =>
+            this.sortRegions(
+                this._editingRegionName
+                    ? list.map(item =>
+                        item.regionName === this._editingRegionName ? region : item,
+                    )
+                    : [...list, region],
+            ),
+        );
 
         this._editingRegionName = null;
-        this.toggleRegionSettingsModal(false);
+        this.closeRegionModal();
     }
 
     /**
-     * Редактировать активный регион из списка
+     * Редактировать регион
      * @param item
      */
-    protected editActiveRegionListItem(item: IMapLayerProperties): void {
+    protected editRegion(item: IMapLayerProperties): void {
         this.showEditingDeleteError.set(false);
         this._editingRegionName = item.regionName;
 
@@ -194,123 +155,215 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
             membersCount: item.analyticsData?.membersCount ?? 0
         });
 
-        const storedFile: File | null = (item.analyticsData?.imageFile as File | null) ?? null;
-        if (storedFile) {
-            this.addRegionForm.controls.image.setValue(storedFile);
-            this.isModalOpen.set(true);
-
-            return;
-        }
-
-        const imageUrl: string | undefined = item.analyticsData?.imagePath?.trim();
-        if (imageUrl) {
-            const cached: File | null = this._fileService.getCachedFileByUrl(imageUrl);
-            this.addRegionForm.controls.image.setValue(cached);
-        } else {
-            this.addRegionForm.controls.image.setValue(null);
-        }
-
-        this.isModalOpen.set(true);
+        this.loadRegionImage(item);
+        this.isRegionModalOpen.set(true);
     }
 
     /**
-     * Удалить активный регион из списка
+     * Удалить регион
      * @param item
      */
-    protected deleteActiveRegionListItem(item: IMapLayerProperties): void {
-        const editingName: string = this.addRegionForm.controls.regionName.value;
-        if (editingName === item.regionName) {
+    protected deleteRegion(item: IMapLayerProperties): void {
+        if (this.addRegionForm.controls.regionName.value === item.regionName) {
             this.showEditingDeleteError.set(true);
 
             return;
         }
 
-        const imageUrl: string | undefined = item.analyticsData?.imagePath?.trim();
-        if (imageUrl) {
-            this._fileService.removeCachedFileByUrl(imageUrl);
+        const url: string | undefined = item.analyticsData?.imagePath?.trim();
+        if (url) {
+            this._fileService.removeCachedFileByUrl(url);
         }
 
-        this.showEditingDeleteError.set(false);
-        this.activeRegionsList.update(list =>
+        this.activeRegions.update(list =>
             list.filter(region => region.regionName !== item.regionName)
         );
     }
 
-    /** Инициализация настроек */
-    private init(): void {
-        const model: IMapModel = this.model();
+    // ---------------------------
+    // Init
+    // ---------------------------
 
-        const props: IMapLayerProperties[] = model.layers
-            .map(l => l.properties)
-            .slice()
-            .sort((a, b) => a.regionName.localeCompare(b.regionName, 'ru', { sensitivity: 'base' }));
+    /** Инициализировать модель */
+    private initModel(): void {
+        const model: IMapModel = this.model();
+        const props: IMapLayerProperties[] = this.sortRegions(
+            model.layers.map(layer => layer.properties)
+        );
 
         this.allRegions.set(props.map(p => p.regionName));
-        const active: IMapLayerProperties[] = props.filter(p => p.isActive);
-        this.activeRegionsList.set(active);
+        this.activeRegions.set(props.filter(p => p.isActive));
 
-        const settingsControls: IAnalyticsMapSettingsForm = this.settingsForm.controls;
-        settingsControls.title.setValue(model.pageTitle);
-        settingsControls.mapInfo.setValue(model.infoText);
+        this.settingsForm.patchValue({
+            title: model.pageTitle,
+            mapInfo: model.infoText,
+            cardDescription: this.card()?.description ?? ''
+        });
 
-        const card: IHubCard | null = this.card();
-        settingsControls.cardDescription.setValue(card?.description ?? '');
+        this.preloadFiles();
+    }
 
-        const preloadTasks: Array<Observable<unknown>> = [];
+    /** Предзагрузить файлы по ссылкам */
+    private preloadFiles(): void {
+        const tasks: Array<Observable<unknown>> = [];
 
-        const cardUrl: string | undefined = card?.backgroundImagePath?.trim();
+        const cardUrl: string | undefined = this.card()?.backgroundImagePath?.trim();
         if (cardUrl) {
-            const cardFileName: string = this._fileService.getFileNameFromUrl(cardUrl) ?? 'card-background.svg';
-
-            preloadTasks.push(
-                this._fileService.downloadAsFile(cardUrl, cardFileName, 'image/svg+xml').pipe(
-                    take(1),
-                    tap(file => settingsControls.cardBackgroundImage.setValue(file)),
+            tasks.push(
+                this._fileService.downloadAsFile(
+                    cardUrl,
+                    this._fileService.getFileNameFromUrl(cardUrl) ?? 'card-background.svg',
+                    'image/svg+xml'
+                ).pipe(
+                    tap(file => this.settingsForm.controls.cardBackgroundImage.setValue(file)),
                     catchError(() => of(null))
                 )
             );
         }
 
-        active.forEach(region => {
+        this.activeRegions().forEach(region => {
             const url: string | undefined = region.analyticsData?.imagePath?.trim();
             if (!url) {
                 return;
             }
 
-            const name: string = this._fileService.getFileNameFromUrl(url) ?? `${region.regionName}.png`;
-
-            preloadTasks.push(
-                this._fileService.downloadAsFile(url, name).pipe(
-                    take(1),
-                    catchError(() => of(null))
-                )
+            tasks.push(
+                this._fileService.downloadAsFile(
+                    url,
+                    this._fileService.getFileNameFromUrl(url) ?? `${region.regionName}.png`
+                ).pipe(catchError(() => of(null)))
             );
         });
 
-        if (preloadTasks.length) {
-            forkJoin(preloadTasks).pipe(take(1)).subscribe();
+        if (tasks.length) {
+            forkJoin(tasks)
+                .pipe(take(1))
+                .subscribe();
         }
     }
 
+    // ---------------------------
+    // Helpers
+    // ---------------------------
+
+    /** Провалидировать форму регионов */
+    private validateRegionForm(): boolean {
+        this.addRegionForm.markAllAsTouched();
+        this.addRegionForm.updateValueAndValidity();
+
+        if (this.addRegionForm.invalid) {
+            return false;
+        }
+
+        const name: string = this.addRegionForm.controls.regionName.value.trim();
+
+        if (!this._editingRegionName &&
+            this.activeRegions().some(r => r.regionName === name)
+        ) {
+            this.addRegionForm.controls.regionName.setErrors({ regionAlreadyExists: true });
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /** Собрать регион из формы */
+    private buildRegionFromForm(): IMapLayerProperties {
+        const f: IAddRegionForm = this.addRegionForm.controls;
+
+        return {
+            regionName: f.regionName.value.trim(),
+            isActive: true,
+            style: {
+                ...(this.activeRegions().find(r => r.regionName === this._editingRegionName)?.style ?? {}),
+                fillColor: f.color.value,
+            },
+            analyticsData: {
+                partnersCount: f.partnersCount.value,
+                excursionsCount: f.excursionsCount.value,
+                membersCount: f.membersCount.value,
+                imageFile: f.image.value as File | null,
+                imagePath: '',
+            },
+        } as IMapLayerProperties;
+    }
+
     /**
-     * Собрать стиль background-image из файла
+     * Загрузить изображение региона
+     * @param item
+     */
+    private loadRegionImage(item: IMapLayerProperties): void {
+        const stored: File | null = item.analyticsData?.imageFile as File | null;
+        if (stored) {
+            this.addRegionForm.controls.image.setValue(stored);
+
+            return;
+        }
+
+        const url: string | undefined = item.analyticsData?.imagePath?.trim();
+        this.addRegionForm.controls.image.setValue(
+            url ? this._fileService.getCachedFileByUrl(url) : null,
+        );
+    }
+
+    /**
+     * Отсортировать регионы по имени
+     * @param list
+     */
+    private sortRegions(list: IMapLayerProperties[]): IMapLayerProperties[] {
+        return list.slice().sort((a, b) =>
+            a.regionName.localeCompare(b.regionName, 'ru', { sensitivity: 'base' }),
+        );
+    }
+
+    /**
+     * Собрать стиль background-image по файлу
      * @param file
+     * @returns
      */
     private buildBgStyle(file: TuiFileLike | null): SafeStyle | null {
         this._revokePreview?.();
-        this._revokePreview = null;
 
-        const { style, revoke }: { style: SafeStyle | null, revoke: () => void } = this._fileService.buildBackgroundImagePreview(file);
+        const { style, revoke }: {
+            style: SafeStyle | null,
+            revoke: () => void
+        } = this._fileService.buildBackgroundImagePreview(file);
         this._revokePreview = revoke;
 
         return style;
     }
 
     /**
+     * Сравнить файлы
+     * @param a
+     * @param b
+     */
+    private compareFiles(a: TuiFileLike | null, b: TuiFileLike | null): boolean {
+        const fa: File | null = a as File | null;
+        const fb: File | null = b as File | null;
+
+        return (
+            fa?.name === fb?.name &&
+            fa?.size === fb?.size &&
+            fa?.lastModified === fb?.lastModified
+        );
+    }
+
+    /** Подписка на изменения имени региона */
+    private listenRegionNameChanges(): void {
+        this.addRegionForm.controls.regionName.valueChanges
+            .pipe(
+                tap(() => this.clearControlError(this.addRegionForm.controls.regionName, 'regionAlreadyExists')),
+                takeUntilDestroyed(this._destroyRef)
+            )
+            .subscribe();
+    }
+
+    /**
      * Убрать ошибку из контрола по ключу
      * @param control
      * @param key
-     * @returns
      */
     private clearControlError(control: FormControl<string>, key: string): void {
         const errors: ValidationErrors | null = control.errors;
@@ -319,7 +372,6 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
         }
 
         delete errors[key];
-
         control.setErrors(Object.keys(errors).length ? errors : null);
     }
 }

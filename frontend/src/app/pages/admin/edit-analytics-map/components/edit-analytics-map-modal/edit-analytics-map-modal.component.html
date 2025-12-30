@@ -87,7 +87,7 @@
                     </span>
                     <tui-scrollbar>
                         <div class="edit-analytics-map-modal__regions-list">
-                            @for (region of activeRegionsList(); track region.regionName) {
+                            @for (region of activeRegions(); track region.regionName) {
                                 <div class="edit-analytics-map-modal__regions-list-item-wrapper">
                                     <div class="edit-analytics-map-modal__regions-list-item">
                                         <span class="edit-analytics-map-modal__regions-list-item-title">
@@ -96,7 +96,7 @@
                                         <div class="edit-analytics-map-modal__regions-list-item-actions">
                                             <button
                                                 type="button"
-                                                (click)="editActiveRegionListItem(region)"
+                                                (click)="editRegion(region)"
                                             >
                                                 <tui-icon
                                                     icon="@tui.pencil"
@@ -106,7 +106,7 @@
                                             </button>
                                             <button
                                                 type="button"
-                                                (click)="deleteActiveRegionListItem(region)"
+                                                (click)="deleteRegion(region)"
                                             >
                                                 <tui-icon
                                                     icon="@tui.trash"
@@ -134,7 +134,7 @@
                         tuiButton
                         appearance="outline"
                         size="m"
-                        (click)="toggleRegionSettingsModal(true)"
+                        (click)="openRegionModal()"
                     >
                         Добавить регион
                     </button>
@@ -155,12 +155,12 @@
     </button>
 </div>
 
-@if (isModalOpen()) {
+@if (isRegionModalOpen()) {
     <add-region
         class="edit-analytics-map-modal__region-settings-modal"
         [form]="addRegionForm"
         [regionsList]="allRegions()"
-        (closeModal)="toggleRegionSettingsModal(false)"
-        (regionSaved)="saveActiveRegionListItem()"
+        (closeModal)="closeRegionModal()"
+        (regionSaved)="saveRegion()"
     />
 }
