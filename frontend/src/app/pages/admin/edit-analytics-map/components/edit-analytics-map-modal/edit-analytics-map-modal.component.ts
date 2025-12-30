@@ -8,7 +8,7 @@ import { TuiFileLike, tuiValidationErrorsProvider } from '@taiga-ui/kit';
 import { AsyncPipe } from '@angular/common';
 import { ImageUploaderComponent } from '../../../../../components/image-uploader/image-uploader.component';
 import { SafeStyle } from '@angular/platform-browser';
-import { catchError, distinctUntilChanged, forkJoin, map, Observable, of, startWith, take, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, forkJoin, Observable, of, Subscription, take, tap } from 'rxjs';
 import { FormFieldComponent } from '../../../../../components/form-field/form-field.component';
 import { IAnalyticsMapSettingsForm } from '../../interfaces/analytics-map-settings-form.interface';
 import { IAddRegionForm } from '../../interfaces/add-region-form.interface';
@@ -73,13 +73,19 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
         membersCount: new FormControl<number>(0, { nonNullable: true, validators: [Validators.required] })
     });
 
-    protected readonly cardPreviewBackgroundImage$: Observable<SafeStyle | null> =
-        this.settingsForm.controls.cardBackgroundImage.valueChanges
-            .pipe(
-                startWith(this.settingsForm.controls.cardBackgroundImage.value),
-                distinctUntilChanged(compareFiles),
-                map(file => this.buildBgStyle(file))
-            );
+    protected readonly cardPreviewBackgroundImage$: Observable<SafeStyle | null> = new Observable<SafeStyle | null>(subscriber => {
+        const control: FormControl<TuiFileLike | null> = this.settingsForm.controls.cardBackgroundImage;
+
+        if (control.value) {
+            subscriber.next(this.buildBgStyle(control.value));
+        }
+
+        const sub: Subscription = control.valueChanges
+            .pipe(distinctUntilChanged(compareFiles))
+            .subscribe(file => subscriber.next(this.buildBgStyle(file)));
+
+        return () => sub.unsubscribe();
+    });
 
     protected editingRegionName: string | null = null;
 
