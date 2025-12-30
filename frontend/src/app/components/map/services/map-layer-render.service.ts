@@ -24,7 +24,8 @@ export class MapLayerRenderService {
         mapInstance: LeafletMap,
         layers: IMapLayer[],
         layerWithPointsColor: string | undefined,
-        onLayerSelected: (props: IMapLayerProperties) => void
+        onLayerSelected: (props: IMapLayerProperties) => void,
+        isReadonly?: boolean
     ): void {
         this.clearLayers();
 
@@ -32,7 +33,8 @@ export class MapLayerRenderService {
             const properties: GeoJsonProperties = this.createLayerProperties(
                 layer,
                 layerWithPointsColor,
-                onLayerSelected
+                onLayerSelected,
+                isReadonly
             );
             const geoLayer: GeoJSON = new GeoJSON(layer.geoData, properties).addTo(mapInstance);
             this._layersOnMap.push(geoLayer);
@@ -64,10 +66,11 @@ export class MapLayerRenderService {
     private createLayerProperties(
         mapLayer: IMapLayer,
         layerWithPointsColor: string | undefined,
-        onLayerSelected: (props: IMapLayerProperties) => void
+        onLayerSelected: (props: IMapLayerProperties) => void,
+        isReadonly?: boolean
     ): GeoJsonProperties {
         const { properties }: IMapLayer = mapLayer;
-        const isActive: boolean = !!properties.isActive;
+        const isActive: boolean = !!properties.isActive && !isReadonly;
         const hasPoints: boolean = !!properties.points?.length;
 
         const layerStyle: PathOptions = this.buildLayerStyle(

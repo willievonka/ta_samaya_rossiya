@@ -26,6 +26,7 @@ export class MapComponent implements AfterViewInit {
     public readonly layerWithPointsColor: InputSignal<string | undefined> = input<string>();
     public readonly pointColor: InputSignal<string | undefined> = input<string>();
     public readonly config: InputSignal<IMapConfig | undefined> = input<IMapConfig>();
+    public readonly isReadonly: InputSignal<true | undefined> = input();
 
     /** Outputs */
     public readonly regionSelected: OutputEmitterRef<IMapLayerProperties | null> = output<IMapLayerProperties | null>();
@@ -99,13 +100,15 @@ export class MapComponent implements AfterViewInit {
         this._renderService.renderLayers(
             this.layers(),
             this.layerWithPointsColor(),
-            (props) => this.regionSelected.emit(props)
+            (props) => this.regionSelected.emit(props),
+            this.isReadonly()
         );
 
         this._renderService.renderPoints(
             this.points(),
             this.pointColor(),
-            (point) => this.pointSelected.emit(point)
+            (point) => this.pointSelected.emit(point),
+            this.isReadonly()
         );
     }
 }

@@ -24,12 +24,13 @@ export class MapPointRenderService {
         mapInstance: LeafletMap,
         points: IMapPoint[],
         pointColor: string | undefined,
-        onPointSelected?: (point: IMapPoint) => void
+        onPointSelected?: (point: IMapPoint) => void,
+        isReadonly?: boolean
     ): void {
         this.clearPoints();
 
         points.forEach((point, index) =>
-            this.renderSinglePoint(mapInstance, point, index, pointColor, onPointSelected)
+            this.renderSinglePoint(mapInstance, point, index, pointColor, onPointSelected, isReadonly)
         );
     }
 
@@ -91,7 +92,8 @@ export class MapPointRenderService {
         point: IMapPoint,
         index: number,
         pointColor: string | undefined,
-        onPointSelected?: (point: IMapPoint) => void
+        onPointSelected?: (point: IMapPoint) => void,
+        isReadonly?: boolean
     ): void {
         const color: string = pointColor || this._defaultPointOptions.color;
         const iconSize: number = this._defaultPointOptions.iconSize;
@@ -103,14 +105,16 @@ export class MapPointRenderService {
 
         this._markers.push(pointMarker);
 
-        pointMarker.on({
-            click: (event: LeafletMouseEvent) => {
-                DomEvent.stopPropagation(event);
-                onPointSelected?.(point);
-                this.applyActiveStyle(pointMarker, point.id);
-                this.panToPoint(mapInstance, point.coordinates);
-            }
-        });
+        if (!isReadonly) {
+            pointMarker.on({
+                click: (event: LeafletMouseEvent) => {
+                    DomEvent.stopPropagation(event);
+                    onPointSelected?.(point);
+                    this.applyActiveStyle(pointMarker, point.id);
+                    this.panToPoint(mapInstance, point.coordinates);
+                }
+            });
+        }
 
         this._markerBaseZIndex.set(point.id, -index);
         this._markersByPointId.set(point.id, pointMarker);
