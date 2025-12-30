@@ -129,34 +129,7 @@
         display: flex;
         flex-direction: column;
         gap: $spacing-s;
-        max-height: 220px;
-    }
-
-    &__regions-list-item-wrapper {
-        display: flex;
-        flex-direction: column;
-        gap: $spacing-xs;
-    }
-
-    &__regions-list-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background-color: color.$bg-secondary;
-        padding: $spacing-m;
-        border-radius: $spacing-m;
-    }
-
-    &__regions-list-item-actions {
-        display: flex;
-        gap: $spacing-m;
-    }
-
-    &__regions-list-item-error {
-        &.tui-enter,
-        &.tui-leave {
-            animation-name: tuiFade;
-        }
+        max-height: 216px;
     }
 
     &__region-settings-modal {

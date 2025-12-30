@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, InputSig
 import { EditMapModalBaseComponent } from '../../../../../components/edit-map-modal/edit-map-modal.base.component';
 import { TuiAccordion } from '@taiga-ui/experimental';
 import { TuiCell } from '@taiga-ui/layout';
-import { TuiButton, TuiError, TuiIcon, TuiScrollbar, TuiTextfield } from '@taiga-ui/core';
-import { FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { TuiButton, TuiScrollbar, TuiTextfield } from '@taiga-ui/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TuiFileLike, tuiValidationErrorsProvider } from '@taiga-ui/kit';
 import { AsyncPipe } from '@angular/common';
 import { ImageUploaderComponent } from '../../../../../components/image-uploader/image-uploader.component';
@@ -17,8 +17,10 @@ import { IMapLayerProperties } from '../../../../../components/map/interfaces/ma
 import { IMapModel } from '../../../../../components/map/models/map.model';
 import { IHubCard } from '../../../../../components/hub-card/interfaces/hub-card.interface';
 import { FileService } from '../../../../../services/file.service';
-import { TuiAnimated } from '@taiga-ui/cdk/directives/animated';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RegionsListComponent } from '../regions-list/regions-list.component';
+import { clearControlError } from '../../../../../utils/clear-control-error.util';
+import { compareFiles } from '../../../../../utils/compare-files.util';
 
 @Component({
     selector: 'edit-analytics-map-modal',
@@ -33,13 +35,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
         TuiCell,
         TuiTextfield,
         TuiButton,
-        TuiIcon,
         TuiScrollbar,
-        TuiError,
-        TuiAnimated,
         ImageUploaderComponent,
         FormFieldComponent,
-        AddRegionComponent
+        AddRegionComponent,
+        RegionsListComponent
     ],
     providers: [
         tuiValidationErrorsProvider({
@@ -77,15 +77,15 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
         this.settingsForm.controls.cardBackgroundImage.valueChanges
             .pipe(
                 startWith(this.settingsForm.controls.cardBackgroundImage.value),
-                distinctUntilChanged(this.compareFiles),
+                distinctUntilChanged(compareFiles),
                 map(file => this.buildBgStyle(file))
             );
 
-    private _editingRegionName: string | null = null;
-    private _revokePreview: (() => void) | null = null;
+    protected editingRegionName: string | null = null;
 
     private readonly _fileService: FileService = inject(FileService);
     private readonly _destroyRef: DestroyRef = inject(DestroyRef);
+    private _revokePreview: (() => void) | null = null;
 
     public ngOnInit(): void {
         this.initModel();
@@ -102,7 +102,7 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
 
     /** Открыть модалку редактирования региона */
     protected openRegionModal(): void {
-        this._editingRegionName = null;
+        this.editingRegionName = null;
         this.isRegionModalOpen.set(true);
     }
 
@@ -127,15 +127,15 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
 
         this.activeRegions.update(list =>
             this.sortRegions(
-                this._editingRegionName
+                this.editingRegionName
                     ? list.map(item =>
-                        item.regionName === this._editingRegionName ? region : item,
+                        item.regionName === this.editingRegionName ? region : item,
                     )
                     : [...list, region],
             ),
         );
 
-        this._editingRegionName = null;
+        this.editingRegionName = null;
         this.closeRegionModal();
     }
 
@@ -145,7 +145,7 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
      */
     protected editRegion(item: IMapLayerProperties): void {
         this.showEditingDeleteError.set(false);
-        this._editingRegionName = item.regionName;
+        this.editingRegionName = item.regionName;
 
         this.addRegionForm.patchValue({
             regionName: item.regionName,
@@ -257,7 +257,7 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
 
         const name: string = this.addRegionForm.controls.regionName.value.trim();
 
-        if (!this._editingRegionName &&
+        if (!this.editingRegionName &&
             this.activeRegions().some(r => r.regionName === name)
         ) {
             this.addRegionForm.controls.regionName.setErrors({ regionAlreadyExists: true });
@@ -276,7 +276,7 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
             regionName: f.regionName.value.trim(),
             isActive: true,
             style: {
-                ...(this.activeRegions().find(r => r.regionName === this._editingRegionName)?.style ?? {}),
+                ...(this.activeRegions().find(r => r.regionName === this.editingRegionName)?.style ?? {}),
                 fillColor: f.color.value,
             },
             analyticsData: {
@@ -334,44 +334,13 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
         return style;
     }
 
-    /**
-     * Сравнить файлы
-     * @param a
-     * @param b
-     */
-    private compareFiles(a: TuiFileLike | null, b: TuiFileLike | null): boolean {
-        const fa: File | null = a as File | null;
-        const fb: File | null = b as File | null;
-
-        return (
-            fa?.name === fb?.name &&
-            fa?.size === fb?.size &&
-            fa?.lastModified === fb?.lastModified
-        );
-    }
-
     /** Подписка на изменения имени региона */
     private listenRegionNameChanges(): void {
         this.addRegionForm.controls.regionName.valueChanges
             .pipe(
-                tap(() => this.clearControlError(this.addRegionForm.controls.regionName, 'regionAlreadyExists')),
+                tap(() => clearControlError(this.addRegionForm.controls.regionName, 'regionAlreadyExists')),
                 takeUntilDestroyed(this._destroyRef)
             )
             .subscribe();
-    }
-
-    /**
-     * Убрать ошибку из контрола по ключу
-     * @param control
-     * @param key
-     */
-    private clearControlError(control: FormControl<string>, key: string): void {
-        const errors: ValidationErrors | null = control.errors;
-        if (!errors || !errors[key]) {
-            return;
-        }
-
-        delete errors[key];
-        control.setErrors(Object.keys(errors).length ? errors : null);
     }
 }
