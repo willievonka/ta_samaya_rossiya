@@ -1,0 +1,47 @@
+<div class="edit-analytics-map-modal">
+    <h2 class="edit-analytics-map-modal__title">Настройки</h2>
+    <form [formGroup]="settingsForm">
+        <tui-accordion class="edit-analytics-map-modal__accordion" size="l">
+            <button tuiAccordion appearance="" tuiCell>
+                Карточка
+            </button>
+            <tui-expand class="edit-analytics-map-modal__accordion-item">
+                <div>
+                    <tui-textfield tuiTextfieldSize="m">
+                        <input
+                            formControlName="cardDescription"
+                            tuiTextfield
+                        />
+                    </tui-textfield>
+                </div>
+            </tui-expand>
+
+            <button tuiAccordion appearance="" tuiCell>
+                Карта
+            </button>
+            <tui-expand class="edit-analytics-map-modal__accordion-item">
+                <div>
+                    Абвгд
+                </div>
+            </tui-expand>
+
+            <button tuiAccordion appearance="" tuiCell>
+                Активные регионы
+            </button>
+            <tui-expand class="edit-analytics-map-modal__accordion-item">
+                <div>
+                    Абвгд
+                </div>
+            </tui-expand>
+        </tui-accordion>
+
+        <button
+            class="edit-analytics-map-modal__save-button"
+            type="submit"
+            tuiButton
+            size="m"
+        >
+            Сохранить
+        </button>
+    </form>
+</div>

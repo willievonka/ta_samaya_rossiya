@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, input, InputSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { IPageHeaderOptions } from './interfaces/page-header-options.interface';
 
 @Component({
     selector: 'page-header',
@@ -11,5 +12,6 @@ import { RouterLink } from '@angular/router';
 })
 export class PageHeaderComponent {
     public readonly title: InputSignal<string> = input.required();
-    public readonly isDetached: InputSignal<boolean> = input(false);
+    public readonly options: InputSignal<IPageHeaderOptions | null> = input<IPageHeaderOptions | null>(null);
+    public readonly logout: OutputEmitterRef<void> = output();
 }

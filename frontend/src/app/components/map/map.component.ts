@@ -6,6 +6,7 @@ import { IMapPoint } from './interfaces/map-point.interface';
 import { MapRenderService } from './services/map-render.service';
 import { MapLayerRenderService } from './services/map-layer-render.service';
 import { MapPointRenderService } from './services/map-point-render.service';
+import { IMapConfig } from './interfaces/map-config.interface';
 
 @Component({
     selector: 'map',
@@ -24,6 +25,7 @@ export class MapComponent implements AfterViewInit {
     public readonly layers: InputSignal<IMapLayer[]> = input.required<IMapLayer[]>();
     public readonly layerWithPointsColor: InputSignal<string | undefined> = input<string>();
     public readonly pointColor: InputSignal<string | undefined> = input<string>();
+    public readonly config: InputSignal<IMapConfig | undefined> = input<IMapConfig>();
 
     /** Outputs */
     public readonly regionSelected: OutputEmitterRef<IMapLayerProperties | null> = output<IMapLayerProperties | null>();
@@ -73,12 +75,16 @@ export class MapComponent implements AfterViewInit {
      * @param container
      */
     private initializeMap(container: HTMLDivElement): Map {
-        return this._renderService.initMap(container, () => {
-            this._renderService.resetActiveLayerSelection();
-            this._renderService.resetActivePointSelection();
-            this.regionSelected.emit(null);
-            this.pointSelected.emit(null);
-        });
+        return this._renderService.initMap(
+            container,
+            () => {
+                this._renderService.resetActiveLayerSelection();
+                this._renderService.resetActivePointSelection();
+                this.regionSelected.emit(null);
+                this.pointSelected.emit(null);
+            },
+            this.config()
+        );
     }
 
     /** Отрисовать наполнение карты */
