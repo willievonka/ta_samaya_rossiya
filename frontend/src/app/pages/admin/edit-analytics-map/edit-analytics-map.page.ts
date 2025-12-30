@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IMapLayerProperties } from '../../../components/map/interfaces/map-layer.interface';
+import { IMapLayer, IMapLayerProperties } from '../../../components/map/interfaces/map-layer.interface';
 import { PageHeaderComponent } from '../../../components/page-header/page-header.component';
 import { MapZoomComponent } from '../../../components/map-zoom/map-zoom.component';
 import { MapComponent } from '../../../components/map/map.component';
 import { EditAnalyticsMapModalComponent } from './components/edit-analytics-map-modal/edit-analytics-map-modal.component';
 import { EditMapPageBaseComponent } from '../../../components/map-page/edit-map.page.base.component';
+import { IMapModel } from '../../../components/map/models/map.model';
 
 @Component({
     selector: 'edit-analytics-map-page',
@@ -19,4 +20,45 @@ import { EditMapPageBaseComponent } from '../../../components/map-page/edit-map.
         EditAnalyticsMapModalComponent
     ]
 })
-export class EditAnalyticsMapPageComponent extends EditMapPageBaseComponent<IMapLayerProperties>{}
+export class EditAnalyticsMapPageComponent extends EditMapPageBaseComponent<IMapLayerProperties> {
+    /**
+     * Обработчик изменения регионов
+     * @param regions
+     */
+    protected handleRegionsChange(regions: IMapLayerProperties[]): void {
+        const current: IMapModel | undefined = this.model();
+        if (!current) {
+            return;
+        }
+
+        const updatedLayers: IMapLayer[] = current.layers.map(layer => {
+            const updatedProps: IMapLayerProperties | undefined = regions.find(r => r.regionName === layer.properties.regionName);
+
+            if (updatedProps) {
+                return { ...layer, properties: updatedProps };
+            } else {
+                return {
+                    ...layer,
+                    properties: {
+                        ...layer.properties,
+                        isActive: false,
+                        style: {},
+                        analyticsData: {
+                            imagePath: '',
+                            imageFile: null,
+                            partnersCount: 0,
+                            excursionsCount: 0,
+                            membersCount: 0
+                        },
+                        points: []
+                    }
+                };
+            }
+        });
+
+        this.model.set({
+            ...current,
+            layers: updatedLayers
+        });
+    }
+}

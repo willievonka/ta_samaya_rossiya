@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, InputSignal, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, InputSignal, OnDestroy, OnInit, output, OutputEmitterRef, signal, WritableSignal } from '@angular/core';
 import { EditMapModalBaseComponent } from '../../../../../components/edit-map-modal/edit-map-modal.base.component';
 import { TuiAccordion } from '@taiga-ui/experimental';
 import { TuiCell } from '@taiga-ui/layout';
@@ -51,6 +51,8 @@ import { compareFiles } from '../../../../../utils/compare-files.util';
 export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent implements OnInit, OnDestroy {
     public readonly model: InputSignal<IMapModel> = input.required();
     public readonly card: InputSignal<IHubCard | null> = input.required();
+
+    public readonly activeRegionsChanged: OutputEmitterRef<IMapLayerProperties[]> = output<IMapLayerProperties[]>();
 
     protected readonly isRegionModalOpen: WritableSignal<boolean> = signal(false);
     protected readonly allRegions: WritableSignal<string[]> = signal([]);
@@ -143,6 +145,7 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
 
         this.editingRegionName = null;
         this.closeRegionModal();
+        this.activeRegionsChanged.emit(this.activeRegions());
     }
 
     /**
@@ -184,6 +187,7 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
         this.activeRegions.update(list =>
             list.filter(region => region.regionName !== item.regionName)
         );
+        this.activeRegionsChanged.emit(this.activeRegions());
     }
 
     // ---------------------------

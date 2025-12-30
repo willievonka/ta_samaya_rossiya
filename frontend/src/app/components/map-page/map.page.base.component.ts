@@ -1,4 +1,4 @@
-import { computed, Directive, inject, Injector, signal, Signal, viewChild, WritableSignal } from '@angular/core';
+import { computed, Directive, effect, inject, Injector, signal, Signal, viewChild, WritableSignal } from '@angular/core';
 import { IMapZoomActions } from '../map/interfaces/map-zoom-actions.interface';
 import { MapComponent } from '../map/map.component';
 import { ActivatedRoute } from '@angular/router';
@@ -17,7 +17,7 @@ export abstract class MapPageBaseComponent<TData> {
     protected readonly activeItem: WritableSignal<TData | null> = signal(null);
     protected readonly mapInstance: Signal<MapComponent | undefined> = viewChild(MapComponent);
     protected readonly zoomActions: Signal<IMapZoomActions | undefined> = computed(() => this.mapInstance()?.zoomActions());
-    protected readonly model: Signal<IMapModel | undefined> = computed(() => this._mapData());
+    protected readonly model: WritableSignal<IMapModel | undefined> = signal(undefined);
     protected readonly card: Signal<IHubCard | null> = computed(() => this._cardFromRoute());
     protected readonly headerOptions: IPageHeaderOptions = {
         isDetached: true
@@ -66,4 +66,10 @@ export abstract class MapPageBaseComponent<TData> {
             ),
         { initialValue: null, injector: this._injector }
     );
+
+    constructor() {
+        effect(() => {
+            this.model.set(this._mapData());
+        });
+    }
 }

@@ -10,9 +10,9 @@
             [zoomActions]="zoomActions"
         />
     }
-    @if (model()?.layers; as mapLayers) {
+    @if (model()?.layers) {
         <map
-            [layers]="mapLayers"
+            [layers]="model()!.layers"
             [config]="config"
         ></map>
     }
@@ -21,6 +21,7 @@
             class="edit-analytics-map__modal"
             [model]="model"
             [card]="card()"
+            (activeRegionsChanged)="handleRegionsChange($event)"
         />
     }
 </div>

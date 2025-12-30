@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, InputSignal, output, OutputEmitterRef, Signal, signal, viewChild, WritableSignal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input, InputSignal, output, OutputEmitterRef, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { Map } from 'leaflet';
 import { IMapLayer, IMapLayerProperties } from './interfaces/map-layer.interface';
 import { IMapZoomActions } from './interfaces/map-zoom-actions.interface';
@@ -43,6 +43,13 @@ export class MapComponent implements AfterViewInit {
     /** Private fields */
     private readonly _mapContainer: Signal<ElementRef<HTMLDivElement>> = viewChild.required<ElementRef<HTMLDivElement>>('mapContainer');
     private readonly _renderService: MapRenderService = inject(MapRenderService);
+
+    constructor() {
+        effect(() => {
+            this.layers();
+            this.renderMapContent();
+        });
+    }
 
     public ngAfterViewInit(): void {
         const container: HTMLDivElement = this._mapContainer().nativeElement;
