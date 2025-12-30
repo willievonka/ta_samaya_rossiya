@@ -224,18 +224,14 @@ public class LayerRegionService : ILayerRegionService
             await _indicatorsService.DeleteIndicatorsAsync(layerRegionId, ct);
         }
 
+        var idsForDeleting = await _historicalObjectService.GetAllIdsByLayerRegionIdAsync(layerRegionId, ct);
+        
         if (layerRegionDto.HistoricalObjects != null)
         {
             _logger.LogInformation("Starting update LayerRegion HistoricalObjects.");
             
-            var existingHistObjIds = await _historicalObjectService.GetAllIdsByLayerRegionIdAsync(layerRegionId, ct);
             var idsForUpdating = layerRegionDto.HistoricalObjects!.Select(x => x.Id!.Value).ToList();
-            var idsForDeleting = existingHistObjIds.Except(idsForUpdating).ToList();
-
-            foreach (var id in idsForDeleting)
-            {
-                await _historicalObjectService.DeleteHistoricalObjectAsync(id, ct);
-            }
+            idsForDeleting = idsForDeleting.Except(idsForUpdating).ToList();
             
             foreach (var historicalObjectDto in layerRegionDto.HistoricalObjects)
             {
@@ -250,6 +246,11 @@ public class LayerRegionService : ILayerRegionService
                     await _historicalObjectService.CreateHistoricalObjectAsync(layerRegionId, historicalObjectDto, ct);
                 }
             }
+        }
+        
+        foreach (var id in idsForDeleting)
+        {
+            await _historicalObjectService.DeleteHistoricalObjectAsync(id, ct);
         }
         
         if (layerRegionDto.Style != null)

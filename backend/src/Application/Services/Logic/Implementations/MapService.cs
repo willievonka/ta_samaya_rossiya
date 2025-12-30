@@ -212,18 +212,14 @@ public class MapService : IMapService
 
         map.UpdatedAt = DateTime.Now;
         
+        var idsForDeleting = await _layerRegionService.GetAllIdsByMapIdAsync(map.Id, ct);
+        
         if (mapDto.Regions != null)
         {
             _logger.LogInformation("Starting update Map LayerRegions.");
             
-            var existingRegionsIds = await _layerRegionService.GetAllIdsByMapIdAsync(map.Id, ct);
             var idsForUpdating = mapDto.Regions.Select(x => x.Id!.Value).ToList();
-            var idsForDeleting = existingRegionsIds.Except(idsForUpdating).ToList();
-
-            foreach (var id in idsForDeleting)
-            {
-                await _layerRegionService.DeleteLayerRegionAsync(id, map.Id, ct);
-            }
+            idsForDeleting = idsForDeleting.Except(idsForUpdating).ToList();
             
             foreach (var regionDto in mapDto.Regions)
             {
@@ -234,6 +230,11 @@ public class MapService : IMapService
                     await _layerRegionService.CreateLayerRegionAsync(map.Id, regionDto, ct);
                 }
             }
+        }
+        
+        foreach (var id in idsForDeleting)
+        {
+            await _layerRegionService.DeleteLayerRegionAsync(id, map.Id, ct);
         }
         
         await _mapRepository.UpdateAsync(map, ct);
