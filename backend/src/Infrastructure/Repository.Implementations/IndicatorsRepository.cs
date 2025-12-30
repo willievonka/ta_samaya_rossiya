@@ -37,23 +37,21 @@ public class IndicatorsRepository : IIndicatorsRepository
     public async Task UpdateAsync(IndicatorsRegion indicators, CancellationToken ct)
     {
         var existing = await _context.IndicatorsRegions
-            .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == indicators.Id, ct);
         if (existing != null)
         {
-            _context.IndicatorsRegions.Update(existing);
+            _context.Entry(existing).CurrentValues.SetValues(indicators);
             await _context.SaveChangesAsync(ct);
         }
     }
 
-    public async Task DeleteByIdAsync(Guid indicatorsId, CancellationToken ct)
+    public async Task DeleteByLayerIdAsync(Guid layerRegionId, CancellationToken ct)
     {
         var existing = await _context.IndicatorsRegions
-            .AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Id == indicatorsId, ct);
+            .FirstOrDefaultAsync(i => i.RegionId == layerRegionId, ct);
         if (existing != null)
         {
-            _context.IndicatorsRegions.Update(existing);
+            _context.IndicatorsRegions.Remove(existing);
             await _context.SaveChangesAsync(ct);
         }
     }

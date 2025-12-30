@@ -23,28 +23,6 @@ public class HistoricalObjectController : ControllerBase
     }
 
     /// <summary>
-    /// Добавить множество объектов, вне зависимости от региона
-    /// </summary>
-    /// <param name="mapId"></param>
-    /// <param name="request"></param>
-    /// <param name="ct"></param>
-    /// <returns></returns>
-    [HttpPost("points")]
-    [Consumes("multipart/form-data")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> CreateManyHistoricalObjects([FromRoute] Guid mapId, 
-        [FromForm] CreateHistoricalObjectsRequest request, CancellationToken ct)
-    {
-        var dtos = HistoricalObjectMapper.CreateHistoricalObjectsRequestToDtosList(request);
-
-        await _layerRegionService.AddNewHistoricalObjectsAsync(dtos, ct);
-        
-        return Ok();
-    }
-
-    /// <summary>
     /// Добавить один объект к определённому региону
     /// </summary>
     /// <param name="mapId"></param>
@@ -57,9 +35,9 @@ public class HistoricalObjectController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CreateHistoricalObject([FromRoute] Guid mapId, [FromRoute] Guid layerId, 
-        [FromForm] CreateHistoricalObjectRequest request, CancellationToken ct)
+        [FromForm] UpsertHistoricalObjectRequest request, CancellationToken ct)
     {
-        var dto = HistoricalObjectMapper.CreateHistoricalObjectRequestToDto(request, layerId);
+        var dto = HistoricalObjectMapper.UpsertHistoricalObjectRequestToDto(request, layerId);
         
         var id = await _historicalObjectService.CreateHistoricalObjectAsync(layerId, dto, ct);
         
@@ -116,9 +94,9 @@ public class HistoricalObjectController : ControllerBase
     /// <returns></returns>
     [HttpPatch("{layerId:guid}/points")]
     public async Task<IActionResult> UpdateHistoricalObject([FromRoute] Guid mapId, [FromRoute] Guid layerId,
-        [FromQuery] Guid pointId, [FromForm] UpdateHistoricalObjectRequest request, CancellationToken ct)
+        [FromQuery] Guid pointId, [FromForm] UpsertHistoricalObjectRequest request, CancellationToken ct)
     {
-        var dto = HistoricalObjectMapper.UpdateHistoricalObjectRequestToDto(request, pointId);
+        var dto = HistoricalObjectMapper.UpsertHistoricalObjectRequestToDto(request, layerId);
         
         var updated = await _historicalObjectService.UpdateHistoricalObjectAsync(pointId, dto, ct);
         

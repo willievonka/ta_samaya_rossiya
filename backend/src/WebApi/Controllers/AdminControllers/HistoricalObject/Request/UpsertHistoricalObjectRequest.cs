@@ -2,19 +2,12 @@
 
 namespace WebApi.Controllers.AdminControllers.HistoricalObject.Request;
 
-public record CreateHistoricalObjectWithIdRequest(
-    Guid LayerId,
+public record UpsertHistoricalObjectRequest(
+    Guid? Id,
     string Title,
-    double[] Coordinates,
+    double[]? Coordinates,
     int Year,
     [FromForm] IFormFile Image,
     string Description,
     string? ExcursionUrl
-    ) : CreateHistoricalObjectRequest(
-    Title,
-    Coordinates,
-    Year,
-    Image,
-    Description,
-    ExcursionUrl
     );

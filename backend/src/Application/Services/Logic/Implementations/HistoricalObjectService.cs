@@ -40,7 +40,7 @@ public class HistoricalObjectService : IHistoricalObjectService
 
         var historicalObject = new HistoricalObject
         {
-            Coordinates = histObjectDto.Coordinates,
+            Coordinates = histObjectDto.Coordinates!,
             Title = histObjectDto.Title!,
             Description = histObjectDto.Description!,
             LayerRegionId = layerRegionId,
@@ -68,14 +68,8 @@ public class HistoricalObjectService : IHistoricalObjectService
     /// <param name="histObjectDto"></param>
     /// <param name="ct"></param>
     /// <returns></returns>
-    public async Task<Guid> UpdateHistoricalObjectAsync(Guid histObjectId, HistoricalObjectDto? histObjectDto, CancellationToken ct)
+    public async Task<Guid> UpdateHistoricalObjectAsync(Guid histObjectId, HistoricalObjectDto histObjectDto, CancellationToken ct)
     {
-        if (histObjectDto == null)
-        {
-            _logger.LogError("HistoricalObjectDto is null");
-            return Guid.Empty;
-        }
-        
         var histObject = await _historicalObjectRepository.GetByIdAsync(histObjectId, ct);
 
         if (histObject == null)
@@ -130,7 +124,7 @@ public class HistoricalObjectService : IHistoricalObjectService
                 Description = histObject.Description,
                 ExcursionUrl = histObject.ExcursionUrl,
                 Year = histObject.Year,
-                ImagePath = histObject.ImagePath,
+                ImagePath = histObject.ImagePath!,
                 Id = histObject.Id,
             };
             
@@ -138,6 +132,13 @@ public class HistoricalObjectService : IHistoricalObjectService
         }
         
         return histObjectsDtos;
+    }
+
+    public async Task<List<Guid>> GetAllIdsByLayerRegionIdAsync(Guid layerRegionId, CancellationToken ct)
+    {
+        var ids = await _historicalObjectRepository.GetAllIdsByLayerRegionIdAsync(layerRegionId, ct);
+        
+        return ids;
     }
 
     /// <summary>

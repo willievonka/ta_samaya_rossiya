@@ -30,11 +30,10 @@ public class LayerRegionStyleRepository : ILayerRegionStyleRepository
     public async Task UpdateAsync(LayerRegionStyle style, CancellationToken ct)
     {
         var existing = await _context.LayerRegionStyles
-            .AsNoTracking()
             .FirstOrDefaultAsync(s => s.Id == style.Id, ct);
         if (existing != null)
         {
-            _context.LayerRegionStyles.Update(style);
+            _context.Entry(existing).CurrentValues.SetValues(style);
             await _context.SaveChangesAsync(ct);
         }
     }
@@ -42,7 +41,6 @@ public class LayerRegionStyleRepository : ILayerRegionStyleRepository
     public async Task DeleteByLayerRegionIdAsync(Guid layerRegionId, CancellationToken ct)
     {
         var existing = await _context.LayerRegionStyles
-            .AsNoTracking()
             .FirstOrDefaultAsync(s => s.RegionId == layerRegionId, ct);
         if (existing != null)
         {

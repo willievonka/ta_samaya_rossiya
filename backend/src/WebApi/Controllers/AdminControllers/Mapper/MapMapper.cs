@@ -88,7 +88,7 @@ public static class MapMapper
             var regionsDtos = new List<LayerRegionDto>();
             foreach (var updatingRegion in request.Regions)
             {
-                regionsDtos.Add(LayerRegionMapper.CreateLayerRegionRequestToDto(updatingRegion));
+                regionsDtos.Add(LayerRegionMapper.UpdateLayerRegionRequestToDto(updatingRegion));
             }
             mapDto.Regions = regionsDtos;
         }

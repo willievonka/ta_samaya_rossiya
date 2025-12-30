@@ -59,6 +59,7 @@ public static class LayerRegionMapper
             Name = request.RegionName,
             Style = LayerRegionStyleMapper.StyleRequestToDto(request.Style),
             Indicators = IndicatorsRegionRequestToDto(request.AnalyticsData),
+            HistoricalObjects = HistoricalObjectMapper.UpsertHistoricalObjectsRequestToDtosList(request.Points)
         };
     }
 
@@ -71,14 +72,16 @@ public static class LayerRegionMapper
         };
     }
     
-    public static LayerRegionDto UpdateLayerRegionRequestToDto(UpdateLayerRegionRequest request)
+    public static LayerRegionDto UpdateLayerRegionRequestToDto(UpsertLayerRegionRequest request)
     {
         return new LayerRegionDto
         {
-            Name = "",
+            Id = request.Id ?? Guid.Empty,
+            Name = request.RegionName ?? "",
             IsActive = request.IsActive,
             Style = LayerRegionStyleMapper.StyleRequestToDto(request.Style),
             Indicators = IndicatorsRegionRequestToDto(request.AnalyticsData),
+            HistoricalObjects = HistoricalObjectMapper.UpsertHistoricalObjectsRequestToDtosList(request.Points)
         };
     }
 

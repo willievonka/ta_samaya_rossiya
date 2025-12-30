@@ -7,13 +7,16 @@ namespace WebApi.Controllers.AdminControllers.Mapper;
 
 public static class HistoricalObjectMapper
 {
-    public static List<HistoricalObjectDto> CreateHistoricalObjectsRequestToDtosList(CreateHistoricalObjectsRequest request)
+    public static List<HistoricalObjectDto>? UpsertHistoricalObjectsRequestToDtosList(UpsertHistoricalObjectsRequest? request, Guid? layerId = null)
     {
+        if (request == null)
+            return null;
+        
         var list = new List<HistoricalObjectDto>();
 
         foreach (var point in request.Points)
         {
-            list.Add(CreateHistoricalObjectRequestToDto(point, point.LayerId));
+            list.Add(UpsertHistoricalObjectRequestToDto(point, layerId));
         }
         
         return list;
@@ -44,7 +47,7 @@ public static class HistoricalObjectMapper
         (
             Id: histObjectDto.Id!.Value,
             Title: histObjectDto.Title!,
-            Coordinates: [ histObjectDto.Coordinates.X, histObjectDto.Coordinates.Y ],
+            Coordinates: [ histObjectDto.Coordinates!.X, histObjectDto.Coordinates.Y ],
             Year: histObjectDto.Year!.Value,
             ImagePath: histObjectDto.ImagePath,
             Description: histObjectDto.Description!,
@@ -52,27 +55,15 @@ public static class HistoricalObjectMapper
         );
     }
 
-    public static HistoricalObjectDto CreateHistoricalObjectRequestToDto(CreateHistoricalObjectRequest request, Guid layerId)
+    public static HistoricalObjectDto UpsertHistoricalObjectRequestToDto(UpsertHistoricalObjectRequest request, Guid? layerId)
     {
         return new HistoricalObjectDto
         {
+            Id = request.Id ?? Guid.Empty,
             LayerRegionId = layerId,
             Title = request.Title,
             Description = request.Description,
-            Coordinates = new Point(request.Coordinates[0], request.Coordinates[1]),
-            Year = request.Year,
-            ExcursionUrl = request.ExcursionUrl,
-            Image = request.Image,
-        };
-    }
-
-    public static HistoricalObjectDto UpdateHistoricalObjectRequestToDto(UpdateHistoricalObjectRequest request, Guid pointId)
-    {
-        return new HistoricalObjectDto
-        {
-            Id = pointId,
-            Title = request.Title,
-            Description = request.Description,
+            Coordinates = request.Coordinates == null ? null : new Point(request.Coordinates[0], request.Coordinates[1]),
             Year = request.Year,
             ExcursionUrl = request.ExcursionUrl,
             Image = request.Image,
