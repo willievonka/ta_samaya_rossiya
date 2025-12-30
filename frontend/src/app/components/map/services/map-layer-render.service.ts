@@ -1,5 +1,5 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
-import { geoJSON, Layer, LeafletMouseEvent, DomEvent, PathOptions, Map as LeafletMap } from 'leaflet';
+import { GeoJSON, Layer, LeafletMouseEvent, DomEvent, PathOptions, Map as LeafletMap } from 'leaflet';
 import { IMapLayer, IMapLayerProperties } from '../interfaces/map-layer.interface';
 import { IActiveLeafletLayer } from '../interfaces/leaflet-layer.interface';
 import { customCoordsToLatLng } from '../utils/custom-coords-to-lat-lng.util';
@@ -11,6 +11,7 @@ import { Feature, GeoJsonProperties } from 'geojson';
 export class MapLayerRenderService {
     private readonly _activeLayer: WritableSignal<IActiveLeafletLayer | null> = signal<IActiveLeafletLayer | null>(null);
     private readonly _defaultLayerStyle: PathOptions = mapConfig.defaultLayerStyle;
+    private _layersOnMap: Layer[] = [];
 
     /**
      * Отрисовать слои
@@ -25,13 +26,16 @@ export class MapLayerRenderService {
         layerWithPointsColor: string | undefined,
         onLayerSelected: (props: IMapLayerProperties) => void
     ): void {
+        this.clearLayers();
+
         layers.forEach((layer) => {
             const properties: GeoJsonProperties = this.createLayerProperties(
                 layer,
                 layerWithPointsColor,
                 onLayerSelected
             );
-            geoJSON(layer.geoData, properties).addTo(mapInstance);
+            const geoLayer: GeoJSON = new GeoJSON(layer.geoData, properties).addTo(mapInstance);
+            this._layersOnMap.push(geoLayer);
         });
     }
 
@@ -42,6 +46,13 @@ export class MapLayerRenderService {
             this.resetLayerStyle(currentLayer);
             this._activeLayer.set(null);
         }
+    }
+
+    /** Очистить слои */
+    private clearLayers(): void {
+        this._activeLayer.set(null);
+        this._layersOnMap.forEach(layer => layer.remove());
+        this._layersOnMap = [];
     }
 
     /**

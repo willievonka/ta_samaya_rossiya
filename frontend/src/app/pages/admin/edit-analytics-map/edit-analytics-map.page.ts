@@ -38,19 +38,10 @@ export class EditAnalyticsMapPageComponent extends EditMapPageBaseComponent<IMap
                 return { ...layer, properties: updatedProps };
             } else {
                 return {
-                    ...layer,
+                    geoData: layer.geoData,
                     properties: {
-                        ...layer.properties,
-                        isActive: false,
-                        style: {},
-                        analyticsData: {
-                            imagePath: '',
-                            imageFile: null,
-                            partnersCount: 0,
-                            excursionsCount: 0,
-                            membersCount: 0
-                        },
-                        points: []
+                        id: layer.properties.id,
+                        regionName: layer.properties.regionName
                     }
                 };
             }

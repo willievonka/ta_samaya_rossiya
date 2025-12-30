@@ -11,6 +11,7 @@ export class MapPointRenderService {
     private readonly _markersByPointId: Map<string, Marker> = new Map<string, Marker>();
     private readonly _markerBaseZIndex: Map<string, number> = new Map<string, number>();
     private readonly _defaultPointOptions: IDefaultMapPointOptions = mapConfig.defaultPointOptions;
+    private _markers: Marker[] = [];
 
     /**
      * Отрисовать массив точек на карте
@@ -25,6 +26,8 @@ export class MapPointRenderService {
         pointColor: string | undefined,
         onPointSelected?: (point: IMapPoint) => void
     ): void {
+        this.clearPoints();
+
         points.forEach((point, index) =>
             this.renderSinglePoint(mapInstance, point, index, pointColor, onPointSelected)
         );
@@ -65,6 +68,16 @@ export class MapPointRenderService {
         this._activeMarkerId.set(null);
     }
 
+    /** Очистить все точки */
+    private clearPoints(): void {
+        this._markersByPointId.clear();
+        this._markerBaseZIndex.clear();
+        this._activeMarker.set(null);
+        this._activeMarkerId.set(null);
+        this._markers.forEach(m => m.remove());
+        this._markers = [];
+    }
+
     /**
      * Отрисовать точку на карте
      * @param mapInstance
@@ -87,6 +100,8 @@ export class MapPointRenderService {
         const pointMarker: Marker = marker(customCoordsToLatLng(point.coordinates, true), { icon })
             .setZIndexOffset(-index)
             .addTo(mapInstance);
+
+        this._markers.push(pointMarker);
 
         pointMarker.on({
             click: (event: LeafletMouseEvent) => {
