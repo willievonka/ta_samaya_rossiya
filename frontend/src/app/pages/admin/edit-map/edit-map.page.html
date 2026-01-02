@@ -1,0 +1,24 @@
+<div class="edit-map">
+    <page-header
+        class="edit-map__header"
+        [title]="'Редактирование карты'"
+        [options]="headerOptions"
+    />
+    @if (zoomActions(); as zoomActions) {
+        <map-zoom
+            class="edit-map__zoom-controls"
+            [zoomActions]="zoomActions"
+        />
+    }
+    @if (model()?.layers) {
+        <map
+            [layers]="model()!.layers"
+            [layerWithPointsColor]="model()?.layerWithPointsColor"
+            [pointColor]="model()?.pointColor"
+            [config]="config"
+            [isReadonly]="true"
+        ></map>
+    }
+    @if (model(); as model) {
+    }
+</div>

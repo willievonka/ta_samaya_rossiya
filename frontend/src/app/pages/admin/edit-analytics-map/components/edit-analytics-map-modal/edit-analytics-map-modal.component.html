@@ -1,9 +1,9 @@
-@if (isRegionModalOpen()) {
+@if (isEditItemModalOpen()) {
     <add-region
         class="edit-analytics-map-modal__region-settings-modal"
-        [form]="addRegionForm"
+        [form]="editItemForm"
         [regionsList]="allRegions()"
-        (closeModal)="closeRegionModal()"
+        (closeModal)="closeEditItemModal()"
         (regionSaved)="saveRegion()"
     />
 }
@@ -95,9 +95,9 @@
                             <regions-list
                                 class="edit-analytics-map-modal__regions-list"
                                 [regions]="activeRegions()"
-                                [editingRegionName]="editingRegionName"
+                                [editingRegionName]="editingItemName"
                                 [showEditingDeleteError]="showEditingDeleteError()"
-                                [currentFormRegionName]="addRegionForm.controls.regionName.value"
+                                [currentFormRegionName]="editItemForm.controls.regionName.value"
                                 (edit)="editRegion($event)"
                                 (delete)="deleteRegion($event)"
                             />
@@ -108,7 +108,7 @@
                         tuiButton
                         appearance="outline"
                         size="m"
-                        (click)="openRegionModal()"
+                        (click)="openEditItemModal()"
                     >
                         Добавить регион
                     </button>

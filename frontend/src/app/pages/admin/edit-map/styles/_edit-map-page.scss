@@ -1,0 +1,45 @@
+@use '../../../../../common-styles/spacing-vars' as *;
+
+:host {
+    display: flex;
+    flex: 1;
+}
+
+.edit-map {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    position: relative;
+    justify-content: center;
+
+    &__header {
+        position: absolute;
+        z-index: 450;
+        top: $spacing-m;
+        left: $spacing-m;
+        padding-right: $spacing-m;
+    }
+
+    &__zoom-controls {
+        position: absolute;
+        z-index: 500;
+        left: $spacing-m;
+    }
+
+    &__modal {
+        position: absolute;
+        z-index: 500;
+        top: $spacing-m;
+        right: $spacing-m;
+    }
+
+    ::ng-deep {
+        .map__point {
+            cursor: grab;
+        }
+
+        .map__point-icon {
+            cursor: grab;
+        }
+    }
+}

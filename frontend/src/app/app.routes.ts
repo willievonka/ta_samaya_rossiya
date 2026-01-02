@@ -28,5 +28,10 @@ export const routes: Routes = [
         path: 'admin/edit-analytics-map',
         canActivate: [adminAuthGuard],
         loadComponent: () => import('./pages/admin/edit-analytics-map/edit-analytics-map.page').then(m => m.EditAnalyticsMapPageComponent)
+    },
+    {
+        path: 'admin/edit-map',
+        canActivate: [adminAuthGuard],
+        loadComponent: () => import('./pages/admin/edit-map/edit-map.page').then(m => m.EditMapPageComponent)
     }
 ];

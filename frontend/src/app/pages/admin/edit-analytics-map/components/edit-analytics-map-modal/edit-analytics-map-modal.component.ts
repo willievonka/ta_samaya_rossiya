@@ -1,26 +1,23 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, InputSignal, OnDestroy, OnInit, output, OutputEmitterRef, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, output, OutputEmitterRef, signal, WritableSignal } from '@angular/core';
 import { EditMapModalBaseComponent } from '../../../../../components/edit-map-modal/edit-map-modal.base.component';
 import { TuiAccordion } from '@taiga-ui/experimental';
 import { TuiCell } from '@taiga-ui/layout';
 import { TuiButton, TuiScrollbar, TuiTextfield } from '@taiga-ui/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TuiFileLike, tuiValidationErrorsProvider } from '@taiga-ui/kit';
 import { AsyncPipe } from '@angular/common';
 import { ImageUploaderComponent } from '../../../../../components/image-uploader/image-uploader.component';
 import { SafeStyle } from '@angular/platform-browser';
-import { catchError, distinctUntilChanged, forkJoin, Observable, of, Subscription, take, tap } from 'rxjs';
+import { catchError, forkJoin, Observable, of, take, tap } from 'rxjs';
 import { FormFieldComponent } from '../../../../../components/form-field/form-field.component';
 import { IAnalyticsMapSettingsForm } from '../../interfaces/analytics-map-settings-form.interface';
-import { IAddRegionForm } from '../../interfaces/add-region-form.interface';
+import { IEditRegionForm } from '../../interfaces/edit-region-form.interface';
 import { AddRegionComponent } from '../add-region/add-region.component';
 import { IMapLayerProperties } from '../../../../../components/map/interfaces/map-layer.interface';
 import { IMapModel } from '../../../../../components/map/models/map.model';
-import { IHubCard } from '../../../../../components/hub-card/interfaces/hub-card.interface';
-import { FileService } from '../../../../../services/file.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RegionsListComponent } from '../regions-list/regions-list.component';
 import { clearControlError } from '../../../../../utils/clear-control-error.util';
-import { compareFiles } from '../../../../../utils/compare-files.util';
 
 @Component({
     selector: 'edit-analytics-map-modal',
@@ -48,77 +45,55 @@ import { compareFiles } from '../../../../../utils/compare-files.util';
         })
     ]
 })
-export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent implements OnInit, OnDestroy {
-    public readonly model: InputSignal<IMapModel> = input.required();
-    public readonly card: InputSignal<IHubCard | null> = input.required();
-
+export class EditAnalyticsMapModalComponent
+    extends EditMapModalBaseComponent<IAnalyticsMapSettingsForm, IEditRegionForm>
+    implements OnInit
+{
     public readonly activeRegionsChanged: OutputEmitterRef<IMapLayerProperties[]> = output<IMapLayerProperties[]>();
 
-    protected readonly isRegionModalOpen: WritableSignal<boolean> = signal(false);
     protected readonly allRegions: WritableSignal<string[]> = signal([]);
     protected readonly activeRegions: WritableSignal<IMapLayerProperties[]> = signal([]);
-    protected readonly showEditingDeleteError: WritableSignal<boolean> = signal(false);
 
-    protected readonly settingsForm: FormGroup<IAnalyticsMapSettingsForm> = new FormGroup<IAnalyticsMapSettingsForm>({
-        title: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
-        cardBackgroundImage: new FormControl<TuiFileLike | null>(null),
-        cardDescription: new FormControl<string>('', { nonNullable: true }),
-        mapInfo: new FormControl<string>('', { nonNullable: true })
-    });
+    protected readonly cardPreviewBackgroundImage$: Observable<SafeStyle | null> = this.createImagePreview(
+        this.settingsForm.controls.cardBackgroundImage
+    );
 
-    protected readonly addRegionForm: FormGroup<IAddRegionForm> = new FormGroup<IAddRegionForm>({
-        regionName: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
-        image: new FormControl<TuiFileLike | null>(null),
-        color: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
-        partnersCount: new FormControl<number>(0, { nonNullable: true, validators: [Validators.required] }),
-        excursionsCount: new FormControl<number>(0, { nonNullable: true, validators: [Validators.required] }),
-        membersCount: new FormControl<number>(0, { nonNullable: true, validators: [Validators.required] })
-    });
-
-    protected readonly cardPreviewBackgroundImage$: Observable<SafeStyle | null> = new Observable<SafeStyle | null>(subscriber => {
-        const control: FormControl<TuiFileLike | null> = this.settingsForm.controls.cardBackgroundImage;
-
-        if (control.value) {
-            subscriber.next(this.buildBgStyle(control.value));
-        }
-
-        const sub: Subscription = control.valueChanges
-            .pipe(distinctUntilChanged(compareFiles))
-            .subscribe(file => subscriber.next(this.buildBgStyle(file)));
-
-        return () => sub.unsubscribe();
-    });
-
-    protected editingRegionName: string | null = null;
-
-    private readonly _fileService: FileService = inject(FileService);
     private readonly _destroyRef: DestroyRef = inject(DestroyRef);
-    private _revokePreview: (() => void) | null = null;
 
     public ngOnInit(): void {
         this.initModel();
         this.listenRegionNameChanges();
     }
 
-    public ngOnDestroy(): void {
-        this._revokePreview?.();
+    /** Собрать форму настроек */
+    protected buildSettingsForm(): IAnalyticsMapSettingsForm {
+        return {
+            title: new FormControl('', {
+                nonNullable: true,
+                validators: [Validators.required],
+            }),
+            cardBackgroundImage: new FormControl<TuiFileLike | null>(null),
+            cardDescription: new FormControl('', { nonNullable: true }),
+            mapInfo: new FormControl('', { nonNullable: true }),
+        };
     }
 
-    // ---------------------------
-    // Region modal
-    // ---------------------------
-
-    /** Открыть модалку редактирования региона */
-    protected openRegionModal(): void {
-        this.editingRegionName = null;
-        this.isRegionModalOpen.set(true);
-    }
-
-    /** Закрыть модалку редактирования региона */
-    protected closeRegionModal(): void {
-        this.addRegionForm.reset();
-        this.showEditingDeleteError.set(false);
-        this.isRegionModalOpen.set(false);
+    /** Собрать форму редактирования региона */
+    protected buildEditItemForm(): IEditRegionForm {
+        return {
+            regionName: new FormControl('', {
+                nonNullable: true,
+                validators: [Validators.required],
+            }),
+            image: new FormControl<TuiFileLike | null>(null),
+            color: new FormControl('', {
+                nonNullable: true,
+                validators: [Validators.required],
+            }),
+            partnersCount: new FormControl(0, { nonNullable: true }),
+            excursionsCount: new FormControl(0, { nonNullable: true }),
+            membersCount: new FormControl(0, { nonNullable: true }),
+        };
     }
 
     // ---------------------------
@@ -135,16 +110,16 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
 
         this.activeRegions.update(list =>
             this.sortRegions(
-                this.editingRegionName
+                this.editingItemName
                     ? list.map(item =>
-                        item.regionName === this.editingRegionName ? region : item,
+                        item.regionName === this.editingItemName ? region : item,
                     )
                     : [...list, region],
             ),
         );
 
-        this.editingRegionName = null;
-        this.closeRegionModal();
+        this.editingItemName = null;
+        this.closeEditItemModal();
         this.activeRegionsChanged.emit(this.activeRegions());
     }
 
@@ -154,9 +129,9 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
      */
     protected editRegion(item: IMapLayerProperties): void {
         this.showEditingDeleteError.set(false);
-        this.editingRegionName = item.regionName;
+        this.editingItemName = item.regionName;
 
-        this.addRegionForm.patchValue({
+        this.editItemForm.patchValue({
             regionName: item.regionName,
             color: item.style?.fillColor ?? '',
             partnersCount: item.analyticsData?.partnersCount ?? 0,
@@ -165,7 +140,7 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
         });
 
         this.loadRegionImage(item);
-        this.isRegionModalOpen.set(true);
+        this.isEditItemModalOpen.set(true);
     }
 
     /**
@@ -173,7 +148,7 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
      * @param item
      */
     protected deleteRegion(item: IMapLayerProperties): void {
-        if (this.addRegionForm.controls.regionName.value === item.regionName) {
+        if (this.editItemForm.controls.regionName.value === item.regionName) {
             this.showEditingDeleteError.set(true);
 
             return;
@@ -181,7 +156,7 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
 
         const url: string | undefined = item.analyticsData?.imagePath?.trim();
         if (url) {
-            this._fileService.removeCachedFileByUrl(url);
+            this.fileService.removeCachedFileByUrl(url);
         }
 
         this.activeRegions.update(list =>
@@ -220,9 +195,9 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
         const cardUrl: string | undefined = this.card()?.backgroundImagePath?.trim();
         if (cardUrl) {
             tasks.push(
-                this._fileService.downloadAsFile(
+                this.fileService.downloadAsFile(
                     cardUrl,
-                    this._fileService.getFileNameFromUrl(cardUrl) ?? 'card-background.svg',
+                    this.fileService.getFileNameFromUrl(cardUrl) ?? 'card-background.svg',
                     'image/svg+xml'
                 ).pipe(
                     tap(file => this.settingsForm.controls.cardBackgroundImage.setValue(file)),
@@ -238,9 +213,9 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
             }
 
             tasks.push(
-                this._fileService.downloadAsFile(
+                this.fileService.downloadAsFile(
                     url,
-                    this._fileService.getFileNameFromUrl(url) ?? `${region.regionName}.png`
+                    this.fileService.getFileNameFromUrl(url) ?? `${region.regionName}.png`
                 ).pipe(catchError(() => of(null)))
             );
         });
@@ -258,19 +233,19 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
 
     /** Провалидировать форму регионов */
     private validateRegionForm(): boolean {
-        this.addRegionForm.markAllAsTouched();
-        this.addRegionForm.updateValueAndValidity();
+        this.editItemForm.markAllAsTouched();
+        this.editItemForm.updateValueAndValidity();
 
-        if (this.addRegionForm.invalid) {
+        if (this.editItemForm.invalid) {
             return false;
         }
 
-        const name: string = this.addRegionForm.controls.regionName.value.trim();
+        const name: string = this.editItemForm.controls.regionName.value.trim();
 
-        if (!this.editingRegionName &&
+        if (!this.editingItemName &&
             this.activeRegions().some(r => r.regionName === name)
         ) {
-            this.addRegionForm.controls.regionName.setErrors({ regionAlreadyExists: true });
+            this.editItemForm.controls.regionName.setErrors({ regionAlreadyExists: true });
 
             return false;
         }
@@ -280,20 +255,20 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
 
     /** Собрать регион из формы */
     private buildRegionFromForm(): IMapLayerProperties {
-        const f: IAddRegionForm = this.addRegionForm.controls;
+        const controls: IEditRegionForm = this.editItemForm.controls;
 
         return {
-            regionName: f.regionName.value.trim(),
+            regionName: controls.regionName.value.trim(),
             isActive: true,
             style: {
-                ...(this.activeRegions().find(r => r.regionName === this.editingRegionName)?.style ?? {}),
-                fillColor: f.color.value,
+                ...(this.activeRegions().find(region => region.regionName === this.editingItemName)?.style ?? {}),
+                fillColor: controls.color.value,
             },
             analyticsData: {
-                partnersCount: f.partnersCount.value,
-                excursionsCount: f.excursionsCount.value,
-                membersCount: f.membersCount.value,
-                imageFile: f.image.value as File | null,
+                partnersCount: controls.partnersCount.value,
+                excursionsCount: controls.excursionsCount.value,
+                membersCount: controls.membersCount.value,
+                imageFile: controls.image.value as File | null,
                 imagePath: '',
             },
         } as IMapLayerProperties;
@@ -306,14 +281,14 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
     private loadRegionImage(item: IMapLayerProperties): void {
         const stored: File | null = item.analyticsData?.imageFile as File | null;
         if (stored) {
-            this.addRegionForm.controls.image.setValue(stored);
+            this.editItemForm.controls.image.setValue(stored);
 
             return;
         }
 
         const url: string | undefined = item.analyticsData?.imagePath?.trim();
-        this.addRegionForm.controls.image.setValue(
-            url ? this._fileService.getCachedFileByUrl(url) : null,
+        this.editItemForm.controls.image.setValue(
+            url ? this.fileService.getCachedFileByUrl(url) : null,
         );
     }
 
@@ -327,28 +302,11 @@ export class EditAnalyticsMapModalComponent extends EditMapModalBaseComponent im
         );
     }
 
-    /**
-     * Собрать стиль background-image по файлу
-     * @param file
-     * @returns
-     */
-    private buildBgStyle(file: TuiFileLike | null): SafeStyle | null {
-        this._revokePreview?.();
-
-        const { style, revoke }: {
-            style: SafeStyle | null,
-            revoke: () => void
-        } = this._fileService.buildBackgroundImagePreview(file);
-        this._revokePreview = revoke;
-
-        return style;
-    }
-
     /** Подписка на изменения имени региона */
     private listenRegionNameChanges(): void {
-        this.addRegionForm.controls.regionName.valueChanges
+        this.editItemForm.controls.regionName.valueChanges
             .pipe(
-                tap(() => clearControlError(this.addRegionForm.controls.regionName, 'regionAlreadyExists')),
+                tap(() => clearControlError(this.editItemForm.controls.regionName, 'regionAlreadyExists')),
                 takeUntilDestroyed(this._destroyRef)
             )
             .subscribe();

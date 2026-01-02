@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { IAddRegionForm } from '../../interfaces/add-region-form.interface';
+import { IEditRegionForm } from '../../interfaces/edit-region-form.interface';
 import { FormFieldComponent } from '../../../../../components/form-field/form-field.component';
 import { ImageUploaderComponent } from '../../../../../components/image-uploader/image-uploader.component';
 import { TuiButton } from '@taiga-ui/core';
@@ -21,7 +21,7 @@ import { SelectAutocompleteComponent } from '../../../../../components/select-au
     ]
 })
 export class AddRegionComponent {
-    public readonly form: InputSignal<FormGroup<IAddRegionForm>> = input.required();
+    public readonly form: InputSignal<FormGroup<IEditRegionForm>> = input.required();
     public readonly regionsList: InputSignal<string[]> = input.required();
 
     public readonly closeModal: OutputEmitterRef<void> = output();
