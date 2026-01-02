@@ -10,7 +10,7 @@ import { ImageUploaderComponent } from '../../../../../components/image-uploader
 import { SafeStyle } from '@angular/platform-browser';
 import { catchError, forkJoin, Observable, of, take, tap } from 'rxjs';
 import { FormFieldComponent } from '../../../../../components/form-field/form-field.component';
-import { IAnalyticsMapSettingsForm } from '../../interfaces/analytics-map-settings-form.interface';
+import { IAnalyticsMapSettingsForm } from '../../../../../components/edit-map-modal/interfaces/analytics-map-settings-form.interface';
 import { IEditRegionForm } from '../../interfaces/edit-region-form.interface';
 import { IMapLayerProperties } from '../../../../../components/map/interfaces/map-layer.interface';
 import { IMapModel } from '../../../../../components/map/models/map.model';
