@@ -72,17 +72,53 @@
                 <div class="edit-map-modal__row">
                     <form-field
                         class="edit-map-modal__field"
+                        label="Цвет точек"
+                        placeholder="Укажите цвет"
+                        [control]="settingsForm.controls.pointsColor"
+                        [color]="true"
+                    />
+                    <form-field
+                        class="edit-map-modal__field"
+                        label="Цвет регионов с точками"
+                        placeholder="Укажите цвет"
+                        [control]="settingsForm.controls.layerWithPointsColor"
+                        [color]="true"
+                    />
+                </div>
+
+                <div class="edit-map-modal__row">
+                    <form-field
+                        class="edit-map-modal__field"
                         label="Описание"
                         placeholder="Укажите описание"
                         [control]="settingsForm.controls.mapInfo"
                         [multiline]="true"
                     />
                 </div>
+            </tui-expand>
 
+            <button
+                class="edit-map-modal__accordion-button"
+                tuiAccordion
+                tuiCell
+                appearance=""
+                type="button"
+            >
+                Историческая линия
+            </button>
+
+            <tui-expand class="edit-map-modal__accordion-item">
                 <div class="edit-map-modal__points-list-wrapper">
                     <span>Список активных точек</span>
                     <tui-scrollbar>
-
+                        <points-list
+                            class="edit-analytics-map-modal__points-list"
+                            [items]="activePoints()"
+                            [editingItemName]="editingItemName"
+                            [showEditingDeleteError]="showEditingDeleteError()"
+                            [currentFormItemName]="editItemForm.controls.pointName.value"
+                            [iconColor]="settingsForm.controls.pointsColor.value"
+                        />
                     </tui-scrollbar>
 
                     <button

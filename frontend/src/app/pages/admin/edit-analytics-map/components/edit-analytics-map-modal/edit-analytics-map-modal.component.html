@@ -94,10 +94,10 @@
                     <tui-scrollbar>
                             <regions-list
                                 class="edit-analytics-map-modal__regions-list"
-                                [regions]="activeRegions()"
-                                [editingRegionName]="editingItemName"
+                                [items]="activeRegions()"
+                                [editingItemName]="editingItemName"
                                 [showEditingDeleteError]="showEditingDeleteError()"
-                                [currentFormRegionName]="editItemForm.controls.regionName.value"
+                                [currentFormItemName]="editItemForm.controls.regionName.value"
                                 (edit)="editRegion($event)"
                                 (delete)="deleteRegion($event)"
                             />

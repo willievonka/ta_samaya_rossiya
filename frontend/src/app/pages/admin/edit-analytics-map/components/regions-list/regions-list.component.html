@@ -1,5 +1,5 @@
 <div class="regions-list">
-    @for (region of regions(); track region.regionName) {
+    @for (region of items(); track region.regionName) {
         <div class="regions-list__item-wrapper">
             <div class="regions-list__item">
                 <span class="regions-list__title">
@@ -27,8 +27,8 @@
 
             @if (
                 showEditingDeleteError() &&
-                editingRegionName() === region.regionName &&
-                currentFormRegionName() === region.regionName
+                editingItemName() === region.regionName &&
+                currentFormItemName() === region.regionName
             ) {
                 <div class="regions-list__error" tuiAnimated>
                     <tui-error error="Регион редактируется" />

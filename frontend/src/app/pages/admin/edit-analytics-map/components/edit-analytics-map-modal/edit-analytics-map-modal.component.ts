@@ -227,6 +227,16 @@ export class EditAnalyticsMapModalComponent
         }
     }
 
+    /** Подписка на изменения имени региона */
+    private listenRegionNameChanges(): void {
+        this.editItemForm.controls.regionName.valueChanges
+            .pipe(
+                tap(() => clearControlError(this.editItemForm.controls.regionName, 'regionAlreadyExists')),
+                takeUntilDestroyed(this._destroyRef)
+            )
+            .subscribe();
+    }
+
     // ---------------------------
     // Helpers
     // ---------------------------
@@ -300,15 +310,5 @@ export class EditAnalyticsMapModalComponent
         return list.slice().sort((a, b) =>
             a.regionName.localeCompare(b.regionName, 'ru', { sensitivity: 'base' }),
         );
-    }
-
-    /** Подписка на изменения имени региона */
-    private listenRegionNameChanges(): void {
-        this.editItemForm.controls.regionName.valueChanges
-            .pipe(
-                tap(() => clearControlError(this.editItemForm.controls.regionName, 'regionAlreadyExists')),
-                takeUntilDestroyed(this._destroyRef)
-            )
-            .subscribe();
     }
 }
