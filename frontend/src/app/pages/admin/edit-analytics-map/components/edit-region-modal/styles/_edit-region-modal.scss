@@ -1,7 +1,7 @@
 @use '../../../../../../../common-styles/spacing-vars' as *;
 @use '../../../../../../../common-styles/color-vars' as color;
 
-.add-region {
+.edit-region-modal {
     display: flex;
     flex-direction: column;
     gap: $spacing-l;

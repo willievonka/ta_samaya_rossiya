@@ -7,10 +7,10 @@ import { TuiButton } from '@taiga-ui/core';
 import { SelectAutocompleteComponent } from '../../../../../components/select-autocomplete/select-autocomplete.component';
 
 @Component({
-    selector: 'add-region',
+    selector: 'edit-region-modal',
     standalone: true,
-    templateUrl: './add-region.component.html',
-    styleUrl: './styles/add-region.master.scss',
+    templateUrl: './edit-region-modal.component.html',
+    styleUrl: './styles/edit-region-modal.master.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ReactiveFormsModule,
@@ -20,7 +20,7 @@ import { SelectAutocompleteComponent } from '../../../../../components/select-au
         TuiButton
     ]
 })
-export class AddRegionComponent {
+export class EditRegionModalComponent {
     public readonly form: InputSignal<FormGroup<IEditRegionForm>> = input.required();
     public readonly regionsList: InputSignal<string[]> = input.required();
 

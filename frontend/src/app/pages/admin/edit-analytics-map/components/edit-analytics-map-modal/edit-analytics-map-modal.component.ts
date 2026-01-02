@@ -12,12 +12,12 @@ import { catchError, forkJoin, Observable, of, take, tap } from 'rxjs';
 import { FormFieldComponent } from '../../../../../components/form-field/form-field.component';
 import { IAnalyticsMapSettingsForm } from '../../interfaces/analytics-map-settings-form.interface';
 import { IEditRegionForm } from '../../interfaces/edit-region-form.interface';
-import { AddRegionComponent } from '../add-region/add-region.component';
 import { IMapLayerProperties } from '../../../../../components/map/interfaces/map-layer.interface';
 import { IMapModel } from '../../../../../components/map/models/map.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RegionsListComponent } from '../regions-list/regions-list.component';
 import { clearControlError } from '../../../../../utils/clear-control-error.util';
+import { EditRegionModalComponent } from '../edit-region-modal/edit-region-modal.component';
 
 @Component({
     selector: 'edit-analytics-map-modal',
@@ -35,7 +35,7 @@ import { clearControlError } from '../../../../../utils/clear-control-error.util
         TuiScrollbar,
         ImageUploaderComponent,
         FormFieldComponent,
-        AddRegionComponent,
+        EditRegionModalComponent,
         RegionsListComponent
     ],
     providers: [

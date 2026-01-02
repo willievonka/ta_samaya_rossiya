@@ -1,9 +1,9 @@
-@let addRegionForm = form();
+@let editRegionForm = form();
 @let regions = regionsList();
 
-<div class="add-region__wrapper">
+<div class="edit-region-modal__wrapper">
     <button
-        class="add-region__close-button"
+        class="edit-region-modal__close-button"
         type="button"
         (click)="closeModal.emit()"
     >
@@ -11,51 +11,51 @@
             <use href="/sprites/cross.svg" />
         </svg>
     </button>
-    <form class="add-region" [formGroup]="addRegionForm" (ngSubmit)="regionSaved.emit()">
+    <form class="edit-region-modal" [formGroup]="editRegionForm" (ngSubmit)="regionSaved.emit()">
         <select-autocomplete
-            [control]="addRegionForm.controls.regionName"
+            [control]="editRegionForm.controls.regionName"
             [itemsList]="regions"
             label="Название региона"
             placeholder="Укажите название"
         />
 
         <div>
-            <span class="add-region__image-uploader-title">
+            <span class="edit-region-modal__image-uploader-title">
                 Изображение региона
             </span>
             <image-uploader
-                class="add-region__image-uploader"
-                [formControl]="addRegionForm.controls.image"
+                class="edit-region-modal__image-uploader"
+                [formControl]="editRegionForm.controls.image"
                 fileType="image/png, image/jpeg"
                 size="m"
             />
-            <span class="add-region__image-uploader-hint">
+            <span class="edit-region-modal__image-uploader-hint">
                 Файл в формате PNG/JPEG, с разрешением 484x256 px
             </span>
         </div>
 
         <form-field
-            [control]="addRegionForm.controls.color"
+            [control]="editRegionForm.controls.color"
             [color]="true"
             label="Цвет региона"
             placeholder="Укажите цвет"
         />
 
-        <div class="add-region__group">
+        <div class="edit-region-modal__group">
             <form-field
-                [control]="addRegionForm.controls.partnersCount"
+                [control]="editRegionForm.controls.partnersCount"
                 [numeric]="true"
                 label="Число партнёров"
                 placeholder="Укажите число"
             />
             <form-field
-                [control]="addRegionForm.controls.excursionsCount"
+                [control]="editRegionForm.controls.excursionsCount"
                 [numeric]="true"
                 label="Число экскурсий"
                 placeholder="Укажите число"
             />
             <form-field
-                [control]="addRegionForm.controls.membersCount"
+                [control]="editRegionForm.controls.membersCount"
                 [numeric]="true"
                 label="Число участников"
                 placeholder="Укажите число"
@@ -63,7 +63,7 @@
         </div>
 
         <button
-            class="add-region__save-button"
+            class="edit-region-modal__save-button"
             type="submit"
             tuiButton
             size="m"
