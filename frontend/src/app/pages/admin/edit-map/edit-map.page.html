@@ -20,5 +20,10 @@
         ></map>
     }
     @if (model(); as model) {
+        <edit-map-modal
+            class="edit-map__modal"
+            [model]="model"
+            [card]="card()"
+        />
     }
 </div>

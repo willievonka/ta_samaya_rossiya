@@ -1,0 +1,120 @@
+<div class="edit-map-modal">
+    <h2 class="edit-map-modal__title">Настройки</h2>
+
+    <form class="edit-map-modal__form" [formGroup]="settingsForm">
+        <div class="edit-map-modal__section">
+            <form-field
+                class="edit-map-modal__field"
+                label="Название проекта"
+                placeholder="Укажите название"
+                [control]="settingsForm.controls.title"
+            />
+        </div>
+
+        <tui-accordion class="edit-map-modal__accordion" size="l">
+            <button
+                class="edit-map-modal__accordion-button"
+                tuiAccordion
+                tuiCell
+                appearance=""
+                type="button"
+            >
+                Карточка
+            </button>
+
+            <tui-expand class="edit-map-modal__accordion-item">
+                <div class="edit-map-modal__row">
+                    <div class="edit-map-modal__card-preview-wrapper">
+                        <span>Предпросмотр карточки</span>
+                        <div class="edit-map-modal__card-preview">
+                            <span class="edit-map-modal__card-preview-title">
+                                {{ (settingsForm.controls.title.value || '').trim() || 'Та самая Россия' }}
+                            </span>
+                            <div
+                                class="edit-map-modal__card-preview-image"
+                                [style.background-image]="cardPreviewBackgroundImage$ | async"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div class="edit-map-modal__image-uploader">
+                        <span>Фоновое изображение</span>
+                        <image-uploader formControlName="cardBackgroundImage" />
+                        <span class="edit-map-modal__image-uploader-hint">
+                            Файл в формате SVG,<br />
+                            с разрешением 238x312 px
+                        </span>
+                    </div>
+                </div>
+
+                <div class="edit-map-modal__row_last">
+                    <form-field
+                        class="edit-map-modal__field"
+                        label="Описание"
+                        placeholder="Укажите описание"
+                        [control]="settingsForm.controls.cardDescription"
+                        [multiline]="true"
+                    />
+                </div>
+            </tui-expand>
+
+            <button
+                class="edit-map-modal__accordion-button"
+                tuiAccordion
+                tuiCell
+                appearance=""
+                type="button"
+            >
+                Карта
+            </button>
+
+            <tui-expand class="edit-map-modal__accordion-item">
+                <div class="edit-map-modal__row">
+                    <form-field
+                        class="edit-map-modal__field"
+                        label="Описание"
+                        placeholder="Укажите описание"
+                        [control]="settingsForm.controls.mapInfo"
+                        [multiline]="true"
+                    />
+                </div>
+
+                <div class="edit-map-modal__points-list-wrapper">
+                    <span>Список активных точек</span>
+                    <tui-scrollbar>
+
+                    </tui-scrollbar>
+
+                    <button
+                        type="button"
+                        tuiButton
+                        appearance="outline"
+                        size="m"
+                        (click)="openEditItemModal()"
+                    >
+                        Добавить точку
+                    </button>
+                </div>
+            </tui-expand>
+        </tui-accordion>
+    </form>
+
+    <div class="edit-map-modal__buttons-wrapper">
+        <button
+            type="submit"
+            tuiButton
+            size="m"
+        >
+            Сохранить
+        </button>
+        <button
+            type="button"
+            appearance="outline"
+            tuiButton
+            size="m"
+            [style.color]="'var(--tui-text-negative)'"
+        >
+            Удалить проект
+        </button>
+    </div>
+</div>

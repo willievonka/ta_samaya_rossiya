@@ -4,6 +4,7 @@ import { IMapPoint } from '../../../components/map/interfaces/map-point.interfac
 import { PageHeaderComponent } from '../../../components/page-header/page-header.component';
 import { MapComponent } from '../../../components/map/map.component';
 import { MapZoomComponent } from '../../../components/map-zoom/map-zoom.component';
+import { EditMapModalComponent } from './components/edit-map-modal/edit-map-modal.component';
 
 @Component({
     selector: 'edit-map',
@@ -14,7 +15,8 @@ import { MapZoomComponent } from '../../../components/map-zoom/map-zoom.componen
     imports: [
         PageHeaderComponent,
         MapComponent,
-        MapZoomComponent
+        MapZoomComponent,
+        EditMapModalComponent
     ]
 })
 export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
