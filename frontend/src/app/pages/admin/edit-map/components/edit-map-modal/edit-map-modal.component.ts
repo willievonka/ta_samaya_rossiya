@@ -3,7 +3,7 @@ import { EditMapModalBaseComponent } from '../../../../../components/edit-map-mo
 import { IMapSettingsForm } from '../../../../../components/edit-map-modal/interfaces/map-settings-form.interface';
 import { IEditPointForm } from '../../interfaces/edit-point-form.interface';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TuiFileLike } from '@taiga-ui/kit';
+import { TuiFileLike, tuiValidationErrorsProvider } from '@taiga-ui/kit';
 import { AsyncPipe } from '@angular/common';
 import { TuiCell } from '@taiga-ui/layout';
 import { TuiButton, TuiScrollbar, TuiTextfield } from '@taiga-ui/core';
@@ -15,6 +15,8 @@ import { SafeStyle } from '@angular/platform-browser';
 import { IMapPoint } from '../../../../../components/map/interfaces/map-point.interface';
 import { PointsListComponent } from '../points-list/points-list.component';
 import { IMapModel } from '../../../../../components/map/models/map.model';
+import { IMapLayerProperties } from '../../../../../components/map/interfaces/map-layer.interface';
+import { EditPointModalComponent } from '../edit-point-modal/edit-point-modal.component';
 
 @Component({
     selector: 'edit-map-modal',
@@ -32,7 +34,14 @@ import { IMapModel } from '../../../../../components/map/models/map.model';
         TuiScrollbar,
         ImageUploaderComponent,
         FormFieldComponent,
-        PointsListComponent
+        PointsListComponent,
+        EditPointModalComponent
+    ],
+    providers: [
+        tuiValidationErrorsProvider({
+            required: 'Поле обязательно для заполнения',
+            pointAlreadyExists: 'Точка уже добавлена в список'
+        })
     ]
 })
 export class EditMapModalComponent
@@ -46,7 +55,8 @@ export class EditMapModalComponent
         this.settingsForm.controls.cardBackgroundImage
     );
 
-    public ngOnInit(): void {
+    public override ngOnInit(): void {
+        super.ngOnInit();
         this.initModel();
     }
 
@@ -74,6 +84,10 @@ export class EditMapModalComponent
     /** Собрать форму редактирования точки */
     protected buildEditItemForm(): IEditPointForm {
         return {
+            regionName: new FormControl('', {
+                nonNullable: true,
+                validators: [Validators.required]
+            }),
             pointName: new FormControl('', {
                 nonNullable: true,
                 validators: [Validators.required]
@@ -92,13 +106,85 @@ export class EditMapModalComponent
         };
     }
 
+    // ---------------------------
+    // Region CRUD
+    // ---------------------------
+
+    /** Сохранить точку */
+    protected savePoint(): void {
+        if (!this.validatePointForm()) {
+            return;
+        }
+
+        console.log('saved');
+
+        this.editingItemName = null;
+        this.closeEditItemModal();
+        this.activePointsChanged.emit(this.activePoints());
+    }
+
+    /**
+     * Редактировать точку
+     * @param item
+     */
+    protected editPoint(item: IMapPoint): void {
+        this.showEditingDeleteError.set(false);
+        this.editingItemName = item.title;
+
+        this.editItemForm.patchValue({
+            regionName: item.regionName,
+            pointName: item.title,
+            coordinates: item.coordinates,
+            year: item.year,
+            description: item.description,
+            excursionUrl: item.excursionUrl
+        });
+
+        this.loadPointImage(item);
+        this.isEditItemModalOpen.set(true);
+    }
+
+    /**
+     * Удалить точку
+     * @param item
+     */
+    protected deletePoint(item: IMapPoint): void {
+        if (this.editItemForm.controls.pointName.value === item.title) {
+            this.showEditingDeleteError.set(true);
+
+            return;
+        }
+
+        const url: string | undefined = item.imagePath?.trim();
+        if (url) {
+            this.fileService.removeCachedFileByUrl(url);
+        }
+
+        console.log(item);
+        this.activePointsChanged.emit(this.activePoints());
+    }
+
+    // ---------------------------
+    // Init
+    // ---------------------------
+
     /** Инициализировать модель */
     private initModel(): void {
-        const model: IMapModel = this.model();
+        const allRegions: IMapLayerProperties[] = this.getAllRegions();
+        this.allRegions.set(allRegions.map(p => p.regionName));
         this.activePoints.set(
-            model.layers.flatMap(layer => layer.properties.points ?? []).sort((a, b) => a.year - b.year)
+            allRegions
+                .filter(region => !!region.points && region.points.length > 0)
+                .flatMap(region =>
+                    region.points!.map(point => ({
+                        ...point,
+                        regionName: region.regionName
+                    }))
+                )
+                .sort((a, b) => a.year - b.year)
         );
 
+        const model: IMapModel = this.model();
         this.settingsForm.patchValue({
             title: model.pageTitle,
             mapInfo: model.infoText,
@@ -137,7 +223,7 @@ export class EditMapModalComponent
             tasks.push(
                 this.fileService.downloadAsFile(
                     url,
-                    this.fileService.getFileNameFromUrl(url) ?? `${point.title}.png`
+                    this.fileService.getFileNameFromUrl(url) ?? `${point.title}`
                 ).pipe(catchError(() => of(null)))
             );
         });
@@ -147,5 +233,49 @@ export class EditMapModalComponent
                 .pipe(take(1))
                 .subscribe();
         }
+    }
+
+    // ---------------------------
+    // Helpers
+    // ---------------------------
+
+    /** Провалидировать форму редактирования точек */
+    private validatePointForm(): boolean {
+        this.editItemForm.markAllAsTouched();
+        this.editItemForm.updateValueAndValidity();
+
+        if (this.editItemForm.invalid) {
+            return false;
+        }
+
+        const name: string = this.editItemForm.controls.pointName.value.trim();
+
+        if (!this.editingItemName &&
+            this.activePoints().some(p => p.title === name)
+        ) {
+            this.editItemForm.controls.pointName.setErrors({ pointAlreadyExists: true });
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Загрузить изображение точки
+     * @param item
+     */
+    private loadPointImage(item: IMapPoint): void {
+        const stored: File | null = item.imageFile as File | null;
+        if (stored) {
+            this.editItemForm.controls.image.setValue(stored);
+
+            return;
+        }
+
+        const url: string | undefined = item.imagePath.trim();
+        this.editItemForm.controls.image.setValue(
+            url ? this.fileService.getCachedFileByUrl(url) : null,
+        );
     }
 }

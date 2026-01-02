@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { IMapLayerProperties } from '../../../../../components/map/interfaces/map-layer.interface';
 import { TuiIcon, TuiError } from '@taiga-ui/core';
 import { TuiAnimated } from '@taiga-ui/cdk/directives/animated';
-import { MapItemsList } from '../../../../../components/edit-map-modal/components/map-items-list/map-items-list.base.component';
+import { MapItemsList } from '../../../../../components/edit-map-modal/components/map-items-list.base.component';
 
 @Component({
     selector: 'regions-list',

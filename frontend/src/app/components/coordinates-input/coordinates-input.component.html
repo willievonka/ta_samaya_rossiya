@@ -1,0 +1,18 @@
+<label tuiLabel class="coordinates-input">
+    <span class="coordinates-input__label">
+        {{ label() }}
+    </span>
+
+    <tui-textfield>
+        <input
+            tuiTextfield
+            [formControl]="innerControl"
+            [placeholder]="placeholder()"
+        />
+    </tui-textfield>
+
+    <tui-error
+        [formControl]="innerControl"
+        [error]="[] | tuiFieldError | async"
+    />
+</label>

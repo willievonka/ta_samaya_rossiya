@@ -19,6 +19,4 @@ import { EditMapModalComponent } from './components/edit-map-modal/edit-map-moda
         EditMapModalComponent
     ]
 })
-export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
-
-}
+export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {}

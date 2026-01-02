@@ -2,9 +2,9 @@
     <edit-region-modal
         class="edit-analytics-map-modal__region-settings-modal"
         [form]="editItemForm"
-        [regionsList]="allRegions()"
+        [allRegionsList]="allRegions()"
         (closeModal)="closeEditItemModal()"
-        (regionSaved)="saveRegion()"
+        (itemSaved)="saveRegion()"
     />
 }
 

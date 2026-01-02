@@ -1,3 +1,13 @@
+@if (isEditItemModalOpen()) {
+    <edit-point-modal
+        class="edit-map-modal__point-settings-modal"
+        [form]="editItemForm"
+        [allRegionsList]="allRegions()"
+        (closeModal)="closeEditItemModal()"
+        (itemSaved)="savePoint()"
+    />
+}
+
 <div class="edit-map-modal">
     <h2 class="edit-map-modal__title">Настройки</h2>
 
@@ -118,6 +128,8 @@
                             [showEditingDeleteError]="showEditingDeleteError()"
                             [currentFormItemName]="editItemForm.controls.pointName.value"
                             [iconColor]="settingsForm.controls.pointsColor.value"
+                            (edit)="editPoint($event)"
+                            (delete)="deletePoint($event)"
                         />
                     </tui-scrollbar>
 

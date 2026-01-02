@@ -23,6 +23,7 @@
             [model]="model"
             [card]="card()"
             (activeRegionsChanged)="handleRegionsChange($event)"
+            (dirtyChange)="this.hasUnsavedChanges.set($event)"
         />
     }
 </div>

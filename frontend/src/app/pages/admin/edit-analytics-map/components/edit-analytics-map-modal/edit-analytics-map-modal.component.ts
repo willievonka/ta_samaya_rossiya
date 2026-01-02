@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, output, OutputEmitterRef, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, output, OutputEmitterRef, signal, WritableSignal } from '@angular/core';
 import { EditMapModalBaseComponent } from '../../../../../components/edit-map-modal/edit-map-modal.base.component';
 import { TuiAccordion } from '@taiga-ui/experimental';
 import { TuiCell } from '@taiga-ui/layout';
@@ -51,16 +51,13 @@ export class EditAnalyticsMapModalComponent
 {
     public readonly activeRegionsChanged: OutputEmitterRef<IMapLayerProperties[]> = output<IMapLayerProperties[]>();
 
-    protected readonly allRegions: WritableSignal<string[]> = signal([]);
     protected readonly activeRegions: WritableSignal<IMapLayerProperties[]> = signal([]);
-
     protected readonly cardPreviewBackgroundImage$: Observable<SafeStyle | null> = this.createImagePreview(
         this.settingsForm.controls.cardBackgroundImage
     );
 
-    private readonly _destroyRef: DestroyRef = inject(DestroyRef);
-
-    public ngOnInit(): void {
+    public override ngOnInit(): void {
+        super.ngOnInit();
         this.initModel();
         this.listenRegionNameChanges();
     }
@@ -171,14 +168,11 @@ export class EditAnalyticsMapModalComponent
 
     /** Инициализировать модель */
     private initModel(): void {
+        const allRegions: IMapLayerProperties[] = this.getAllRegions();
+        this.allRegions.set(allRegions.map(p => p.regionName));
+        this.activeRegions.set(allRegions.filter(p => p.isActive));
+
         const model: IMapModel = this.model();
-        const props: IMapLayerProperties[] = this.sortRegions(
-            model.layers.map(layer => layer.properties)
-        );
-
-        this.allRegions.set(props.map(p => p.regionName));
-        this.activeRegions.set(props.filter(p => p.isActive));
-
         this.settingsForm.patchValue({
             title: model.pageTitle,
             mapInfo: model.infoText,
@@ -215,7 +209,7 @@ export class EditAnalyticsMapModalComponent
             tasks.push(
                 this.fileService.downloadAsFile(
                     url,
-                    this.fileService.getFileNameFromUrl(url) ?? `${region.regionName}.png`
+                    this.fileService.getFileNameFromUrl(url) ?? `${region.regionName}`
                 ).pipe(catchError(() => of(null)))
             );
         });
@@ -232,7 +226,7 @@ export class EditAnalyticsMapModalComponent
         this.editItemForm.controls.regionName.valueChanges
             .pipe(
                 tap(() => clearControlError(this.editItemForm.controls.regionName, 'regionAlreadyExists')),
-                takeUntilDestroyed(this._destroyRef)
+                takeUntilDestroyed(this.destroyRef)
             )
             .subscribe();
     }
@@ -241,7 +235,7 @@ export class EditAnalyticsMapModalComponent
     // Helpers
     // ---------------------------
 
-    /** Провалидировать форму регионов */
+    /** Провалидировать форму редактирования регионов */
     private validateRegionForm(): boolean {
         this.editItemForm.markAllAsTouched();
         this.editItemForm.updateValueAndValidity();
@@ -299,16 +293,6 @@ export class EditAnalyticsMapModalComponent
         const url: string | undefined = item.analyticsData?.imagePath?.trim();
         this.editItemForm.controls.image.setValue(
             url ? this.fileService.getCachedFileByUrl(url) : null,
-        );
-    }
-
-    /**
-     * Отсортировать регионы по имени
-     * @param list
-     */
-    private sortRegions(list: IMapLayerProperties[]): IMapLayerProperties[] {
-        return list.slice().sort((a, b) =>
-            a.regionName.localeCompare(b.regionName, 'ru', { sensitivity: 'base' }),
         );
     }
 }

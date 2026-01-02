@@ -7,6 +7,7 @@ export interface IMapPoint {
     imageFile?: File | null;
     description: string;
     excursionUrl: string;
+    regionName?: string;
 }
 
 export interface IDefaultMapPointOptions {

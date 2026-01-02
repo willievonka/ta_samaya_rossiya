@@ -1,5 +1,5 @@
 @let editRegionForm = form();
-@let regions = regionsList();
+@let regions = allRegionsList();
 
 <div class="edit-region-modal__wrapper">
     <button
@@ -11,7 +11,7 @@
             <use href="/sprites/cross.svg" />
         </svg>
     </button>
-    <form class="edit-region-modal" [formGroup]="editRegionForm" (ngSubmit)="regionSaved.emit()">
+    <form class="edit-region-modal" [formGroup]="editRegionForm" (ngSubmit)="itemSaved.emit()">
         <select-autocomplete
             [control]="editRegionForm.controls.regionName"
             [itemsList]="regions"

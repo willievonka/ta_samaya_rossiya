@@ -3,6 +3,7 @@ import { TuiFileLike } from '@taiga-ui/kit';
 
 export interface IEditPointForm {
     pointName: FormControl<string>;
+    regionName: FormControl<string>;
     coordinates: FormControl<[number, number]>;
     image: FormControl<TuiFileLike | null>;
     year: FormControl<number>;
