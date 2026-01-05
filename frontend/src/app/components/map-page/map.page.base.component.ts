@@ -29,12 +29,14 @@ export abstract class MapPageBaseComponent<TData> {
     private readonly _injector: Injector = inject(Injector);
 
     private readonly _mapData: Signal<IMapModel | undefined> = toSignal(
-        this._route.queryParamMap
-            .pipe(
-                map((paramMap) => paramMap.get('id') ?? ''),
-                distinctUntilChanged(),
-                switchMap((id) => this._mapDataService.getMapData(id))
-            ),
+        this._route.url.pipe(
+            switchMap(segments => {
+                const isCreateRoute: boolean = segments.some(s => s.path === 'create-map');
+                const mapId: string = this._route.snapshot.queryParamMap.get('id') ?? '';
+
+                return this._mapDataService.getMapData(mapId, isCreateRoute);
+            })
+        ),
         { initialValue: undefined, injector: this._injector }
     );
 

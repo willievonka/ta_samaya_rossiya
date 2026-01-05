@@ -46,4 +46,9 @@ export class HubService {
 
         this._router.navigate([path], extras);
     }
+
+    /** Перейти на страницу создания карты */
+    public navigateToCreateMap(): void {
+        this._router.navigate(['admin/create-map']);
+    }
 }

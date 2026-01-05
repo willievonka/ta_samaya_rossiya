@@ -51,6 +51,11 @@ export class AdminHubPageComponent {
         this._hubService.navigateToMap(card, true);
     }
 
+    /** Редирект на страницу создания карты */
+    protected navigateToCreateMap(): void {
+        this._hubService.navigateToCreateMap();
+    }
+
     /** Загрузить список карточек карт */
     private loadMapCardList(): void {
         this._hubService.getMapCardsList()
