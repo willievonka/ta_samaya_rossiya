@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, forwardRef, inject, input, InputSignal, OnInit } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALIDATORS, NG_VALUE_ACCESSOR, ReactiveFormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, InputSignal, OnInit } from '@angular/core';
+import { FormControl, ReactiveFormsModule, ValidatorFn } from '@angular/forms';
 import { coordinatesValidator } from './validators/coordinates.validator';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TuiError, TuiTextfield } from '@taiga-ui/core';
@@ -21,93 +21,84 @@ import { startWith } from 'rxjs';
         TuiFieldErrorPipe
     ],
     providers: [
-        {
-            provide: NG_VALUE_ACCESSOR,
-            useExisting: forwardRef(() => CoordinatesInputComponent),
-            multi: true
-        },
-        {
-            provide: NG_VALIDATORS,
-            useExisting: forwardRef(() => CoordinatesInputComponent),
-            multi: true
-        },
         tuiValidationErrorsProvider({
             required: 'Поле обязательно для заполнения',
             coordinatesFormatError: 'Неверный формат координат'
         })
     ]
 })
-export class CoordinatesInputComponent implements ControlValueAccessor, OnInit {
+export class CoordinatesInputComponent implements OnInit {
     public readonly label: InputSignal<string> = input.required();
     public readonly control: InputSignal<FormControl> = input.required();
     public readonly placeholder: InputSignal<string> = input('');
 
-    protected readonly innerControl: FormControl<string> = new FormControl<string>('', { validators: [coordinatesValidator], nonNullable: true });
+    protected readonly innerControl: FormControl<string> = new FormControl<string>('', {
+        validators: [coordinatesValidator],
+        nonNullable: true
+    });
+
     private readonly _destroyRef: DestroyRef = inject(DestroyRef);
 
     public ngOnInit(): void {
-        this.init();
+        this.syncValidators();
+        this.syncFromOuter();
+        this.syncToOuter();
     }
 
-    /** @inheritdoc */
-    public writeValue(obj: [number, number] | null): void {
-        if (obj) {
-            const formatted: string = `${obj[0]}, ${obj[1]}`;
-            if (this.innerControl.value !== formatted) {
-                this.innerControl.setValue(formatted, { emitEvent: false });
-            }
-        } else {
-            this.innerControl.setValue('', { emitEvent: false });
-        }
-    }
+    /** Синхронизировать валидаторы */
+    private syncValidators(): void {
+        const outer: FormControl = this.control();
+        const outerValidator: ValidatorFn | null = outer.validator;
 
-    /** @inheritdoc */
-    public registerOnChange(fn: (value: [number, number] | null) => void): void {
-        this.onChange = fn;
-    }
-
-    /** @inheritdoc */
-    public registerOnTouched(fn: () => void): void {
-        this.onTouched = fn;
-    }
-
-    /** @inheritdoc */
-    public setDisabledState(): void {
-        this.innerControl.disable({ emitEvent: false });
-    }
-
-    /** Валидация контрола */
-    public validate(): ValidationErrors | null {
-        return this.innerControl.errors;
-    }
-
-    /** Инициализация контрола */
-    private init(): void {
-        const parentValidator: ValidatorFn | null = this.control().validator;
         this.innerControl.setValidators(
-            parentValidator
-                ? [coordinatesValidator, parentValidator]
+            outerValidator
+                ? [coordinatesValidator, outerValidator]
                 : [coordinatesValidator]
         );
-        this.innerControl.updateValueAndValidity({ emitEvent: false });
 
+        this.innerControl.updateValueAndValidity({ emitEvent: false });
+    }
+
+    /** Синхронизировать с внешними изменениями */
+    private syncFromOuter(): void {
         this.control().valueChanges
             .pipe(
                 startWith(this.control().value),
-                takeUntilDestroyed(this._destroyRef)
+                takeUntilDestroyed(this._destroyRef),
             )
-            .subscribe(value => this.writeValue(value));
+            .subscribe(value => {
+                const formatted: string =
+                    value && value.length === 2 ? `${value[0]}, ${value[1]}` : '';
 
+                if (this.innerControl.value !== formatted) {
+                    this.innerControl.setValue(formatted, { emitEvent: false });
+                }
+            });
+    }
+
+    /** Синхронизировать с внутренними изменениями */
+    private syncToOuter(): void {
         this.innerControl.valueChanges
             .pipe(takeUntilDestroyed(this._destroyRef))
-            .subscribe((raw: string) => {
+            .subscribe(raw => {
+                const outer: FormControl = this.control();
+
                 if (this.innerControl.invalid) {
-                    this.onChange(null);
+                    outer.setErrors(this.innerControl.errors);
 
                     return;
                 }
+
                 const parsed: [number, number] | null = this.parseCoordinates(raw);
-                this.onChange(parsed);
+
+                if (!parsed) {
+                    outer.setErrors({ coordinatesFormatError: true });
+
+                    return;
+                }
+
+                outer.setErrors(null);
+                outer.setValue(parsed, { emitEvent: false });
             });
     }
 
@@ -126,7 +117,4 @@ export class CoordinatesInputComponent implements ControlValueAccessor, OnInit {
 
         return [lat, lng];
     }
-
-    private onChange: (value: [number, number] | null) => void = () => { /* noop */ };
-    private onTouched: () => void = () => { /* noop */ };
 }

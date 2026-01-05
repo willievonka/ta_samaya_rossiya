@@ -7,12 +7,13 @@
         <input
             tuiTextfield
             [formControl]="innerControl"
+            (blur)="control().markAsTouched()"
             [placeholder]="placeholder()"
         />
     </tui-textfield>
 
     <tui-error
-        [formControl]="innerControl"
+        [formControl]="control()"
         [error]="[] | tuiFieldError | async"
     />
 </label>
