@@ -13,17 +13,21 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Directive()
 export abstract class EditMapModalBaseComponent<
     TSettingsForm extends { [K in keyof TSettingsForm]: AbstractControl },
-    TItemForm extends { [K in keyof TItemForm]: AbstractControl }
+    TItemForm extends { [K in keyof TItemForm]: AbstractControl },
+    TItem
 > implements OnInit {
     public readonly model: InputSignal<IMapModel> = input.required();
     public readonly card: InputSignal<IHubCard | null> = input.required();
 
     public readonly dirtyChange: OutputEmitterRef<boolean> = output();
+    public readonly activeItemsChanged: OutputEmitterRef<TItem[]> = output();
 
     protected readonly settingsForm: FormGroup<TSettingsForm>;
     protected readonly editItemForm: FormGroup<TItemForm>;
 
     protected readonly allRegions: WritableSignal<string[]> = signal([]);
+    protected readonly activeItems: WritableSignal<TItem[]> = signal([]);
+
     protected readonly isEditItemModalOpen: WritableSignal<boolean> = signal(false);
     protected readonly showEditingDeleteError: WritableSignal<boolean> = signal(false);
 

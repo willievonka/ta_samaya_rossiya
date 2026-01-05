@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, output, OutputEmitterRef, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { EditMapModalBaseComponent } from '../../../../../components/edit-map-modal/edit-map-modal.base.component';
 import { IMapSettingsForm } from '../../../../../components/edit-map-modal/interfaces/map-settings-form.interface';
 import { IEditPointForm } from '../../interfaces/edit-point-form.interface';
@@ -45,12 +45,9 @@ import { EditPointModalComponent } from '../edit-point-modal/edit-point-modal.co
     ]
 })
 export class EditMapModalComponent
-    extends EditMapModalBaseComponent<IMapSettingsForm, IEditPointForm>
+    extends EditMapModalBaseComponent<IMapSettingsForm, IEditPointForm, IMapPoint>
     implements OnInit
 {
-    public readonly activePointsChanged: OutputEmitterRef<IMapPoint[]> = output<IMapPoint[]>();
-
-    protected readonly activePoints: WritableSignal<IMapPoint[]> = signal([]);
     protected readonly cardPreviewBackgroundImage$: Observable<SafeStyle | null> = this.createImagePreview(
         this.settingsForm.controls.cardBackgroundImage
     );
@@ -117,7 +114,7 @@ export class EditMapModalComponent
         }
 
         const point: IMapPoint = this.buildPointFromForm();
-        this.activePoints.update(list => {
+        this.activeItems.update(list => {
             const updatedList: IMapPoint[] = this.editingItemName
                 ? list.map(item =>
                     item.title === this.editingItemName ? point : item
@@ -131,7 +128,7 @@ export class EditMapModalComponent
 
         this.editingItemName = null;
         this.closeEditItemModal();
-        this.activePointsChanged.emit(this.activePoints());
+        this.activeItemsChanged.emit(this.activeItems());
     }
 
     /**
@@ -171,10 +168,10 @@ export class EditMapModalComponent
             this.fileService.removeCachedFileByUrl(url);
         }
 
-        this.activePoints.update(list =>
+        this.activeItems.update(list =>
             list.filter(point => point.title !== item.title)
         );
-        this.activePointsChanged.emit(this.activePoints());
+        this.activeItemsChanged.emit(this.activeItems());
     }
 
     // ---------------------------
@@ -185,7 +182,7 @@ export class EditMapModalComponent
     private initModel(): void {
         const allRegions: IMapLayerProperties[] = this.getAllRegions();
         this.allRegions.set(allRegions.map(p => p.regionName));
-        this.activePoints.set(
+        this.activeItems.set(
             allRegions
                 .filter(region => !!region.points && region.points.length > 0)
                 .flatMap(region =>
@@ -227,7 +224,7 @@ export class EditMapModalComponent
             );
         }
 
-        this.activePoints().forEach(point => {
+        this.activeItems().forEach(point => {
             const url: string | undefined = point.imagePath?.trim();
             if (!url) {
                 return;
@@ -264,7 +261,7 @@ export class EditMapModalComponent
         const name: string = this.editItemForm.controls.pointName.value.trim();
 
         if (!this.editingItemName &&
-            this.activePoints().some(p => p.title === name)
+            this.activeItems().some(p => p.title === name)
         ) {
             this.editItemForm.controls.pointName.setErrors({ pointAlreadyExists: true });
 

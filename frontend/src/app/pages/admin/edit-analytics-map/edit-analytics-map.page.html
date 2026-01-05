@@ -22,7 +22,7 @@
             class="edit-analytics-map__modal"
             [model]="model"
             [card]="card()"
-            (activeRegionsChanged)="handleRegionsChange($event)"
+            (activeItemsChanged)="handleRegionsChange($event)"
             (dirtyChange)="this.hasUnsavedChanges.set($event)"
         />
     }

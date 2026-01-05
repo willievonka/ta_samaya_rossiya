@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, output, OutputEmitterRef, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { EditMapModalBaseComponent } from '../../../../../components/edit-map-modal/edit-map-modal.base.component';
 import { TuiAccordion } from '@taiga-ui/experimental';
 import { TuiCell } from '@taiga-ui/layout';
@@ -46,12 +46,9 @@ import { EditRegionModalComponent } from '../edit-region-modal/edit-region-modal
     ]
 })
 export class EditAnalyticsMapModalComponent
-    extends EditMapModalBaseComponent<IAnalyticsMapSettingsForm, IEditRegionForm>
+    extends EditMapModalBaseComponent<IAnalyticsMapSettingsForm, IEditRegionForm, IMapLayerProperties>
     implements OnInit
 {
-    public readonly activeRegionsChanged: OutputEmitterRef<IMapLayerProperties[]> = output<IMapLayerProperties[]>();
-
-    protected readonly activeRegions: WritableSignal<IMapLayerProperties[]> = signal([]);
     protected readonly cardPreviewBackgroundImage$: Observable<SafeStyle | null> = this.createImagePreview(
         this.settingsForm.controls.cardBackgroundImage
     );
@@ -104,7 +101,7 @@ export class EditAnalyticsMapModalComponent
         }
 
         const region: IMapLayerProperties = this.buildRegionFromForm();
-        this.activeRegions.update(list =>
+        this.activeItems.update(list =>
             this.sortRegions(
                 this.editingItemName
                     ? list.map(item =>
@@ -116,7 +113,7 @@ export class EditAnalyticsMapModalComponent
 
         this.editingItemName = null;
         this.closeEditItemModal();
-        this.activeRegionsChanged.emit(this.activeRegions());
+        this.activeItemsChanged.emit(this.activeItems());
     }
 
     /**
@@ -155,10 +152,10 @@ export class EditAnalyticsMapModalComponent
             this.fileService.removeCachedFileByUrl(url);
         }
 
-        this.activeRegions.update(list =>
+        this.activeItems.update(list =>
             list.filter(region => region.regionName !== item.regionName)
         );
-        this.activeRegionsChanged.emit(this.activeRegions());
+        this.activeItemsChanged.emit(this.activeItems());
     }
 
     // ---------------------------
@@ -169,7 +166,7 @@ export class EditAnalyticsMapModalComponent
     private initModel(): void {
         const allRegions: IMapLayerProperties[] = this.getAllRegions();
         this.allRegions.set(allRegions.map(p => p.regionName));
-        this.activeRegions.set(allRegions.filter(p => p.isActive));
+        this.activeItems.set(allRegions.filter(p => p.isActive));
 
         const model: IMapModel = this.model();
         this.settingsForm.patchValue({
@@ -199,7 +196,7 @@ export class EditAnalyticsMapModalComponent
             );
         }
 
-        this.activeRegions().forEach(region => {
+        this.activeItems().forEach(region => {
             const url: string | undefined = region.analyticsData?.imagePath?.trim();
             if (!url) {
                 return;
@@ -246,7 +243,7 @@ export class EditAnalyticsMapModalComponent
         const name: string = this.editItemForm.controls.regionName.value.trim();
 
         if (!this.editingItemName &&
-            this.activeRegions().some(r => r.regionName === name)
+            this.activeItems().some(r => r.regionName === name)
         ) {
             this.editItemForm.controls.regionName.setErrors({ regionAlreadyExists: true });
 
@@ -264,7 +261,7 @@ export class EditAnalyticsMapModalComponent
             regionName: controls.regionName.value.trim(),
             isActive: true,
             style: {
-                ...(this.activeRegions().find(region => region.regionName === this.editingItemName)?.style ?? {}),
+                ...(this.activeItems().find(region => region.regionName === this.editingItemName)?.style ?? {}),
                 fillColor: controls.color.value,
             },
             analyticsData: {
