@@ -5,6 +5,8 @@ import { PageHeaderComponent } from '../../../components/page-header/page-header
 import { MapComponent } from '../../../components/map/map.component';
 import { MapZoomComponent } from '../../../components/map-zoom/map-zoom.component';
 import { EditMapModalComponent } from './components/edit-map-modal/edit-map-modal.component';
+import { IMapModel } from '../../../components/map/models/map.model';
+import { IMapLayer } from '../../../components/map/interfaces/map-layer.interface';
 
 @Component({
     selector: 'edit-map',
@@ -19,4 +21,32 @@ import { EditMapModalComponent } from './components/edit-map-modal/edit-map-moda
         EditMapModalComponent
     ]
 })
-export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {}
+export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
+    /**
+     * Обработчик изменения точек
+     * @param points
+     */
+    protected handlePointsChanged(points: IMapPoint[]): void {
+        const current: IMapModel | undefined = this.model();
+        if (!current) {
+            return;
+        }
+
+        const updatedLayers: IMapLayer[] = current.layers.map(layer => {
+            const pointsForLayer: IMapPoint[] = points.filter(p => p.regionName === layer.properties.regionName);
+
+            return {
+                ...layer,
+                properties: {
+                    ...layer.properties,
+                    points: pointsForLayer
+                }
+            };
+        });
+
+        this.model.set({
+            ...current,
+            layers: updatedLayers
+        });
+    }
+}

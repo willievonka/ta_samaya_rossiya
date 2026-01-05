@@ -105,7 +105,7 @@ export class MapComponent implements AfterViewInit {
         );
 
         this._renderService.renderPoints(
-            this.points(),
+            this.points().sort((a, b) => a.year - b.year),
             this.pointColor(),
             (point) => this.pointSelected.emit(point),
             this.isReadonly()
