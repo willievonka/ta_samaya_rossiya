@@ -48,6 +48,10 @@
     &__accordion-item {
         box-shadow: none;
         padding: $spacing-m $spacing-xl;
+
+        &:not(._expanded) {
+            padding-block: 0;
+        }
     }
 
     &__field {
