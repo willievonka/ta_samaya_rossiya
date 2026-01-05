@@ -116,7 +116,18 @@ export class EditMapModalComponent
             return;
         }
 
-        console.log('saved');
+        const point: IMapPoint = this.buildPointFromForm();
+        this.activePoints.update(list => {
+            const updatedList: IMapPoint[] = this.editingItemName
+                ? list.map(item =>
+                    item.title === this.editingItemName ? point : item
+                )
+                : [...list, point];
+
+            return [...updatedList].sort(
+                (a, b) => a.year - b.year
+            );
+        });
 
         this.editingItemName = null;
         this.closeEditItemModal();
@@ -160,7 +171,9 @@ export class EditMapModalComponent
             this.fileService.removeCachedFileByUrl(url);
         }
 
-        console.log(item);
+        this.activePoints.update(list =>
+            list.filter(point => point.title !== item.title)
+        );
         this.activePointsChanged.emit(this.activePoints());
     }
 
@@ -259,6 +272,22 @@ export class EditMapModalComponent
         }
 
         return true;
+    }
+
+    /** Собрать точку из формы */
+    private buildPointFromForm(): IMapPoint {
+        const controls: IEditPointForm = this.editItemForm.controls;
+
+        return {
+            title: controls.pointName.value.trim(),
+            regionName: controls.regionName.value.trim(),
+            coordinates: controls.coordinates.value,
+            year: controls.year.value,
+            imageFile: controls.image.value as File | null,
+            imagePath: '',
+            description: controls.description.value.trim(),
+            excursionUrl: controls.excursionUrl.value.trim()
+        } as IMapPoint;
     }
 
     /**

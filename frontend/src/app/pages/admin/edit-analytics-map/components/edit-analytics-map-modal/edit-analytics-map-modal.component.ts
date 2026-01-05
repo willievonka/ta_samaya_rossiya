@@ -104,7 +104,6 @@ export class EditAnalyticsMapModalComponent
         }
 
         const region: IMapLayerProperties = this.buildRegionFromForm();
-
         this.activeRegions.update(list =>
             this.sortRegions(
                 this.editingItemName
