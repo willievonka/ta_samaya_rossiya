@@ -26,7 +26,7 @@ export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
      * Обработчик изменения точек
      * @param points
      */
-    protected handlePointsChanged(points: IMapPoint[]): void {
+    protected handlePointsChange(points: IMapPoint[]): void {
         const current: IMapModel | undefined = this.model();
         if (!current) {
             return;
@@ -47,6 +47,23 @@ export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
         this.model.set({
             ...current,
             layers: updatedLayers
+        });
+    }
+
+    /**
+     * Обработчик изменения цветов для карты
+     * @param colors
+     */
+    protected handleColorsChange(colors: { layerWithPointsColor: string, pointColor: string }): void {
+        const current: IMapModel | undefined = this.model();
+        if (!current) {
+            return;
+        }
+
+        this.model.set({
+            ...current,
+            layerWithPointsColor: colors.layerWithPointsColor,
+            pointColor: colors.pointColor
         });
     }
 }

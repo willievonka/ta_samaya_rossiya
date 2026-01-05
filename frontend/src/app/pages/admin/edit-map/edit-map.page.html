@@ -24,7 +24,8 @@
             class="edit-map__modal"
             [model]="model"
             [card]="card()"
-            (activeItemsChanged)="handlePointsChanged($event)"
+            (activeItemsChanged)="handlePointsChange($event)"
+            (colorsChanged)="handleColorsChange($event)"
             (dirtyChange)="this.hasUnsavedChanges.set($event)"
         />
     }

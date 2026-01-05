@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, output, OutputEmitterRef } from '@angular/core';
 import { EditMapModalBaseComponent } from '../../../../../components/edit-map-modal/edit-map-modal.base.component';
 import { IMapSettingsForm } from '../../../../../components/edit-map-modal/interfaces/map-settings-form.interface';
 import { IEditPointForm } from '../../interfaces/edit-point-form.interface';
@@ -10,13 +10,14 @@ import { TuiButton, TuiScrollbar, TuiTextfield } from '@taiga-ui/core';
 import { ImageUploaderComponent } from '../../../../../components/image-uploader/image-uploader.component';
 import { FormFieldComponent } from '../../../../../components/form-field/form-field.component';
 import { TuiAccordion } from '@taiga-ui/experimental';
-import { catchError, forkJoin, Observable, of, take, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, forkJoin, Observable, of, take, tap } from 'rxjs';
 import { SafeStyle } from '@angular/platform-browser';
 import { IMapPoint } from '../../../../../components/map/interfaces/map-point.interface';
 import { PointsListComponent } from '../points-list/points-list.component';
 import { IMapModel } from '../../../../../components/map/models/map.model';
 import { IMapLayerProperties } from '../../../../../components/map/interfaces/map-layer.interface';
 import { EditPointModalComponent } from '../edit-point-modal/edit-point-modal.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'edit-map-modal',
@@ -48,6 +49,8 @@ export class EditMapModalComponent
     extends EditMapModalBaseComponent<IMapSettingsForm, IEditPointForm, IMapPoint>
     implements OnInit
 {
+    public readonly colorsChanged: OutputEmitterRef<{ layerWithPointsColor: string, pointColor: string }> = output();
+
     protected readonly cardPreviewBackgroundImage$: Observable<SafeStyle | null> = this.createImagePreview(
         this.settingsForm.controls.cardBackgroundImage
     );
@@ -55,6 +58,7 @@ export class EditMapModalComponent
     public override ngOnInit(): void {
         super.ngOnInit();
         this.initModel();
+        this.handleColorsChange();
     }
 
     /** Собрать форму настроек */
@@ -303,5 +307,25 @@ export class EditMapModalComponent
         this.editItemForm.controls.image.setValue(
             url ? this.fileService.getCachedFileByUrl(url) : null,
         );
+    }
+
+    /** Обработчик изменения цветов */
+    private handleColorsChange(): void {
+        this.settingsForm.valueChanges
+            .pipe(
+                distinctUntilChanged(),
+                takeUntilDestroyed(this.destroyRef)
+            )
+            .subscribe(() => {
+                const layerColorControl: FormControl<string> = this.settingsForm.controls.layerWithPointsColor;
+                const pointColorControl: FormControl<string> = this.settingsForm.controls.pointsColor;
+
+                if (layerColorControl.valid && pointColorControl.valid) {
+                    this.colorsChanged.emit({
+                        layerWithPointsColor: layerColorControl.value,
+                        pointColor: pointColorControl.value
+                    });
+                }
+            });
     }
 }
