@@ -1,13 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { MapPageBaseComponent } from '../../../components/map-page/map.page.base.component';
-import { IMapLayerProperties } from '../../../components/map/interfaces/map-layer.interface';
+import { IMapLayer, IMapLayerProperties } from '../../../components/map/interfaces/map-layer.interface';
 import { PageHeaderComponent } from '../../../components/page-header/page-header.component';
 import { MapZoomComponent } from '../../../components/map-zoom/map-zoom.component';
 import { MapComponent } from '../../../components/map/map.component';
-import { IPageHeaderOptions } from '../../../components/page-header/interfaces/page-header-options.interface';
-import { IMapConfig } from '../../../components/map/interfaces/map-config.interface';
-import { editMapConfig } from '../../../components/map/configs/edit-map.config';
 import { EditAnalyticsMapModalComponent } from './components/edit-analytics-map-modal/edit-analytics-map-modal.component';
+import { EditMapPageBaseComponent } from '../../../components/map-page/edit-map.page.base.component';
+import { IMapModel } from '../../../components/map/models/map.model';
 
 @Component({
     selector: 'edit-analytics-map-page',
@@ -22,13 +20,36 @@ import { EditAnalyticsMapModalComponent } from './components/edit-analytics-map-
         EditAnalyticsMapModalComponent
     ]
 })
-export class EditAnalyticsMapPageComponent extends MapPageBaseComponent<IMapLayerProperties>{
-    protected override readonly headerOptions: IPageHeaderOptions = {
-        isDetached: true,
-        adminState: {
-            changeRedirect: true,
-            showLogoutIcon: false
+export class EditAnalyticsMapPageComponent extends EditMapPageBaseComponent<IMapLayerProperties> {
+    /**
+     * Обработчик изменения регионов
+     * @param regions
+     */
+    protected handleRegionsChange(regions: IMapLayerProperties[]): void {
+        const current: IMapModel | undefined = this.model();
+        if (!current) {
+            return;
         }
-    };
-    protected readonly config: IMapConfig = editMapConfig;
+
+        const updatedLayers: IMapLayer[] = current.layers.map(layer => {
+            const updatedProps: IMapLayerProperties | undefined = regions.find(r => r.regionName === layer.properties.regionName);
+
+            if (updatedProps) {
+                return { ...layer, properties: updatedProps };
+            } else {
+                return {
+                    geoData: layer.geoData,
+                    properties: {
+                        id: layer.properties.id,
+                        regionName: layer.properties.regionName
+                    }
+                };
+            }
+        });
+
+        this.model.set({
+            ...current,
+            layers: updatedLayers
+        });
+    }
 }

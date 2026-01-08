@@ -1,0 +1,158 @@
+@use '../../../../../../../common-styles/color-vars' as color;
+@use '../../../../../../../common-styles/spacing-vars' as *;
+
+:host {
+    position: relative;
+}
+
+.edit-map-modal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px;
+    height: 880px;
+    box-sizing: border-box;
+    border-radius: $spacing-xl;
+    background-color: color.$bg-primary;
+    box-shadow: -$spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
+
+    &__title {
+        color: color.$text-primary;
+        margin: $spacing-xl;
+        margin-bottom: $spacing-l;
+    }
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__section {
+        margin: 0 $spacing-xl;
+        margin-bottom: $spacing-m;
+    }
+
+    &__accordion {
+        border-radius: 0;
+    }
+
+    &__accordion-button {
+        padding: $spacing-s $spacing-xl;
+        padding-right: $spacing-2xl;
+        font-size: 20px;
+        line-height: normal;
+        font-weight: 700;
+    }
+
+    &__accordion-item {
+        box-shadow: none;
+        padding: $spacing-m $spacing-xl;
+
+        &:not(._expanded) {
+            padding-block: 0;
+        }
+    }
+
+    &__field {
+        width: 100%;
+    }
+
+    &__error {
+        font-size: 14px;
+    }
+
+    &__row {
+        display: flex;
+        width: 100%;
+        gap: $spacing-l;
+        margin-bottom: $spacing-l;
+
+        &_last {
+            margin-bottom: $spacing-xs;
+        }
+    }
+
+    &__image-uploader {
+        display: flex;
+        flex-direction: column;
+        width: 258px;
+        gap: $spacing-s;
+    }
+
+    &__image-uploader-hint {
+        display: block;
+        padding: 13px;
+        border-radius: 10px;
+        background-color: color.$bg-secondary;
+        font-size: 14px;
+        line-height: normal;
+        font-weight: 600;
+    }
+
+    &__card-preview-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-s;
+        min-width: 278px;
+    }
+
+    &__card-preview {
+        display: flex;
+        flex-shrink: 0;
+        width: 278px;
+        height: 156px;
+        background-color: color.$bg-secondary;
+        border-radius: $spacing-s;
+        overflow: hidden;
+    }
+
+    &__card-preview-title {
+        width: 145px;
+        margin-left: 10px;
+        margin-right: $spacing-xs;
+        align-content: center;
+        font-size: 28px;
+        line-height: 28px;
+        font-weight: 800;
+    }
+
+    &__card-preview-image {
+        flex: 1;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    &__points-list-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-m;
+    }
+
+    &__points-list {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-s;
+    }
+
+    &__point-settings-modal {
+        position: absolute;
+        right: 624px;
+        bottom: 0;
+        width: 520px;
+    }
+
+    &__buttons-wrapper {
+        display: flex;
+        margin: $spacing-xl;
+        margin-top: auto;
+        justify-content: space-between;
+    }
+}
+
+::ng-deep {
+    tui-hint {
+        background-color: color.$bg-secondary !important;
+    }
+}

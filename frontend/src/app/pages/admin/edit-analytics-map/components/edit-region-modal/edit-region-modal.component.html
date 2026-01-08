@@ -1,0 +1,74 @@
+@let editRegionForm = form();
+@let regions = allRegionsList();
+
+<div class="edit-region-modal__wrapper">
+    <button
+        class="edit-region-modal__close-button"
+        type="button"
+        (click)="closeModal.emit()"
+    >
+        <svg width="8.6" height="8.6">
+            <use href="/sprites/cross.svg" />
+        </svg>
+    </button>
+    <form class="edit-region-modal" [formGroup]="editRegionForm" (ngSubmit)="itemSaved.emit()">
+        <select-autocomplete
+            [control]="editRegionForm.controls.regionName"
+            [itemsList]="regions"
+            label="Название региона"
+            placeholder="Укажите название"
+        />
+
+        <div>
+            <span class="edit-region-modal__image-uploader-title">
+                Изображение региона
+            </span>
+            <image-uploader
+                class="edit-region-modal__image-uploader"
+                [formControl]="editRegionForm.controls.image"
+                fileType="image/png, image/jpeg"
+                size="m"
+            />
+            <span class="edit-region-modal__image-uploader-hint">
+                Файл в формате PNG/JPEG, с разрешением 484x256 px
+            </span>
+        </div>
+
+        <form-field
+            [control]="editRegionForm.controls.color"
+            [color]="true"
+            label="Цвет региона"
+            placeholder="Укажите цвет"
+        />
+
+        <div class="edit-region-modal__group">
+            <form-field
+                [control]="editRegionForm.controls.partnersCount"
+                [numeric]="true"
+                label="Число партнёров"
+                placeholder="Укажите число"
+            />
+            <form-field
+                [control]="editRegionForm.controls.excursionsCount"
+                [numeric]="true"
+                label="Число экскурсий"
+                placeholder="Укажите число"
+            />
+            <form-field
+                [control]="editRegionForm.controls.membersCount"
+                [numeric]="true"
+                label="Число участников"
+                placeholder="Укажите число"
+            />
+        </div>
+
+        <button
+            class="edit-region-modal__save-button"
+            type="submit"
+            tuiButton
+            size="m"
+        >
+            Сохранить
+        </button>
+    </form>
+</div>

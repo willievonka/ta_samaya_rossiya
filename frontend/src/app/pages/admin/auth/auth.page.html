@@ -13,30 +13,46 @@
                 Вход в админ-панель
             </h1>
         </div>
-        <tui-textfield>
-            <input
-                formControlName="login"
-                placeholder="Логин"
-                tuiTextfield
+
+        <div class="auth-page__field">
+            <tui-textfield>
+                <input
+                    [formControl]="authForm.controls.email"
+                    placeholder="Электронная почта"
+                    tuiTextfield
+                />
+            </tui-textfield>
+            <tui-error
+                class="auth-page__error"
+                [formControl]="authForm.controls.email"
+                [error]="[] | tuiFieldError | async"
             />
-        </tui-textfield>
-        <tui-error
-            formControlName="login"
-            [error]="[] | tuiFieldError | async"
-        />
-        <tui-textfield>
-            <input
-                formControlName="password"
-                placeholder="Пароль"
-                tuiTextfield
-                type="password"
+        </div>
+
+        <div class="auth-page__field">
+            <tui-textfield>
+                <input
+                    [formControl]="authForm.controls.password"
+                    placeholder="Пароль"
+                    tuiTextfield
+                    type="password"
+                />
+                <tui-icon tuiPassword />
+            </tui-textfield>
+            <tui-error
+                class="auth-page__error"
+                [formControl]="authForm.controls.password"
+                [error]="[] | tuiFieldError | async"
             />
-            <tui-icon tuiPassword />
-        </tui-textfield>
-        <tui-error
-            formControlName="password"
-            [error]="[] | tuiFieldError | async"
-        />
+            @if (authForm.errors) {
+                <tui-error
+                    class="auth-page__error"
+                    [formGroup]="authForm"
+                    [error]="[] | tuiFieldError | async"
+                />
+            }
+        </div>
+
         <button
             size="l"
             tuiButton
@@ -45,11 +61,5 @@
         >
             Войти
         </button>
-        <tui-error
-            [formGroup]="authForm"
-            [error]="[] | tuiFieldError | async"
-        />
     </form>
 </div>
-
-

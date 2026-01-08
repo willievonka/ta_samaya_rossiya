@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, InputSignal, output, OutputEmitterRef, Signal, signal, viewChild, WritableSignal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input, InputSignal, output, OutputEmitterRef, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { Map } from 'leaflet';
 import { IMapLayer, IMapLayerProperties } from './interfaces/map-layer.interface';
 import { IMapZoomActions } from './interfaces/map-zoom-actions.interface';
@@ -26,6 +26,7 @@ export class MapComponent implements AfterViewInit {
     public readonly layerWithPointsColor: InputSignal<string | undefined> = input<string>();
     public readonly pointColor: InputSignal<string | undefined> = input<string>();
     public readonly config: InputSignal<IMapConfig | undefined> = input<IMapConfig>();
+    public readonly isReadonly: InputSignal<true | undefined> = input();
 
     /** Outputs */
     public readonly regionSelected: OutputEmitterRef<IMapLayerProperties | null> = output<IMapLayerProperties | null>();
@@ -43,6 +44,13 @@ export class MapComponent implements AfterViewInit {
     /** Private fields */
     private readonly _mapContainer: Signal<ElementRef<HTMLDivElement>> = viewChild.required<ElementRef<HTMLDivElement>>('mapContainer');
     private readonly _renderService: MapRenderService = inject(MapRenderService);
+
+    constructor() {
+        effect(() => {
+            this.layers();
+            this.renderMapContent();
+        });
+    }
 
     public ngAfterViewInit(): void {
         const container: HTMLDivElement = this._mapContainer().nativeElement;
@@ -92,13 +100,15 @@ export class MapComponent implements AfterViewInit {
         this._renderService.renderLayers(
             this.layers(),
             this.layerWithPointsColor(),
-            (props) => this.regionSelected.emit(props)
+            (props) => this.regionSelected.emit(props),
+            this.isReadonly()
         );
 
         this._renderService.renderPoints(
-            this.points(),
+            this.points().sort((a, b) => a.year - b.year),
             this.pointColor(),
-            (point) => this.pointSelected.emit(point)
+            (point) => this.pointSelected.emit(point),
+            this.isReadonly()
         );
     }
 }

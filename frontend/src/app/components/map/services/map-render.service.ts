@@ -68,7 +68,8 @@ export class MapRenderService {
     public renderLayers(
         layers: IMapLayer[],
         layerWithPointsColor: string | undefined,
-        onLayerSelected: (props: IMapLayerProperties) => void
+        onLayerSelected: (props: IMapLayerProperties) => void,
+        isReadonly?: boolean
     ): void {
         const instance: LeafletMap | null = this._mapInstance();
         if (!instance) {
@@ -79,7 +80,8 @@ export class MapRenderService {
             instance,
             layers,
             layerWithPointsColor,
-            onLayerSelected
+            onLayerSelected,
+            isReadonly
         );
     }
 
@@ -92,7 +94,8 @@ export class MapRenderService {
     public renderPoints(
         points: IMapPoint[],
         pointColor: string | undefined,
-        onPointSelected?: (point: IMapPoint) => void
+        onPointSelected?: (point: IMapPoint) => void,
+        isReadonly?: boolean
     ): void {
         const instance: LeafletMap | null = this._mapInstance();
         if (!instance) {
@@ -103,7 +106,8 @@ export class MapRenderService {
             instance,
             points,
             pointColor,
-            onPointSelected
+            onPointSelected,
+            isReadonly
         );
     }
 

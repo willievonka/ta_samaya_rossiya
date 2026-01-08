@@ -1,0 +1,51 @@
+<div class="points-list">
+    @for (point of items(); let index = $index; track point.title) {
+        <div class="points-list__item-wrapper">
+            <div class="points-list__item">
+                <div class="points-list__item-title">
+                    <div
+                        class="points-list__item-icon"
+                        [style]="{ backgroundColor: iconColor() || '#C2121F' }"
+                    >
+                        {{ index + 1 }}
+                    </div>
+                    <span>
+                        {{ point.year }}
+                    </span>
+                    <div class="points-list__item-divider"></div>
+                    <span>
+                        {{ point.title }}
+                    </span>
+                </div>
+
+                <div class="points-list__actions">
+                    <button type="button" (click)="edit.emit(point)">
+                        <tui-icon
+                            icon="@tui.pencil"
+                            [style.font-size.rem]="1"
+                            [style.color]="'var(--tui-background-accent-1)'"
+                        />
+                    </button>
+
+                    <button type="button" (click)="delete.emit(point)">
+                        <tui-icon
+                            icon="@tui.trash"
+                            [style.font-size.rem]="1"
+                            [style.color]="'var(--tui-text-negative)'"
+                        />
+                    </button>
+                </div>
+            </div>
+
+            @if (
+                showEditingDeleteError() &&
+                editingItemName() === point.title &&
+                currentFormItemName() === point.title
+            ) {
+                <div class="points-list__error" tuiAnimated>
+                    <tui-error error="Точка редактируется" />
+                </div>
+            }
+        </div>
+    }
+</div>

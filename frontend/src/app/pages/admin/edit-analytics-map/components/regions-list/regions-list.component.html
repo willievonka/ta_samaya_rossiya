@@ -1,0 +1,39 @@
+<div class="regions-list">
+    @for (region of items(); track region.regionName) {
+        <div class="regions-list__item-wrapper">
+            <div class="regions-list__item">
+                <span class="regions-list__title">
+                    {{ region.regionName }}
+                </span>
+
+                <div class="regions-list__actions">
+                    <button type="button" (click)="edit.emit(region)">
+                        <tui-icon
+                            icon="@tui.pencil"
+                            [style.font-size.rem]="1"
+                            [style.color]="'var(--tui-background-accent-1)'"
+                        />
+                    </button>
+
+                    <button type="button" (click)="delete.emit(region)">
+                        <tui-icon
+                            icon="@tui.trash"
+                            [style.font-size.rem]="1"
+                            [style.color]="'var(--tui-text-negative)'"
+                        />
+                    </button>
+                </div>
+            </div>
+
+            @if (
+                showEditingDeleteError() &&
+                editingItemName() === region.regionName &&
+                currentFormItemName() === region.regionName
+            ) {
+                <div class="regions-list__error" tuiAnimated>
+                    <tui-error error="Регион редактируется" />
+                </div>
+            }
+        </div>
+    }
+</div>

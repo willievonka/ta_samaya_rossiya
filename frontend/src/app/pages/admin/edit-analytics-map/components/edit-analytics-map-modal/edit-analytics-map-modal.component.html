@@ -1,47 +1,128 @@
+@if (isEditItemModalOpen()) {
+    <edit-region-modal
+        class="edit-analytics-map-modal__region-settings-modal"
+        [form]="editItemForm"
+        [allRegionsList]="allRegions()"
+        (closeModal)="closeEditItemModal()"
+        (itemSaved)="saveRegion()"
+    />
+}
+
 <div class="edit-analytics-map-modal">
     <h2 class="edit-analytics-map-modal__title">Настройки</h2>
-    <form [formGroup]="settingsForm">
+
+    <form class="edit-analytics-map-modal__form" [formGroup]="settingsForm">
+        <div class="edit-analytics-map-modal__section">
+            <form-field
+                class="edit-analytics-map-modal__field"
+                label="Название проекта"
+                placeholder="Укажите название"
+                [control]="settingsForm.controls.title"
+            />
+        </div>
+
         <tui-accordion class="edit-analytics-map-modal__accordion" size="l">
-            <button tuiAccordion appearance="" tuiCell>
+            <button
+                class="edit-analytics-map-modal__accordion-button"
+                tuiAccordion
+                tuiCell
+                appearance=""
+                type="button"
+            >
                 Карточка
             </button>
+
             <tui-expand class="edit-analytics-map-modal__accordion-item">
-                <div>
-                    <tui-textfield tuiTextfieldSize="m">
-                        <input
-                            formControlName="cardDescription"
-                            tuiTextfield
-                        />
-                    </tui-textfield>
+                <div class="edit-analytics-map-modal__row">
+                    <div class="edit-analytics-map-modal__card-preview-wrapper">
+                        <span>Предпросмотр карточки</span>
+                        <div class="edit-analytics-map-modal__card-preview">
+                            <span class="edit-analytics-map-modal__card-preview-title">
+                                {{ (settingsForm.controls.title.value || '').trim() || 'Та самая Россия' }}
+                            </span>
+                            <div
+                                class="edit-analytics-map-modal__card-preview-image"
+                                [style.background-image]="cardPreviewBackgroundImage$ | async"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div class="edit-analytics-map-modal__image-uploader">
+                        <span>Фоновое изображение</span>
+                        <image-uploader formControlName="cardBackgroundImage" />
+                        <span class="edit-analytics-map-modal__image-uploader-hint">
+                            Файл в формате SVG,<br />
+                            с разрешением 556x266 px
+                        </span>
+                    </div>
+                </div>
+
+                <div class="edit-analytics-map-modal__row_last">
+                    <form-field
+                        class="edit-analytics-map-modal__field"
+                        label="Описание"
+                        placeholder="Укажите описание"
+                        [control]="settingsForm.controls.cardDescription"
+                        [multiline]="true"
+                    />
                 </div>
             </tui-expand>
 
-            <button tuiAccordion appearance="" tuiCell>
+            <button
+                class="edit-analytics-map-modal__accordion-button"
+                tuiAccordion
+                tuiCell
+                appearance=""
+                type="button"
+            >
                 Карта
             </button>
-            <tui-expand class="edit-analytics-map-modal__accordion-item">
-                <div>
-                    Абвгд
-                </div>
-            </tui-expand>
 
-            <button tuiAccordion appearance="" tuiCell>
-                Активные регионы
-            </button>
             <tui-expand class="edit-analytics-map-modal__accordion-item">
-                <div>
-                    Абвгд
+                <div class="edit-analytics-map-modal__row">
+                    <form-field
+                        class="edit-analytics-map-modal__field"
+                        label="Описание"
+                        placeholder="Укажите описание"
+                        [control]="settingsForm.controls.mapInfo"
+                        [multiline]="true"
+                    />
+                </div>
+
+                <div class="edit-analytics-map-modal__regions-list-wrapper">
+                    <span>Список активных регионов</span>
+                    <tui-scrollbar>
+                            <regions-list
+                                class="edit-analytics-map-modal__regions-list"
+                                [items]="activeItems()"
+                                [editingItemName]="editingItemName"
+                                [showEditingDeleteError]="showEditingDeleteError()"
+                                [currentFormItemName]="editItemForm.controls.regionName.value"
+                                (edit)="editRegion($event)"
+                                (delete)="deleteRegion($event)"
+                            />
+                    </tui-scrollbar>
+
+                    <button
+                        type="button"
+                        tuiButton
+                        appearance="outline"
+                        size="m"
+                        (click)="openEditItemModal()"
+                    >
+                        Добавить регион
+                    </button>
                 </div>
             </tui-expand>
         </tui-accordion>
-
-        <button
-            class="edit-analytics-map-modal__save-button"
-            type="submit"
-            tuiButton
-            size="m"
-        >
-            Сохранить
-        </button>
     </form>
+
+    <button
+        class="edit-analytics-map-modal__save-button"
+        type="submit"
+        tuiButton
+        size="m"
+    >
+        Сохранить
+    </button>
 </div>

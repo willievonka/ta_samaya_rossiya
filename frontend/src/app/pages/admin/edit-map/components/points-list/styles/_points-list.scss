@@ -1,0 +1,72 @@
+@use '../../../../../../../common-styles/color-vars' as color;
+@use '../../../../../../../common-styles/spacing-vars' as *;
+
+.points-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-s;
+    max-height: 300px;
+
+    &__item-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-xs;
+    }
+
+    &__item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: color.$bg-secondary;
+        padding: $spacing-m;
+        border-radius: $spacing-m;
+    }
+
+    &__item-title {
+        display: grid;
+        grid-template-columns: $spacing-xl 4ch 1ch 1fr;
+        align-items: center;
+        column-gap: $spacing-s;
+    }
+
+    &__item-icon {
+        display: flex;
+        width: $spacing-xl;
+        height: $spacing-xl;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+        color: color.$bg-primary;
+        outline: 1px solid color.$bg-primary;
+
+        font-size: $spacing-m;
+        line-height: $spacing-m;
+    }
+
+    &__item-divider {
+        display: grid;
+        place-items: center;
+
+        &::before {
+            content: '';
+            width: $spacing-s;
+            height: $spacing-s;
+            border-radius: 50%;
+            background-color: color.$border;
+            transition: background-color 150ms ease;
+        }
+    }
+
+    &__actions {
+        display: flex;
+        gap: $spacing-m;
+    }
+
+    &__error {
+        &.tui-enter,
+        &.tui-leave {
+            animation-name: tuiFade;
+        }
+    }
+}

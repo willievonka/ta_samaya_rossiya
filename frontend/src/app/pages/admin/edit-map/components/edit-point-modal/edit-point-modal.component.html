@@ -1,0 +1,77 @@
+@let editPointForm = form();
+@let regions = allRegionsList();
+
+<div class="edit-point-modal__wrapper">
+    <button
+        class="edit-point-modal__close-button"
+        type="button"
+        (click)="closeModal.emit()"
+    >
+        <svg width="8.6" height="8.6">
+            <use href="/sprites/cross.svg" />
+        </svg>
+    </button>
+    <form
+        class="edit-point-modal"
+        [formGroup]="editPointForm"
+        (ngSubmit)="itemSaved.emit()"
+    >
+        <form-field
+            [control]="editPointForm.controls.pointName"
+            label="Название точки"
+            placeholder="Укажите название"
+        />
+        <select-autocomplete
+            [control]="editPointForm.controls.regionName"
+            [itemsList]="regions"
+            label="Регион"
+            placeholder="Укажите регион"
+        />
+        <div class="edit-point-modal__group">
+            <coordinates-input
+                [control]="editPointForm.controls.coordinates"
+                label="Координаты точки"
+                placeholder="Укажите через запятую"
+            />
+            <form-field
+                [control]="editPointForm.controls.year"
+                label="Год события"
+                placeholder="Укажите год"
+                [numeric]="true"
+            />
+        </div>
+        <div>
+            <span class="edit-point-modal__image-uploader-title">
+                Изображение
+            </span>
+            <image-uploader
+                class="edit-point-modal__image-uploader"
+                [formControl]="editPointForm.controls.image"
+                fileType="image/png, image/jpeg"
+                size="m"
+            />
+            <span class="edit-point-modal__image-uploader-hint">
+                Файл в формате PNG/JPEG, с разрешением 484x256 px
+            </span>
+        </div>
+        <form-field
+            [control]="editPointForm.controls.description"
+            label="Описание"
+            placeholder="Укажите описание"
+            [multiline]="true"
+        />
+        <form-field
+            [control]="editPointForm.controls.excursionUrl"
+            label="Ссылка на видеоэкскурсию"
+            placeholder="Укажите ссылку"
+        />
+        <button
+            class="edit-point-modal__save-button"
+            type="submit"
+            tuiButton
+            size="m"
+        >
+            Сохранить
+        </button>
+    </form>
+</div>

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, EMPTY, map, Observable } from 'rxjs';
 import { IMapLayerProperties } from '../interfaces/map-layer.interface';
@@ -17,16 +17,19 @@ export class MapDataService {
      * Получить данные для карты по mapId
      * @param mapId
      */
-    public getMapData(mapId: string): Observable<IMapModel> {
-        return this._http.get<IMapDto>(`${this._apiUrl}/maps`, { params: { mapId } })
-            .pipe(
-                catchError(() => {
-                    this._router.navigate(['/']);
+    public getMapData(mapId: string, raw: boolean = false): Observable<IMapModel> {
+        const options: { params?: HttpParams } = raw
+            ? {}
+            : { params: new HttpParams().set('mapId', mapId) };
 
-                    return EMPTY;
-                }),
-                map((dto) => this.mapDtoToModel(dto))
-            );
+        return this._http.get<IMapDto>(`${this._apiUrl}/maps`, options).pipe(
+            catchError(() => {
+                this._router.navigate(['/']);
+
+                return EMPTY;
+            }),
+            map((dto) => this.mapDtoToModel(dto))
+        );
     }
 
     /**

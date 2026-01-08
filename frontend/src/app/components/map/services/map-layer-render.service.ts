@@ -1,5 +1,5 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
-import { geoJSON, Layer, LeafletMouseEvent, DomEvent, PathOptions, Map as LeafletMap } from 'leaflet';
+import { GeoJSON, Layer, LeafletMouseEvent, DomEvent, PathOptions, Map as LeafletMap } from 'leaflet';
 import { IMapLayer, IMapLayerProperties } from '../interfaces/map-layer.interface';
 import { IActiveLeafletLayer } from '../interfaces/leaflet-layer.interface';
 import { customCoordsToLatLng } from '../utils/custom-coords-to-lat-lng.util';
@@ -11,6 +11,7 @@ import { Feature, GeoJsonProperties } from 'geojson';
 export class MapLayerRenderService {
     private readonly _activeLayer: WritableSignal<IActiveLeafletLayer | null> = signal<IActiveLeafletLayer | null>(null);
     private readonly _defaultLayerStyle: PathOptions = mapConfig.defaultLayerStyle;
+    private _layersOnMap: Layer[] = [];
 
     /**
      * Отрисовать слои
@@ -23,15 +24,20 @@ export class MapLayerRenderService {
         mapInstance: LeafletMap,
         layers: IMapLayer[],
         layerWithPointsColor: string | undefined,
-        onLayerSelected: (props: IMapLayerProperties) => void
+        onLayerSelected: (props: IMapLayerProperties) => void,
+        isReadonly?: boolean
     ): void {
+        this.clearLayers();
+
         layers.forEach((layer) => {
             const properties: GeoJsonProperties = this.createLayerProperties(
                 layer,
                 layerWithPointsColor,
-                onLayerSelected
+                onLayerSelected,
+                isReadonly
             );
-            geoJSON(layer.geoData, properties).addTo(mapInstance);
+            const geoLayer: GeoJSON = new GeoJSON(layer.geoData, properties).addTo(mapInstance);
+            this._layersOnMap.push(geoLayer);
         });
     }
 
@@ -44,6 +50,13 @@ export class MapLayerRenderService {
         }
     }
 
+    /** Очистить слои */
+    private clearLayers(): void {
+        this._activeLayer.set(null);
+        this._layersOnMap.forEach(layer => layer.remove());
+        this._layersOnMap = [];
+    }
+
     /**
      * Создать свойства слоя
      * @param mapLayer
@@ -53,10 +66,11 @@ export class MapLayerRenderService {
     private createLayerProperties(
         mapLayer: IMapLayer,
         layerWithPointsColor: string | undefined,
-        onLayerSelected: (props: IMapLayerProperties) => void
+        onLayerSelected: (props: IMapLayerProperties) => void,
+        isReadonly?: boolean
     ): GeoJsonProperties {
         const { properties }: IMapLayer = mapLayer;
-        const isActive: boolean = !!properties.isActive;
+        const isActive: boolean = !!properties.isActive && !isReadonly;
         const hasPoints: boolean = !!properties.points?.length;
 
         const layerStyle: PathOptions = this.buildLayerStyle(

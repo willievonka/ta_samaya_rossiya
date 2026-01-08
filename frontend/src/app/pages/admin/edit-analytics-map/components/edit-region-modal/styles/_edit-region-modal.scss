@@ -1,0 +1,65 @@
+@use '../../../../../../../common-styles/spacing-vars' as *;
+@use '../../../../../../../common-styles/color-vars' as color;
+
+.edit-region-modal {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-l;
+
+    &__wrapper {
+        position: relative;
+        background-color: color.$bg-primary;
+        padding: $spacing-xl;
+        border-radius: $spacing-xl;
+        box-shadow: -$spacing-xs $spacing-xs $spacing-m rgba(black, 0.33);
+    }
+
+    &__image-uploader-title {
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    &__image-uploader {
+        display: block;
+        margin-bottom: $spacing-s;
+    }
+
+    &__image-uploader-hint {
+        display: flex;
+        justify-content: center;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: color.$bg-secondary;
+        font-size: 14px;
+        line-height: normal;
+        font-weight: 600;
+    }
+
+    &__group {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: $spacing-s;
+        margin-bottom: $spacing-xs;
+    }
+
+    &__close-button {
+        position: absolute;
+        top: $spacing-xl;
+        right: $spacing-xl;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        z-index: 1;
+        padding: $spacing-s;
+        border-radius: 100%;
+        background-color: color.$bg-secondary;
+        opacity: 0.75;
+    }
+
+    &__save-button {
+        margin-top: $spacing-s;
+        align-self: flex-start;
+    }
+}

@@ -11,6 +11,7 @@ export class MapPointRenderService {
     private readonly _markersByPointId: Map<string, Marker> = new Map<string, Marker>();
     private readonly _markerBaseZIndex: Map<string, number> = new Map<string, number>();
     private readonly _defaultPointOptions: IDefaultMapPointOptions = mapConfig.defaultPointOptions;
+    private _markers: Marker[] = [];
 
     /**
      * Отрисовать массив точек на карте
@@ -23,10 +24,13 @@ export class MapPointRenderService {
         mapInstance: LeafletMap,
         points: IMapPoint[],
         pointColor: string | undefined,
-        onPointSelected?: (point: IMapPoint) => void
+        onPointSelected?: (point: IMapPoint) => void,
+        isReadonly?: boolean
     ): void {
+        this.clearPoints();
+
         points.forEach((point, index) =>
-            this.renderSinglePoint(mapInstance, point, index, pointColor, onPointSelected)
+            this.renderSinglePoint(mapInstance, point, index, pointColor, onPointSelected, isReadonly)
         );
     }
 
@@ -65,6 +69,16 @@ export class MapPointRenderService {
         this._activeMarkerId.set(null);
     }
 
+    /** Очистить все точки */
+    private clearPoints(): void {
+        this._markersByPointId.clear();
+        this._markerBaseZIndex.clear();
+        this._activeMarker.set(null);
+        this._activeMarkerId.set(null);
+        this._markers.forEach(m => m.remove());
+        this._markers = [];
+    }
+
     /**
      * Отрисовать точку на карте
      * @param mapInstance
@@ -78,7 +92,8 @@ export class MapPointRenderService {
         point: IMapPoint,
         index: number,
         pointColor: string | undefined,
-        onPointSelected?: (point: IMapPoint) => void
+        onPointSelected?: (point: IMapPoint) => void,
+        isReadonly?: boolean
     ): void {
         const color: string = pointColor || this._defaultPointOptions.color;
         const iconSize: number = this._defaultPointOptions.iconSize;
@@ -88,14 +103,18 @@ export class MapPointRenderService {
             .setZIndexOffset(-index)
             .addTo(mapInstance);
 
-        pointMarker.on({
-            click: (event: LeafletMouseEvent) => {
-                DomEvent.stopPropagation(event);
-                onPointSelected?.(point);
-                this.applyActiveStyle(pointMarker, point.id);
-                this.panToPoint(mapInstance, point.coordinates);
-            }
-        });
+        this._markers.push(pointMarker);
+
+        if (!isReadonly) {
+            pointMarker.on({
+                click: (event: LeafletMouseEvent) => {
+                    DomEvent.stopPropagation(event);
+                    onPointSelected?.(point);
+                    this.applyActiveStyle(pointMarker, point.id);
+                    this.panToPoint(mapInstance, point.coordinates);
+                }
+            });
+        }
 
         this._markerBaseZIndex.set(point.id, -index);
         this._markersByPointId.set(point.id, pointMarker);

@@ -38,8 +38,9 @@ export class AdminHubPageComponent {
 
     /** Разлогин и выход в клиентское приложение */
     protected logout(): void {
-        this._authService.logout();
-        this._router.navigate(['/']);
+        this._authService.logout()
+            .pipe(take(1))
+            .subscribe(() => this._router.navigate(['/']));
     }
 
     /**
@@ -48,6 +49,11 @@ export class AdminHubPageComponent {
      */
     protected navigateToEditMap(card: IHubCard): void {
         this._hubService.navigateToMap(card, true);
+    }
+
+    /** Редирект на страницу создания карты */
+    protected navigateToCreateMap(): void {
+        this._hubService.navigateToCreateMap();
     }
 
     /** Загрузить список карточек карт */

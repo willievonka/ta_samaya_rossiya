@@ -1,0 +1,36 @@
+@use '../../../../../../../common-styles/color-vars' as color;
+@use '../../../../../../../common-styles/spacing-vars' as *;
+
+.regions-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-s;
+    max-height: 220px;
+
+    &__item-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-xs;
+    }
+
+    &__item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: color.$bg-secondary;
+        padding: $spacing-m;
+        border-radius: $spacing-m;
+    }
+
+    &__actions {
+        display: flex;
+        gap: $spacing-m;
+    }
+
+    &__error {
+        &.tui-enter,
+        &.tui-leave {
+            animation-name: tuiFade;
+        }
+    }
+}

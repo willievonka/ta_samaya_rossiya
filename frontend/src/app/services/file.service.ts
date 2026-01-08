@@ -1,0 +1,110 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
+import { TuiFileLike } from '@taiga-ui/kit';
+import { catchError, map, Observable, of, shareReplay, tap, throwError } from 'rxjs';
+
+@Injectable({ providedIn: 'root' })
+export class FileService {
+    private readonly _http: HttpClient = inject(HttpClient);
+    private readonly _sanitizer: DomSanitizer = inject(DomSanitizer);
+    private readonly _fileCache: Map<string, File> = new Map<string, File>();
+    private readonly _inFlight: Map<string, Observable<File>> = new Map<string, Observable<File>>();
+
+    /**
+     * Скачать файл по ссылке
+     * @param url
+     * @param fileName
+     * @param mime
+     */
+    public downloadAsFile(url: string, fileName: string, mime?: string): Observable<File> {
+        const normalizedUrl: string = url.trim();
+
+        const cachedFile: File | undefined = this._fileCache.get(normalizedUrl);
+        if (cachedFile) {
+            return of(cachedFile);
+        }
+
+        const cachedRequest$: Observable<File> | undefined = this._inFlight.get(normalizedUrl);
+        if (cachedRequest$) {
+            return cachedRequest$;
+        }
+
+        const request$: Observable<File> = this._http.get(normalizedUrl, { responseType: 'blob' })
+            .pipe(
+                map(blob => new File([blob], fileName, { type: mime ?? blob.type })),
+                tap(file => this._fileCache.set(normalizedUrl, file)),
+                shareReplay({ bufferSize: 1, refCount: true }),
+                catchError(err => {
+                    this._inFlight.delete(normalizedUrl);
+
+                    return throwError(() => err);
+                }),
+                tap({
+                    next: () => this._inFlight.delete(normalizedUrl),
+                    error: () => {}
+                })
+            );
+
+        this._inFlight.set(normalizedUrl, request$);
+
+        return request$;
+    }
+
+    /**
+     * Достать файл из кэша по url
+     * @param url
+     */
+    public getCachedFileByUrl(url: string): File | null {
+        const normalizedUrl: string = url.trim();
+
+        return this._fileCache.get(normalizedUrl) ?? null;
+    }
+
+    /**
+     * Удалить файл из кэша по url
+     * @param url
+     */
+    public removeCachedFileByUrl(url: string): void {
+        const normalizedUrl: string = url.trim();
+
+        this._fileCache.delete(normalizedUrl);
+        this._inFlight.delete(normalizedUrl);
+    }
+
+    /**
+     * Получить название файла по url
+     * @param url
+     */
+    public getFileNameFromUrl(url: string): string | null {
+        try {
+            const u: URL = new URL(url, window.location.origin);
+            const last: string | undefined = u.pathname.split('/').filter(Boolean).pop();
+
+            return last ? decodeURIComponent(last) : null;
+        } catch {
+            const last: string | undefined = url.split('?')[0]?.split('#')[0]?.split('/').pop();
+
+            return last ?? null;
+        }
+    }
+
+    /**
+     * Собрать стиль background-image из файла
+     * @param file
+     */
+    public buildBackgroundImagePreview(file: TuiFileLike | null): { style: SafeStyle | null; revoke: () => void } {
+        if (!file) {
+            return { style: null, revoke: (): void => {} };
+        }
+
+        const objectUrl: string = URL.createObjectURL(file as File);
+        const style: SafeStyle = this._sanitizer.bypassSecurityTrustStyle(`url("${objectUrl}")`);
+
+        return {
+            style,
+            revoke: () => URL.revokeObjectURL(objectUrl)
+        };
+    }
+}

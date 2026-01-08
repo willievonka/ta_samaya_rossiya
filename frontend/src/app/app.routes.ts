@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { adminAuthGuard } from './guards/admin-auth.guard';
+import { canDeactivateGuard } from './guards/can-deactivate.guard';
 
 export const routes: Routes = [
     {
@@ -21,12 +22,25 @@ export const routes: Routes = [
     },
     {
         path: 'admin',
-        // canActivate: [adminAuthGuard],
+        canActivate: [adminAuthGuard],
         loadComponent: () => import('./pages/admin/admin-hub/admin-hub.page').then(m => m.AdminHubPageComponent)
     },
     {
         path: 'admin/edit-analytics-map',
-        // canActivate: [adminAuthGuard],
+        canActivate: [adminAuthGuard],
+        canDeactivate: [canDeactivateGuard],
         loadComponent: () => import('./pages/admin/edit-analytics-map/edit-analytics-map.page').then(m => m.EditAnalyticsMapPageComponent)
+    },
+    {
+        path: 'admin/edit-map',
+        canActivate: [adminAuthGuard],
+        canDeactivate: [canDeactivateGuard],
+        loadComponent: () => import('./pages/admin/edit-map/edit-map.page').then(m => m.EditMapPageComponent)
+    },
+    {
+        path: 'admin/create-map',
+        canActivate: [adminAuthGuard],
+        canDeactivate: [canDeactivateGuard],
+        loadComponent: () => import('./pages/admin/edit-map/edit-map.page').then(m => m.EditMapPageComponent)
     }
 ];

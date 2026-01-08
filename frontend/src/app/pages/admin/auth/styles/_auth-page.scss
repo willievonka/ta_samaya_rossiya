@@ -39,6 +39,16 @@
         line-height: normal;
         align-self: center;
     }
+
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-xs;
+    }
+
+    &__error {
+        font-size: 14px;
+    }
 }
 
 ::ng-deep {
