@@ -1,16 +1,17 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, EMPTY, map, Observable } from 'rxjs';
-import { IMapLayerProperties } from '../interfaces/map-layer.interface';
-import { environment } from '../../../../environments';
-import { IMapDto } from '../dto/map.dto';
-import { IMapModel } from '../models/map.model';
+import { IMapLayerProperties } from '../components/map/interfaces/map-layer.interface';
+import { environment } from '../../environments';
+import { IMapDto } from '../components/map/dto/map.dto';
+import { IMapModel } from '../components/map/models/map.model';
 import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class MapDataService {
     private readonly _http: HttpClient = inject(HttpClient);
-    private readonly _apiUrl: string = environment.clientApiUrl;
+    private readonly _clientApiUrl: string = environment.clientApiUrl;
+    private readonly _adminApiUrl: string = environment.adminApiUrl;
     private readonly _router: Router = inject(Router);
 
     /**
@@ -18,18 +19,20 @@ export class MapDataService {
      * @param mapId
      */
     public getMapData(mapId: string, raw: boolean = false): Observable<IMapModel> {
-        const options: { params?: HttpParams } = raw
-            ? {}
-            : { params: new HttpParams().set('mapId', mapId) };
+        const baseUrl: string = raw ? this._adminApiUrl : this._clientApiUrl;
+        const options: { params?: HttpParams } | undefined = raw
+            ? undefined
+            : { params: new HttpParams({ fromObject: { mapId } }) };
 
-        return this._http.get<IMapDto>(`${this._apiUrl}/maps`, options).pipe(
-            catchError(() => {
-                this._router.navigate(['/']);
+        return this._http.get<IMapDto>(`${baseUrl}/maps`, options)
+            .pipe(
+                map((dto: IMapDto) => this.mapDtoToModel(dto)),
+                catchError(() => {
+                    this._router.navigate(['/']);
 
-                return EMPTY;
-            }),
-            map((dto) => this.mapDtoToModel(dto))
-        );
+                    return EMPTY;
+                })
+            );
     }
 
     /**

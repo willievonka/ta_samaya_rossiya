@@ -2,7 +2,7 @@ import { computed, Directive, effect, inject, Injector, signal, Signal, viewChil
 import { IMapZoomActions } from '../map/interfaces/map-zoom-actions.interface';
 import { MapComponent } from '../map/map.component';
 import { ActivatedRoute } from '@angular/router';
-import { MapDataService } from '../map/services/map-data.service';
+import { MapDataService } from '../../services/map-data.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IMapModel } from '../map/models/map.model';
 import { distinctUntilChanged, map, of, switchMap } from 'rxjs';
