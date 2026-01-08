@@ -171,6 +171,25 @@ public class MapService : IMapService
     }
 
     /// <summary>
+    /// Получает MapDto с ещё не созданными LayerRegions, которые формируются из базовых Regions
+    /// </summary>
+    /// <param name="ct"></param>
+    /// <returns></returns>
+    public async Task<MapDto> GetEmptyMapAsync(CancellationToken ct)
+    {
+        var regions = await _layerRegionService.GetAllBasicRegionsAsync(ct);
+
+        var mapDto = new MapDto
+        {
+            Title = string.Empty,
+            Info = string.Empty,
+            Regions = regions
+        };
+        
+        return mapDto;
+    }
+
+    /// <summary>
     /// Обновляет карту, обновятся только не null значения. Остальные свойства сохраняться прежними.
     /// Принимается полный Snapshot карты, недостающие элементы удаляются, новые добавляются, старые обновляются
     /// </summary>
@@ -201,7 +220,7 @@ public class MapService : IMapService
             
             map.BackgroundImage = fileUri;
         }
-        else _logger.LogError("Image is null");
+        else _logger.LogWarning("Image is null");
         
         if (mapDto.Title != null) map.Title = mapDto.Title;
         if (mapDto.Description != null) map.Description = mapDto.Description;

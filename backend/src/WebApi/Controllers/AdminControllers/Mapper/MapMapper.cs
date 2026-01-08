@@ -24,6 +24,30 @@ public static class MapMapper
         };
     }
 
+    public static MapPageResponse? EmptyMapDtoToResponse(MapDto? mapDto)
+    {
+        if (mapDto == null)
+            return null;
+
+        var features = new List<MapLayerResponse>();
+
+        if (mapDto.Regions != null)
+        {
+            foreach (var region in mapDto.Regions)
+            {
+                var regionResponse = LayerRegionMapper.BasicRegionDtoToResponse(region);
+                
+                var geometry = region.Geometry;
+                features.Add(new MapLayerResponse(geometry,
+                    regionResponse!));
+            }
+        }
+        
+        var layers = new MapLayersFeatureCollectionResponse(features);
+
+        return new MapPageResponse(layers, "", "", null, null);
+    }
+    
     public static MapPageResponse? MapDtoToResponse(MapDto? dto)
     {
         if (dto == null)
@@ -83,10 +107,10 @@ public static class MapMapper
             HistoricalObjectPointColor = request.PointColor,
         };
 
-        if (request.Regions != null)
+        if (request.Layers != null)
         {
             var regionsDtos = new List<LayerRegionDto>();
-            foreach (var updatingRegion in request.Regions)
+            foreach (var updatingRegion in request.Layers)
             {
                 regionsDtos.Add(LayerRegionMapper.UpdateLayerRegionRequestToDto(updatingRegion));
             }

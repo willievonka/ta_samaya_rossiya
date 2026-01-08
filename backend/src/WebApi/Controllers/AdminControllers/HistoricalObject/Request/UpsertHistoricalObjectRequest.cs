@@ -7,7 +7,7 @@ public record UpsertHistoricalObjectRequest(
     string Title,
     double[]? Coordinates,
     int Year,
-    [FromForm] IFormFile Image,
+    [FromForm] IFormFile? Image,
     string Description,
     string? ExcursionUrl
     );
