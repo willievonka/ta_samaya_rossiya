@@ -68,7 +68,7 @@ public class LayerRegionStyleService : ILayerRegionStyleService
         
         if (style == null)
         {
-            _logger.LogError("Style could not be found by layer {layerRegionId}", layerRegionId);
+            _logger.LogWarning("Style could not be found by layer {layerRegionId}", layerRegionId);
             return null;
         }
 
@@ -108,7 +108,7 @@ public class LayerRegionStyleService : ILayerRegionStyleService
         var style = await _layerRegionStyleRepository.GetByLayerRegionIdAsync(layerRegionId, ct);
         if (style == null)
         {
-            _logger.LogError("Style could not be found by layer {layerRegionId}", layerRegionId);
+            _logger.LogWarning("Style could not be found by layer {layerRegionId}", layerRegionId);
             return null;
         }
 
@@ -141,7 +141,7 @@ public class LayerRegionStyleService : ILayerRegionStyleService
         var style = await _layerRegionStyleRepository.GetByLayerRegionIdAsync(layerRegionId, ct);
         if (style == null)
         {
-            _logger.LogError("Style {styleId} could not be found", layerRegionId);
+            _logger.LogWarning("Style {styleId} could not be found", layerRegionId);
             return;
         }
         

@@ -33,7 +33,7 @@ public class AdminSeederService : IAdminSeederService
 
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
-                _logger.LogError("Environment file does not contain email or password for creating admin number {index}"
+                _logger.LogWarning("Environment file does not contain email or password for creating admin number {index}"
                     , index);
                 break;
             }
@@ -41,7 +41,7 @@ public class AdminSeederService : IAdminSeederService
             var existingAdmin = await _adminRepository.GetByEmailAsync(email);
             if (existingAdmin != null)
             {
-                _logger.LogError("Admin already exists for email {email}",  email);
+                _logger.LogWarning("Admin already exists for email {email}",  email);
                 index++;
                 continue;
             }

@@ -54,7 +54,6 @@ public class IndicatorsService : IIndicatorsService
             indicators.ImagePath = fileUri;
         }
         else _logger.LogError("Image is null");
-
         
         await _indicatorsRepository.AddAsync(indicators, ct);
         
@@ -73,7 +72,7 @@ public class IndicatorsService : IIndicatorsService
         
         if (indicators == null)
         {
-            _logger.LogError("IndicatorsRegion could not be found by layer {indicatorsRegionDto.Id}", layerRegionId);
+            _logger.LogWarning("IndicatorsRegion could not be found by layer {indicatorsRegionDto.Id}", layerRegionId);
             return null;
         }
 
@@ -101,7 +100,7 @@ public class IndicatorsService : IIndicatorsService
 
         if (indicators == null)
         {
-            _logger.LogError("IndicatorsRegion {indicatorsRegionDto.Id} could not be found", indicatorsRegionDto.Id);
+            _logger.LogWarning("IndicatorsRegion {indicatorsRegionDto.Id} could not be found", indicatorsRegionDto.Id);
             return Guid.Empty;
         }
         
@@ -113,7 +112,7 @@ public class IndicatorsService : IIndicatorsService
             
             indicators.ImagePath = fileUri;
         }
-        else _logger.LogError("Image is null");
+        else _logger.LogWarning("Image is null");
         
         if (indicatorsRegionDto.IsActive != null) indicators.IsActive = indicatorsRegionDto.IsActive.Value;
         if (indicatorsRegionDto.Excursions != null) indicators.Excursions = indicatorsRegionDto.Excursions.Value;

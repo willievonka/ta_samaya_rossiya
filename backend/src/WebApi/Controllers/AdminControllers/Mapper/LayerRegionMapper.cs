@@ -9,7 +9,16 @@ namespace WebApi.Controllers.AdminControllers.Mapper;
 
 public static class LayerRegionMapper
 {
-    public static MapLayerPropertiesResponse? LayerRegionDtoToResponse(LayerRegionDto? layerRegionDto, bool isAnalyticsMap = false)
+    public static MapLayerPropertiesResponse? BasicRegionDtoToResponse(LayerRegionDto? layerRegionDto)
+    {
+        if (layerRegionDto == null)
+            return null;
+
+        return new MapLayerPropertiesResponse(Guid.Empty, layerRegionDto.Name);
+    }
+    
+    public static MapLayerPropertiesResponse? LayerRegionDtoToResponse(LayerRegionDto? layerRegionDto,
+        bool isAnalyticsMap = false)
     {
         if (layerRegionDto == null)
             return null;

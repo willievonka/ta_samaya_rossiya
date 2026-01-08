@@ -8,6 +8,7 @@ using WebApi.Controllers.AdminControllers.Mapper;
 namespace WebApi.Controllers.AdminControllers.Map;
 
 [ApiController]
+[Authorize]
 [Route("api/admin/maps")]
 public class AdminMapController : ControllerBase
 {
@@ -19,7 +20,7 @@ public class AdminMapController : ControllerBase
     }
 
     /// <summary>
-    /// Получить карту
+    /// Получить карту. При mapId = null отправиться шаблон карты для её дальнейшего создания
     /// </summary>
     /// <param name="mapId">Id карты</param>
     /// <param name="ct">Токен отмены</param>
@@ -27,16 +28,21 @@ public class AdminMapController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(MapPageResponse),StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetMap([FromQuery] Guid mapId, CancellationToken ct)
+    public async Task<IActionResult> GetMap([FromQuery] Guid? mapId, CancellationToken ct)
     {
-        var map = await _mapService.GetMapAsync(mapId, ct);
+        if (mapId == null)
+        {
+            var mapDto = await _mapService.GetEmptyMapAsync(ct);
+        
+            return Ok(MapMapper.EmptyMapDtoToResponse(mapDto));
+        }
+        
+        var map = await _mapService.GetMapAsync(mapId.Value, ct);
 
         var response = MapMapper.MapDtoToResponse(map);
         
         return response == null ? NotFound() : Ok(response);
     }
-    
-    //TODO: GetMapWithActiveRegions
     
     /// <summary>
     /// Получить все карточки карт

@@ -181,11 +181,39 @@ public class LayerRegionService : ILayerRegionService
         return regionsDtos;
     }
 
+    /// <summary>
+    /// Получает Id у всех LayerRegion, привязанных к карте MapId
+    /// </summary>
+    /// <param name="mapId"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     public async Task<List<Guid>> GetAllIdsByMapIdAsync(Guid mapId, CancellationToken ct)
     {
         var ids = await _layerRegionRepository.GetAllIdsByMapIdAsync(mapId, ct);
         
         return ids;
+    }
+
+    /// <summary>
+    /// Получает базовые Region и формирует на их основе "шаблоны" LayerRegion
+    /// </summary>
+    /// <param name="ct"></param>
+    /// <returns></returns>
+    public async Task<List<LayerRegionDto>> GetAllBasicRegionsAsync(CancellationToken ct)
+    {
+        var basicRegions = await _regionRepository.GetAllAsync(ct);
+
+        var regions = new List<LayerRegionDto>();
+        foreach (var basicRegion in basicRegions!)
+        {
+            regions.Add(new LayerRegionDto
+            {
+                Name = basicRegion.Name,
+                Geometry = basicRegion.Geometry.Geometry
+            });
+        }
+        
+        return regions;
     }
 
     /// <summary>
@@ -290,14 +318,14 @@ public class LayerRegionService : ILayerRegionService
         var layerRegion = await _layerRegionRepository.GetWithRegionByIdAsync(layerRegionId, ct);
         if (layerRegion == null)
         {
-            _logger.LogInformation("layer {layerRegionId} could not be deleted", layerRegionId);
+            _logger.LogError("Layer {layerRegionId} could not be deleted", layerRegionId);
             return false;
         }
         
         var regionName = layerRegion.Region.Name;
         
         await _layerRegionRepository.DeleteByIdAsync(layerRegionId, ct);
-        _logger.LogInformation("layer {layerRegionId} deleted", layerRegionId);
+        _logger.LogInformation("Layer {layerRegionId} deleted", layerRegionId);
         
         var existLayerRegion = await _layerRegionRepository.GetNoActiveEmptyByNameAndMapIdAsync(regionName, mapId, ct);
         if (existLayerRegion == null)

@@ -11,5 +11,5 @@ public record UpsertLayerRegionRequest(
     bool? IsActive,
     UpsertLayerRegionStyleRequest? Style = null,
     UpsertIndicatorsRequest? AnalyticsData = null,
-    UpsertHistoricalObjectsRequest? Points = null
+    List<UpsertHistoricalObjectRequest>? Points = null
     );

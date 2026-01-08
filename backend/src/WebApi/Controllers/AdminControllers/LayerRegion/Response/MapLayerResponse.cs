@@ -10,5 +10,5 @@ public record MapLayerResponse(
 )
 {
     [JsonPropertyOrder(-1)]
-    public string Type => "Feature";// изменить в обязательнные поля
+    public string Type => "Feature";
 };

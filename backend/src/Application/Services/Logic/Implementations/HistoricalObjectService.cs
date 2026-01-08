@@ -74,7 +74,7 @@ public class HistoricalObjectService : IHistoricalObjectService
 
         if (histObject == null)
         {
-            _logger.LogError("HistoricalObject {histObjectId} could not be found", histObjectId);
+            _logger.LogWarning("HistoricalObject {histObjectId} could not be found", histObjectId);
             return Guid.Empty;
         }
         
@@ -86,7 +86,7 @@ public class HistoricalObjectService : IHistoricalObjectService
             
             histObject.ImagePath = fileUri;
         }
-        else _logger.LogError("Image is null");
+        else _logger.LogWarning("Image is null");
         
         if (histObjectDto.ExcursionUrl != null) histObject.ExcursionUrl = histObjectDto.ExcursionUrl;
         if (histObjectDto.Year != null) histObject.Year = histObjectDto.Year.Value;
@@ -110,7 +110,7 @@ public class HistoricalObjectService : IHistoricalObjectService
 
         if (histObjects == null || histObjects.Count == 0)
         {
-            _logger.LogError("HistoricalObjects could not be found by layer {layerRegionId} region", layerRegionId);
+            _logger.LogWarning("HistoricalObjects could not be found by layer {layerRegionId} region", layerRegionId);
             return null;
         }
         
@@ -154,7 +154,7 @@ public class HistoricalObjectService : IHistoricalObjectService
         var histObject = await _historicalObjectRepository.GetByIdAsync(histObjectId, ct);
         if (histObject == null)
         {
-            _logger.LogError("HistoricalObject {histObjectId} could not be found", histObjectId);
+            _logger.LogWarning("HistoricalObject {histObjectId} could not be found", histObjectId);
             return false;
         }
 

@@ -7,14 +7,14 @@ namespace WebApi.Controllers.AdminControllers.Mapper;
 
 public static class HistoricalObjectMapper
 {
-    public static List<HistoricalObjectDto>? UpsertHistoricalObjectsRequestToDtosList(UpsertHistoricalObjectsRequest? request, Guid? layerId = null)
+    public static List<HistoricalObjectDto>? UpsertHistoricalObjectsRequestToDtosList(List<UpsertHistoricalObjectRequest>? request, Guid? layerId = null)
     {
         if (request == null)
             return null;
         
         var list = new List<HistoricalObjectDto>();
 
-        foreach (var point in request.Points)
+        foreach (var point in request)
         {
             list.Add(UpsertHistoricalObjectRequestToDto(point, layerId));
         }

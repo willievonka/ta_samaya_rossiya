@@ -8,6 +8,7 @@ public interface IMapService
     Task<Guid> CreateMapAsync(MapDto? mapDto, CancellationToken ct);
     Task<bool> DeleteMapAsync(Guid mapId, CancellationToken ct);
     Task<MapDto?> GetMapAsync(Guid mapId, CancellationToken ct);
+    Task<MapDto> GetEmptyMapAsync(CancellationToken ct);
     Task<Guid> UpdateMapAsync(MapDto? mapDto, CancellationToken ct);
     Task<Guid> AddNewLayerRegionAsync(Guid mapId, LayerRegionDto layerRegionDto, CancellationToken ct);
 }
