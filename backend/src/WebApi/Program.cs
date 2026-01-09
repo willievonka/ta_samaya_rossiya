@@ -14,9 +14,9 @@ using WebApi.Middleware;
 
 namespace WebApi;
 
-public partial class Program
+public class Program
 {
-    private static async Task Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -41,8 +41,11 @@ public partial class Program
         Directory.CreateDirectory("logs");
 
         ConfigureMiddleware(app);
-        
-        await app.Services.CheckAndMigrateDatabaseAsync();
+
+        if (!app.Environment.IsEnvironment("Testing"))
+        {
+            await app.Services.CheckAndMigrateDatabaseAsync();
+        }
         await app.RunAsync();
     }
 
