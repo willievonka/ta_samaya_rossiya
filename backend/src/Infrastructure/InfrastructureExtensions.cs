@@ -20,11 +20,13 @@ public static class InfrastructureExtensions
         services.AddScoped<ILayerRegionStyleRepository, LayerRegionStyleRepository>();
         services.AddScoped<IHistoricalObjectRepository, HistoricalObjectRepository>();
         services.AddScoped<IAdminRepository, AdminRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         
         services.AddScoped<IRegionSeederService, RegionSeederService>();
         services.AddScoped<ISaveImageService, SaveImageService>();
         services.AddScoped<IAdminSeederService, AdminSeederService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ITokenService, TokenService>();
         
         services.AddScoped<IAdminManager, AdminManager>();
         

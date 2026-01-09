@@ -14,7 +14,7 @@ using WebApi.Middleware;
 
 namespace WebApi;
 
-internal class Program
+public partial class Program
 {
     private static async Task Main(string[] args)
     {
@@ -97,7 +97,8 @@ internal class Program
                     ValidAudience = configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)),
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero,
+                    
                 };
             });
     }
