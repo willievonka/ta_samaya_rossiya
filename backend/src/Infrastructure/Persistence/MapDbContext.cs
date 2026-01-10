@@ -18,6 +18,7 @@ public class MapDbContext : DbContext
     public DbSet<RegionGeometry> RegionGeometries => Set<RegionGeometry>();
     public DbSet<LayerRegionStyle> LayerRegionStyles => Set<LayerRegionStyle>();
     public DbSet<Admin> Admins => Set<Admin>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -68,6 +69,18 @@ public class MapDbContext : DbContext
             .HasConversion(
                 v => v.ToUniversalTime(),
                 v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+        modelBuilder.Entity<RefreshToken>()
+            .Property(m => m.ExpiresAt)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+        modelBuilder.Entity<RefreshToken>()
+            .Property(m => m.CreatedAt)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         
         AddPrimaryKey(modelBuilder);
         
@@ -101,6 +114,9 @@ public class MapDbContext : DbContext
         
         modelBuilder.Entity<Admin>()
             .HasKey(a => a.Id);
+        
+        modelBuilder.Entity<RefreshToken>()
+            .HasKey(rt => rt.Id);
     }
     
     private void AddAutoGeneratingId(ModelBuilder modelBuilder)
@@ -134,6 +150,10 @@ public class MapDbContext : DbContext
             .ValueGeneratedOnAdd();
         
         modelBuilder.Entity<Admin>()
+            .Property(x => x.Id)
+            .ValueGeneratedOnAdd();
+        
+        modelBuilder.Entity<RefreshToken>()
             .Property(x => x.Id)
             .ValueGeneratedOnAdd();
     }

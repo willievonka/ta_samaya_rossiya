@@ -14,9 +14,9 @@ using WebApi.Middleware;
 
 namespace WebApi;
 
-internal class Program
+public class Program
 {
-    private static async Task Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -41,8 +41,11 @@ internal class Program
         Directory.CreateDirectory("logs");
 
         ConfigureMiddleware(app);
-        
-        await app.Services.CheckAndMigrateDatabaseAsync();
+
+        if (!app.Environment.IsEnvironment("Testing"))
+        {
+            await app.Services.CheckAndMigrateDatabaseAsync();
+        }
         await app.RunAsync();
     }
 
@@ -97,7 +100,8 @@ internal class Program
                     ValidAudience = configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)),
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero,
+                    
                 };
             });
     }
