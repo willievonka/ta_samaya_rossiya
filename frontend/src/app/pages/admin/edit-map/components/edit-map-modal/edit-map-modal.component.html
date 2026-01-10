@@ -152,6 +152,8 @@
             type="submit"
             tuiButton
             size="m"
+            [disabled]="settingsForm.invalid || isEditItemModalOpen()"
+            (click)="saveMap()"
         >
             Сохранить
         </button>

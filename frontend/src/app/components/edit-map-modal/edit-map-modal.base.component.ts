@@ -1,7 +1,7 @@
 import { DestroyRef, Directive, inject, input, InputSignal, OnInit, output, OutputEmitterRef, signal, WritableSignal } from '@angular/core';
 import { IMapModel } from '../map/models/map.model';
 import { IHubCard } from '../hub-card/interfaces/hub-card.interface';
-import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ɵFormGroupRawValue } from '@angular/forms';
 import { FileService } from '../../services/file.service';
 import { TuiFileLike } from '@taiga-ui/kit';
 import { distinctUntilChanged, merge, Observable, Subscription } from 'rxjs';
@@ -21,6 +21,7 @@ export abstract class EditMapModalBaseComponent<
 
     public readonly dirtyChange: OutputEmitterRef<boolean> = output();
     public readonly activeItemsChanged: OutputEmitterRef<TItem[]> = output();
+    public readonly mapSaved: OutputEmitterRef<ɵFormGroupRawValue<TSettingsForm>> = output();
 
     protected readonly settingsForm: FormGroup<TSettingsForm>;
     protected readonly editItemForm: FormGroup<TItemForm>;
@@ -57,6 +58,17 @@ export abstract class EditMapModalBaseComponent<
                     this.settingsForm.dirty || this.editItemForm.dirty
                 )
             );
+    }
+
+    /** Сохранить карту */
+    protected saveMap(): void {
+        this.settingsForm.markAllAsTouched();
+        this.settingsForm.updateValueAndValidity();
+        if (this.settingsForm.invalid) {
+            return;
+        }
+
+        this.mapSaved.emit(this.settingsForm.getRawValue());
     }
 
     /** Открыть модалку редактирования элемента карты */

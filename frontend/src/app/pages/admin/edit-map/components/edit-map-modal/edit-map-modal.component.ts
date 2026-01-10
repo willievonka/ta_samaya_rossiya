@@ -69,8 +69,14 @@ export class EditMapModalComponent
                 validators: [Validators.required],
             }),
             cardBackgroundImage: new FormControl<TuiFileLike | null>(null),
-            cardDescription: new FormControl('', { nonNullable: true }),
-            mapInfo: new FormControl('', { nonNullable: true }),
+            cardDescription: new FormControl ('', {
+                nonNullable: true,
+                validators: [Validators.required]
+            }),
+            mapInfo: new FormControl ('', {
+                nonNullable: true,
+                validators: [Validators.required]
+            }),
             layerWithPointsColor: new FormControl ('', {
                 nonNullable: true,
                 validators: [Validators.required]
@@ -102,7 +108,10 @@ export class EditMapModalComponent
                 nonNullable: true,
                 validators: [Validators.required]
             }),
-            description: new FormControl('', { nonNullable: true }),
+            description: new FormControl('', {
+                nonNullable: true,
+                validators: [Validators.required]
+            }),
             excursionUrl: new FormControl('', { nonNullable: true })
         };
     }

@@ -7,6 +7,8 @@ import { MapZoomComponent } from '../../../components/map-zoom/map-zoom.componen
 import { EditMapModalComponent } from './components/edit-map-modal/edit-map-modal.component';
 import { IMapModel } from '../../../components/map/models/map.model';
 import { IMapLayer } from '../../../components/map/interfaces/map-layer.interface';
+import { ɵFormGroupRawValue } from '@angular/forms';
+import { IMapSettingsForm } from '../../../components/edit-map-modal/interfaces/map-settings-form.interface';
 
 @Component({
     selector: 'edit-map',
@@ -22,6 +24,19 @@ import { IMapLayer } from '../../../components/map/interfaces/map-layer.interfac
     ]
 })
 export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
+    /** Обработчик сохранения карты */
+    protected handleMapSave(savedData: ɵFormGroupRawValue<IMapSettingsForm>): void {
+        this.model.update((current) => ({
+            pageTitle: savedData.title,
+            infoText: savedData.mapInfo,
+            layers: current?.layers ?? [],
+            layerWithPointsColor: savedData.layerWithPointsColor,
+            pointColor: savedData.pointsColor
+        }));
+
+        this.hasUnsavedChanges.set(false);
+    }
+
     /**
      * Обработчик изменения точек
      * @param points

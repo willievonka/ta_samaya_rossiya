@@ -67,8 +67,14 @@ export class EditAnalyticsMapModalComponent
                 validators: [Validators.required]
             }),
             cardBackgroundImage: new FormControl<TuiFileLike | null>(null),
-            cardDescription: new FormControl('', { nonNullable: true }),
-            mapInfo: new FormControl('', { nonNullable: true })
+            cardDescription: new FormControl ('', {
+                nonNullable: true,
+                validators: [Validators.required]
+            }),
+            mapInfo: new FormControl ('', {
+                nonNullable: true,
+                validators: [Validators.required]
+            })
         };
     }
 
@@ -84,9 +90,18 @@ export class EditAnalyticsMapModalComponent
                 nonNullable: true,
                 validators: [Validators.required]
             }),
-            partnersCount: new FormControl(0, { nonNullable: true }),
-            excursionsCount: new FormControl(0, { nonNullable: true }),
-            membersCount: new FormControl(0, { nonNullable: true })
+            partnersCount: new FormControl(0, {
+                nonNullable: true,
+                validators: [Validators.required]
+            }),
+            excursionsCount: new FormControl(0, {
+                nonNullable: true,
+                validators: [Validators.required]
+            }),
+            membersCount: new FormControl(0, {
+                nonNullable: true,
+                validators: [Validators.required]
+            }),
         };
     }
 

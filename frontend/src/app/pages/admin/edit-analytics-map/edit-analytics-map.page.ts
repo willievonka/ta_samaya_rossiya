@@ -6,6 +6,8 @@ import { MapComponent } from '../../../components/map/map.component';
 import { EditAnalyticsMapModalComponent } from './components/edit-analytics-map-modal/edit-analytics-map-modal.component';
 import { EditMapPageBaseComponent } from '../../../components/map-page/edit-map.page.base.component';
 import { IMapModel } from '../../../components/map/models/map.model';
+import { ɵFormGroupRawValue } from '@angular/forms';
+import { IAnalyticsMapSettingsForm } from '../../../components/edit-map-modal/interfaces/analytics-map-settings-form.interface';
 
 @Component({
     selector: 'edit-analytics-map-page',
@@ -21,6 +23,17 @@ import { IMapModel } from '../../../components/map/models/map.model';
     ]
 })
 export class EditAnalyticsMapPageComponent extends EditMapPageBaseComponent<IMapLayerProperties> {
+    /** Обработчик сохранения карты */
+    protected handleMapSave(savedData: ɵFormGroupRawValue<IAnalyticsMapSettingsForm>): void {
+        this.model.update((current) => ({
+            pageTitle: savedData.title,
+            infoText: savedData.mapInfo,
+            layers: current?.layers ?? []
+        }));
+
+        this.hasUnsavedChanges.set(false);
+    }
+
     /**
      * Обработчик изменения регионов
      * @param regions
