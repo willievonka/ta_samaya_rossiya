@@ -2,28 +2,60 @@ import { HttpErrorResponse, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from
 import { AuthService } from '../services/auth.service';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { catchError, switchMap, throwError } from 'rxjs';
 
-export const authInterceptor: HttpInterceptorFn = (request: HttpRequest<unknown>, next: HttpHandlerFn) => {
+const retriedRequests: WeakMap<HttpRequest<unknown>, boolean> = new WeakMap<HttpRequest<unknown>, boolean>();
+
+export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
     const authService: AuthService = inject(AuthService);
     const router: Router = inject(Router);
 
-    const isEndpointWithAuth: boolean = request.url.includes('/admin/') && !request.url.includes('/auth/login');
-    const token: string | null = authService.getToken();
+    const token: string | null = authService.getAccessToken();
+    const isProtected: boolean = req.url.includes('/admin/') && !req.url.includes('/auth/login');
+    const alreadyRetried: boolean = retriedRequests.get(req) ?? false;
+    const requestToSend: HttpRequest<unknown> = isProtected && token
+        ? req.clone({ headers: req.headers.set('Authorization', `Bearer ${token}`) })
+        : req;
 
-    const requestToSend: HttpRequest<unknown> = isEndpointWithAuth && token
-        ? request.clone({ headers: request.headers.set('Authorization', `Bearer ${token}`) })
-        : request;
+    const logout: () => void = () => {
+        authService.forceLogoutLocal();
+        router.navigate(['/admin/auth']);
+    };
 
-    return next(requestToSend)
-        .pipe(
-            catchError((error: unknown) => {
-                if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
-                    authService.forceLogoutLocal();
-                    router.navigate(['/admin/auth']);
-                }
+    return next(requestToSend).pipe(
+        catchError((error: unknown) => {
+            if (!(error instanceof HttpErrorResponse)) {
+                return throwError(() => error);
+            }
+
+            if (error.status === 403 && isProtected) {
+                logout();
 
                 return throwError(() => error);
-            })
-        );
+            }
+
+            if (error.status === 401 && isProtected && !alreadyRetried && !req.url.includes('/auth/refresh')) {
+                retriedRequests.set(req, true);
+
+                return authService.refreshToken().pipe(
+                    switchMap(() => {
+                        const newToken: string | null = authService.getAccessToken();
+                        const retriedReq: HttpRequest<unknown> = newToken
+                            ? req.clone({ headers: req.headers.set('Authorization', `Bearer ${newToken}`) })
+                            : req;
+                        retriedRequests.set(retriedReq, true);
+
+                        return next(retriedReq);
+                    }),
+                    catchError(() => {
+                        logout();
+
+                        return throwError(() => error);
+                    })
+                );
+            }
+
+            return throwError(() => error);
+        })
+    );
 };

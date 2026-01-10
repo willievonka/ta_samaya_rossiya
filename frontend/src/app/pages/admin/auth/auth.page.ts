@@ -8,8 +8,6 @@ import { AsyncPipe } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { take } from 'rxjs';
 
-
-
 @Component({
     selector: 'auth-page',
     standalone: true,
