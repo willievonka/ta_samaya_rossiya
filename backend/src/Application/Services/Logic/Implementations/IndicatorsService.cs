@@ -115,6 +115,7 @@ public class IndicatorsService : IIndicatorsService
         else if (indicators.ImagePath != null)
         {
             await _imageService.DeleteImageAsync(indicators.ImagePath);
+            indicators.ImagePath = null;
             _logger.LogInformation("Image {path} deleted", indicators.ImagePath);
         }
         
