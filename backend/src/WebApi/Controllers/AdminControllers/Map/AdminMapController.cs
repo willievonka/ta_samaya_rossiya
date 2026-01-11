@@ -69,16 +69,18 @@ public class AdminMapController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(StatusCodes.Status303SeeOther)]  
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]  
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CreateMap([FromForm] CreateMapRequest request, CancellationToken ct)
     {
         var mapDto = MapMapper.CreateMapRequestToDto(request);
         
-        await _mapService.CreateMapAsync(mapDto, ct);
+        var mapId = await _mapService.CreateMapAsync(mapDto, ct);
         
-        return RedirectToAction(nameof(GetAllMapsCards));
+        if (mapId == Guid.Empty)
+            return BadRequest();
+        
+        return Ok(new { mapId = mapId });
     }
 
     /// <summary>
@@ -125,7 +127,7 @@ public class AdminMapController : ControllerBase
         if (id == Guid.Empty)
             return BadRequest();
         
-        return Ok(id);
+        return Ok();
     }
 
     /// <summary>
