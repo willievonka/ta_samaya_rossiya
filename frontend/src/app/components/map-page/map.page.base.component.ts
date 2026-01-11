@@ -58,11 +58,6 @@ export abstract class MapPageBaseComponent<TData> {
                         return of(null);
                     }
 
-                    const fromState: IHubCard | undefined = history.state?.card as IHubCard | undefined;
-                    if (fromState?.id === id) {
-                        return of(fromState);
-                    }
-
                     return this._hubService.getMapCardById(id);
                 })
             ),
