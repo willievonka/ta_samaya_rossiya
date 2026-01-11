@@ -90,6 +90,7 @@ public class HistoricalObjectService : IHistoricalObjectService
         else if (histObject.ImagePath != null)
         {
             await _imageService.DeleteImageAsync(histObject.ImagePath);
+            histObject.ImagePath = null;
             _logger.LogInformation("Image {path} deleted", histObject.ImagePath);
         }
 
