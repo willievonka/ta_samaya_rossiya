@@ -1,7 +1,6 @@
 import { TuiRoot } from '@taiga-ui/core';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AuthService } from './services/auth.service';
 
 @Component({
     selector: 'app-root',
@@ -16,7 +15,6 @@ import { AuthService } from './services/auth.service';
 export class App implements AfterViewInit {
     private readonly _originalHeight: number = 952;
     private readonly _host: ElementRef<HTMLElement> = inject(ElementRef<HTMLElement>);
-    private readonly _authService: AuthService = inject(AuthService);
 
     public ngAfterViewInit(): void {
         this.applyZoom();

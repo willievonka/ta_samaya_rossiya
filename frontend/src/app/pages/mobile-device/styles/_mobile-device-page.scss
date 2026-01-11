@@ -1,0 +1,25 @@
+@use '../../../../common-styles/spacing-vars' as *;
+
+:host {
+    display: flex;
+    flex: 1;
+}
+
+.mobile-device {
+    display: flex;
+    flex-direction: column;
+    padding: $spacing-2xl;
+    padding-top: $spacing-4xl;
+
+    &__logo {
+        width: 207px;
+        height: $spacing-8xl;
+        margin-bottom: $spacing-2xl;
+    }
+
+    &__title {
+        font-size: $spacing-xl;
+        line-height: normal;
+        margin-bottom: $spacing-l;
+    }
+}
