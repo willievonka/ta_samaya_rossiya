@@ -9,6 +9,7 @@ import { IMapModel } from '../../../components/map/models/map.model';
 import { IMapLayer } from '../../../components/map/interfaces/map-layer.interface';
 import { ɵFormGroupRawValue } from '@angular/forms';
 import { IMapSettingsForm } from '../../../components/edit-map-modal/interfaces/map-settings-form.interface';
+import { take, tap } from 'rxjs';
 
 @Component({
     selector: 'edit-map',
@@ -26,6 +27,8 @@ import { IMapSettingsForm } from '../../../components/edit-map-modal/interfaces/
 export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
     /** Обработчик сохранения карты */
     protected handleMapSave(savedData: ɵFormGroupRawValue<IMapSettingsForm>): void {
+        this.isSaving.set(true);
+
         this.model.update((current) => ({
             pageTitle: savedData.title,
             infoText: savedData.mapInfo,
@@ -34,7 +37,22 @@ export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
             pointColor: savedData.pointsColor
         }));
 
-        this.hasUnsavedChanges.set(false);
+        const model: IMapModel | undefined = this.model();
+        if (model) {
+            this.mapDataService.saveMap(this.mapId, {
+                isAnalytics: false,
+                title: model.pageTitle,
+                infoText: model.infoText,
+                backgroundImage: savedData.cardBackgroundImage,
+                description: savedData.cardDescription,
+                layers: model.layers.map(layer => layer.properties)
+            })
+                .pipe(
+                    take(1),
+                    tap(() => this.hasUnsavedChanges.set(false))
+                )
+                .subscribe(() => this.isSaving.set(false));
+        }
     }
 
     /**

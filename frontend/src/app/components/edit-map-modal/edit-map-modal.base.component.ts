@@ -1,4 +1,4 @@
-import { DestroyRef, Directive, inject, input, InputSignal, OnInit, output, OutputEmitterRef, signal, WritableSignal } from '@angular/core';
+import { computed, DestroyRef, Directive, inject, input, InputSignal, OnInit, output, OutputEmitterRef, Signal, signal, WritableSignal } from '@angular/core';
 import { IMapModel } from '../map/models/map.model';
 import { IHubCard } from '../hub-card/interfaces/hub-card.interface';
 import { AbstractControl, FormControl, FormGroup, ɵFormGroupRawValue } from '@angular/forms';
@@ -18,6 +18,7 @@ export abstract class EditMapModalBaseComponent<
 > implements OnInit {
     public readonly model: InputSignal<IMapModel> = input.required();
     public readonly card: InputSignal<IHubCard | null> = input.required();
+    public readonly isSaving: InputSignal<boolean> = input.required();
 
     public readonly dirtyChange: OutputEmitterRef<boolean> = output();
     public readonly activeItemsChanged: OutputEmitterRef<TItem[]> = output();
@@ -26,7 +27,8 @@ export abstract class EditMapModalBaseComponent<
     protected readonly settingsForm: FormGroup<TSettingsForm>;
     protected readonly editItemForm: FormGroup<TItemForm>;
 
-    protected readonly allRegions: WritableSignal<string[]> = signal([]);
+    protected readonly allRegions: WritableSignal<IMapLayerProperties[]> = signal([]);
+    protected readonly allRegionsNames: Signal<string[]> = computed(() => this.allRegions().map(r => r.regionName));
     protected readonly activeItems: WritableSignal<TItem[]> = signal([]);
 
     protected readonly isEditItemModalOpen: WritableSignal<boolean> = signal(false);
@@ -58,6 +60,7 @@ export abstract class EditMapModalBaseComponent<
                     this.settingsForm.dirty || this.editItemForm.dirty
                 )
             );
+        this.allRegions.set(this.getAllRegions());
     }
 
     /** Сохранить карту */

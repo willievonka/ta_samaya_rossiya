@@ -2,7 +2,7 @@
     <edit-point-modal
         class="edit-map-modal__point-settings-modal"
         [form]="editItemForm"
-        [allRegionsList]="allRegions()"
+        [allRegionsList]="allRegionsNames()"
         (closeModal)="closeEditItemModal()"
         (itemSaved)="savePoint()"
     />
@@ -152,6 +152,7 @@
             type="submit"
             tuiButton
             size="m"
+            [loading]="isSaving()"
             [disabled]="settingsForm.invalid || isEditItemModalOpen()"
             (click)="saveMap()"
         >

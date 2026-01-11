@@ -23,25 +23,25 @@ export abstract class MapPageBaseComponent<TData> {
         isDetached: true
     };
 
-    private readonly _mapDataService: MapDataService = inject(MapDataService);
+    protected readonly route: ActivatedRoute = inject(ActivatedRoute);
+    protected readonly mapDataService: MapDataService = inject(MapDataService);
     private readonly _hubService: HubService = inject(HubService);
-    private readonly _route: ActivatedRoute = inject(ActivatedRoute);
     private readonly _injector: Injector = inject(Injector);
 
     private readonly _mapData: Signal<IMapModel | undefined> = toSignal(
-        this._route.url.pipe(
+        this.route.url.pipe(
             switchMap(segments => {
                 const isCreateRoute: boolean = segments.some(s => s.path === 'create-map');
-                const mapId: string = this._route.snapshot.queryParamMap.get('id') ?? '';
+                const mapId: string = this.route.snapshot.queryParamMap.get('id') ?? '';
 
-                return this._mapDataService.getMapData(mapId, isCreateRoute);
+                return this.mapDataService.getMapData(mapId, isCreateRoute);
             })
         ),
         { initialValue: undefined, injector: this._injector }
     );
 
     private readonly _isEditRoute: Signal<boolean> = toSignal(
-        this._route.url.pipe(
+        this.route.url.pipe(
             map(segments => segments.some(s => s.path === 'admin')),
             distinctUntilChanged()
         ),
@@ -49,7 +49,7 @@ export abstract class MapPageBaseComponent<TData> {
     );
 
     private readonly _cardFromRoute: Signal<IHubCard | null> = toSignal(
-        this._route.queryParamMap
+        this.route.queryParamMap
             .pipe(
                 map((paramMap) => paramMap.get('id') ?? ''),
                 distinctUntilChanged(),

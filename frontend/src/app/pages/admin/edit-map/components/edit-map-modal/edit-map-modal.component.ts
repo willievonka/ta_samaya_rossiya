@@ -3,7 +3,7 @@ import { EditMapModalBaseComponent } from '../../../../../components/edit-map-mo
 import { IMapSettingsForm } from '../../../../../components/edit-map-modal/interfaces/map-settings-form.interface';
 import { IEditPointForm } from '../../interfaces/edit-point-form.interface';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TuiFileLike, tuiValidationErrorsProvider } from '@taiga-ui/kit';
+import { TuiButtonLoading, tuiValidationErrorsProvider } from '@taiga-ui/kit';
 import { AsyncPipe } from '@angular/common';
 import { TuiCell } from '@taiga-ui/layout';
 import { TuiButton, TuiScrollbar, TuiTextfield } from '@taiga-ui/core';
@@ -15,7 +15,6 @@ import { SafeStyle } from '@angular/platform-browser';
 import { IMapPoint } from '../../../../../components/map/interfaces/map-point.interface';
 import { PointsListComponent } from '../points-list/points-list.component';
 import { IMapModel } from '../../../../../components/map/models/map.model';
-import { IMapLayerProperties } from '../../../../../components/map/interfaces/map-layer.interface';
 import { EditPointModalComponent } from '../edit-point-modal/edit-point-modal.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -32,6 +31,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
         TuiCell,
         TuiTextfield,
         TuiButton,
+        TuiButtonLoading,
         TuiScrollbar,
         ImageUploaderComponent,
         FormFieldComponent,
@@ -68,7 +68,7 @@ export class EditMapModalComponent
                 nonNullable: true,
                 validators: [Validators.required],
             }),
-            cardBackgroundImage: new FormControl<TuiFileLike | null>(null),
+            cardBackgroundImage: new FormControl<File | null>(null),
             cardDescription: new FormControl ('', {
                 nonNullable: true,
                 validators: [Validators.required]
@@ -103,7 +103,7 @@ export class EditMapModalComponent
                 nonNullable: true,
                 validators: [Validators.required]
             }),
-            image: new FormControl<TuiFileLike | null>(null),
+            image: new FormControl<File | null>(null),
             year: new FormControl<number>(new Date().getFullYear(), {
                 nonNullable: true,
                 validators: [Validators.required]
@@ -193,10 +193,8 @@ export class EditMapModalComponent
 
     /** Инициализировать модель */
     private initModel(): void {
-        const allRegions: IMapLayerProperties[] = this.getAllRegions();
-        this.allRegions.set(allRegions.map(p => p.regionName));
         this.activeItems.set(
-            allRegions
+            this.allRegions()
                 .filter(region => !!region.points && region.points.length > 0)
                 .flatMap(region =>
                     region.points!.map(point => ({
@@ -287,13 +285,15 @@ export class EditMapModalComponent
     /** Собрать точку из формы */
     private buildPointFromForm(): IMapPoint {
         const controls: IEditPointForm = this.editItemForm.controls;
+        const existing: IMapPoint | undefined = this.activeItems().find(p => p.title === this.editingItemName);
 
         return {
+            id: existing?.id,
             title: controls.pointName.value.trim(),
             regionName: controls.regionName.value.trim(),
             coordinates: controls.coordinates.value,
             year: controls.year.value,
-            imageFile: controls.image.value as File | null,
+            image: controls.image.value,
             imagePath: '',
             description: controls.description.value.trim(),
             excursionUrl: controls.excursionUrl.value.trim()
@@ -305,7 +305,7 @@ export class EditMapModalComponent
      * @param item
      */
     private loadPointImage(item: IMapPoint): void {
-        const stored: File | null = item.imageFile as File | null;
+        const stored: File | null | undefined = item.image;
         if (stored) {
             this.editItemForm.controls.image.setValue(stored);
 

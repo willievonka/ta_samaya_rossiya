@@ -8,6 +8,7 @@ import { EditMapPageBaseComponent } from '../../../components/map-page/edit-map.
 import { IMapModel } from '../../../components/map/models/map.model';
 import { ɵFormGroupRawValue } from '@angular/forms';
 import { IAnalyticsMapSettingsForm } from '../../../components/edit-map-modal/interfaces/analytics-map-settings-form.interface';
+import { take, tap } from 'rxjs';
 
 @Component({
     selector: 'edit-analytics-map-page',
@@ -25,13 +26,30 @@ import { IAnalyticsMapSettingsForm } from '../../../components/edit-map-modal/in
 export class EditAnalyticsMapPageComponent extends EditMapPageBaseComponent<IMapLayerProperties> {
     /** Обработчик сохранения карты */
     protected handleMapSave(savedData: ɵFormGroupRawValue<IAnalyticsMapSettingsForm>): void {
+        this.isSaving.set(true);
+
         this.model.update((current) => ({
             pageTitle: savedData.title,
             infoText: savedData.mapInfo,
             layers: current?.layers ?? []
         }));
 
-        this.hasUnsavedChanges.set(false);
+        const model: IMapModel | undefined = this.model();
+        if (model) {
+            this.mapDataService.saveMap(this.mapId, {
+                isAnalytics: true,
+                title: model.pageTitle,
+                infoText: model.infoText,
+                backgroundImage: savedData.cardBackgroundImage,
+                description: savedData.cardDescription,
+                layers: model.layers.map(layer => layer.properties)
+            })
+                .pipe(
+                    take(1),
+                    tap(() => this.hasUnsavedChanges.set(false))
+                )
+                .subscribe(() => this.isSaving.set(false));
+        }
     }
 
     /**

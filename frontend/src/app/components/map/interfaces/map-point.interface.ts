@@ -4,7 +4,7 @@ export interface IMapPoint {
     coordinates: [number, number];
     year: number;
     imagePath: string;
-    imageFile?: File | null;
+    image?: File | null;
     description: string;
     excursionUrl: string;
     regionName?: string;

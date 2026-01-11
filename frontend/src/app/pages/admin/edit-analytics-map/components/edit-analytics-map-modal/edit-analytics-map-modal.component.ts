@@ -4,7 +4,7 @@ import { TuiAccordion } from '@taiga-ui/experimental';
 import { TuiCell } from '@taiga-ui/layout';
 import { TuiButton, TuiScrollbar, TuiTextfield } from '@taiga-ui/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TuiFileLike, tuiValidationErrorsProvider } from '@taiga-ui/kit';
+import { TuiButtonLoading, tuiValidationErrorsProvider } from '@taiga-ui/kit';
 import { AsyncPipe } from '@angular/common';
 import { ImageUploaderComponent } from '../../../../../components/image-uploader/image-uploader.component';
 import { SafeStyle } from '@angular/platform-browser';
@@ -32,6 +32,7 @@ import { EditRegionModalComponent } from '../edit-region-modal/edit-region-modal
         TuiCell,
         TuiTextfield,
         TuiButton,
+        TuiButtonLoading,
         TuiScrollbar,
         ImageUploaderComponent,
         FormFieldComponent,
@@ -66,7 +67,7 @@ export class EditAnalyticsMapModalComponent
                 nonNullable: true,
                 validators: [Validators.required]
             }),
-            cardBackgroundImage: new FormControl<TuiFileLike | null>(null),
+            cardBackgroundImage: new FormControl<File | null>(null),
             cardDescription: new FormControl ('', {
                 nonNullable: true,
                 validators: [Validators.required]
@@ -85,7 +86,7 @@ export class EditAnalyticsMapModalComponent
                 nonNullable: true,
                 validators: [Validators.required]
             }),
-            image: new FormControl<TuiFileLike | null>(null),
+            image: new FormControl<File | null>(null),
             color: new FormControl('', {
                 nonNullable: true,
                 validators: [Validators.required]
@@ -179,9 +180,7 @@ export class EditAnalyticsMapModalComponent
 
     /** Инициализировать модель */
     private initModel(): void {
-        const allRegions: IMapLayerProperties[] = this.getAllRegions();
-        this.allRegions.set(allRegions.map(p => p.regionName));
-        this.activeItems.set(allRegions.filter(p => p.isActive));
+        this.activeItems.set(this.allRegions().filter(p => p.isActive));
 
         const model: IMapModel = this.model();
         this.settingsForm.patchValue({
@@ -271,19 +270,22 @@ export class EditAnalyticsMapModalComponent
     /** Собрать регион из формы */
     private buildRegionFromForm(): IMapLayerProperties {
         const controls: IEditRegionForm = this.editItemForm.controls;
+        const regionName: string = controls.regionName.value.trim();
+        const existing: IMapLayerProperties | undefined = this.activeItems().find(r => r.regionName === this.editingItemName);
 
         return {
-            regionName: controls.regionName.value.trim(),
+            id: this.allRegions().find(r => r.regionName === regionName)?.id,
+            regionName,
             isActive: true,
             style: {
-                ...(this.activeItems().find(region => region.regionName === this.editingItemName)?.style ?? {}),
+                ...(existing?.style ?? {}),
                 fillColor: controls.color.value,
             },
             analyticsData: {
                 partnersCount: controls.partnersCount.value,
                 excursionsCount: controls.excursionsCount.value,
                 membersCount: controls.membersCount.value,
-                imageFile: controls.image.value as File | null,
+                image: controls.image.value,
                 imagePath: '',
             },
         } as IMapLayerProperties;
@@ -294,7 +296,7 @@ export class EditAnalyticsMapModalComponent
      * @param item
      */
     private loadRegionImage(item: IMapLayerProperties): void {
-        const stored: File | null = item.analyticsData?.imageFile as File | null;
+        const stored: File | null | undefined = item.analyticsData?.image;
         if (stored) {
             this.editItemForm.controls.image.setValue(stored);
 

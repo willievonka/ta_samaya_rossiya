@@ -10,7 +10,9 @@ export class EditMapPageBaseComponent<TData>
     extends MapPageBaseComponent<TData>
     implements ICanComponentDeactivate
 {
+    protected readonly isSaving: WritableSignal<boolean> = signal(false);
     protected readonly hasUnsavedChanges: WritableSignal<boolean> = signal(false);
+    protected readonly mapId: string = this.route.snapshot.queryParamMap.get('id') ?? '';
 
     protected override readonly headerOptions: IPageHeaderOptions = {
         isDetached: true,

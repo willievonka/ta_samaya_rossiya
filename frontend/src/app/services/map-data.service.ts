@@ -6,6 +6,7 @@ import { environment } from '../../environments';
 import { IMapDto } from '../components/map/dto/map.dto';
 import { IMapModel } from '../components/map/models/map.model';
 import { Router } from '@angular/router';
+import { ISaveMapDto } from '../components/map/dto/save-map.dto';
 
 @Injectable({ providedIn: 'root' })
 export class MapDataService {
@@ -36,6 +37,27 @@ export class MapDataService {
     }
 
     /**
+     * Сохранить карту
+     * @param mapId
+     * @param data
+     */
+    public saveMap(mapId: string, dto: ISaveMapDto): Observable<void> {
+        return this._http.put<void>(
+            `${this._adminApiUrl}/maps`,
+            this.mapDtoToFormData(dto),
+            { params: new HttpParams({ fromObject: { mapId } }) }
+        ).pipe(
+            catchError((error) => {
+                if (error.status !== 401) {
+                    alert('Данные не сохранены, попробуйте еще раз');
+                }
+
+                return EMPTY;
+            })
+        );
+    }
+
+    /**
      * Смаппить dto в модель
      * @param dto
      */
@@ -50,5 +72,108 @@ export class MapDataService {
             layerWithPointsColor: dto.activeLayerColor,
             pointColor: dto.pointColor
         };
+    }
+
+    /**
+     * Смаппить dto в FormData
+     * @param dto
+     */
+    private mapDtoToFormData(dto: ISaveMapDto): FormData {
+        const formData: FormData = new FormData();
+
+        formData.append('isAnalytics', String(dto.isAnalytics));
+        formData.append('title', dto.title);
+        formData.append('description', dto.description);
+        formData.append('infoText', dto.infoText);
+
+        if (dto.activeLayerColor) {
+            formData.append('activeLayerColor', dto.activeLayerColor);
+        }
+
+        if (dto.pointColor) {
+            formData.append('pointColor', dto.pointColor);
+        }
+
+        if (dto.backgroundImage) {
+            formData.append('backgroundImage', dto.backgroundImage);
+        }
+
+        dto.layers.forEach((layer, layerIndex) => {
+            const layerPrefix: string = `layers[${layerIndex}]`;
+
+            formData.append(`${layerPrefix}.id`, layer.id);
+            formData.append(`${layerPrefix}.regionName`, layer.regionName);
+            formData.append(`${layerPrefix}.isActive`, String(layer.isActive ?? false));
+
+            if (layer.style) {
+                Object.entries(layer.style).forEach(([key, value]: [string, unknown]) => {
+                    if (value !== undefined && value !== null) {
+                        formData.append(
+                            `${layerPrefix}.style.${key}`,
+                            String(value)
+                        );
+                    }
+                });
+            }
+
+            if (layer.analyticsData) {
+                const analyticsPrefix: string = `${layerPrefix}.analyticsData`;
+
+                formData.append(
+                    `${analyticsPrefix}.partnersCount`,
+                    String(layer.analyticsData.partnersCount)
+                );
+                formData.append(
+                    `${analyticsPrefix}.excursionsCount`,
+                    String(layer.analyticsData.excursionsCount)
+                );
+                formData.append(
+                    `${analyticsPrefix}.membersCount`,
+                    String(layer.analyticsData.membersCount)
+                );
+                formData.append(
+                    `${analyticsPrefix}.isActive`,
+                    'true'
+                );
+
+                if (layer.analyticsData.image) {
+                    formData.append(
+                        `${analyticsPrefix}.image`,
+                        layer.analyticsData.image
+                    );
+                    console.log(layer.analyticsData.image.name);
+                }
+            }
+
+            layer.points?.forEach((point, pointIndex) => {
+                const pointPrefix: string = `${layerPrefix}.points[${pointIndex}]`;
+
+                formData.append(`${pointPrefix}.id`, point.id);
+                formData.append(`${pointPrefix}.title`, point.title);
+                formData.append(`${pointPrefix}.year`, String(point.year));
+                formData.append(
+                    `${pointPrefix}.coordinates[0]`,
+                    String(point.coordinates[0])
+                );
+                formData.append(
+                    `${pointPrefix}.coordinates[1]`,
+                    String(point.coordinates[1])
+                );
+                formData.append(`${pointPrefix}.description`, point.description);
+
+                if (point.excursionUrl) {
+                    formData.append(`${pointPrefix}.excursionUrl`, point.excursionUrl);
+                }
+                if (point.image) {
+                    formData.append(
+                        `${pointPrefix}.image`,
+                        point.image
+                    );
+                    console.log(point.image.name);
+                }
+            });
+        });
+
+        return formData;
     }
 }

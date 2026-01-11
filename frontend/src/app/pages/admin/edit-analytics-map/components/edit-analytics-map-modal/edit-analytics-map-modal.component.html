@@ -2,7 +2,7 @@
     <edit-region-modal
         class="edit-analytics-map-modal__region-settings-modal"
         [form]="editItemForm"
-        [allRegionsList]="allRegions()"
+        [allRegionsList]="allRegionsNames()"
         (closeModal)="closeEditItemModal()"
         (itemSaved)="saveRegion()"
     />
@@ -122,6 +122,7 @@
         type="submit"
         tuiButton
         size="m"
+        [loading]="isSaving()"
         [disabled]="settingsForm.invalid || isEditItemModalOpen()"
         (click)="saveMap()"
     >
