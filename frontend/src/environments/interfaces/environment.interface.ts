@@ -3,5 +3,4 @@ export interface IEnvironment {
     host: string;
     clientApiUrl: string;
     adminApiUrl: string;
-    authTokenTimeToLive: number;
 }

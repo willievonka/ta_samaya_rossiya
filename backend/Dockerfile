@@ -2,7 +2,6 @@
 WORKDIR /app
 
 COPY *.sln ./
-
 COPY src/WebApi/WebApi.csproj src/WebApi/
 COPY src/Application/Application.csproj src/Application/
 COPY src/Domain/Domain.csproj src/Domain/
@@ -12,15 +11,17 @@ RUN dotnet restore src/WebApi/WebApi.csproj
 
 COPY src/ src/
 
-RUN dotnet publish src/WebApi/WebApi.csproj -c Release -o /app/publish --no-restore
+RUN dotnet publish src/WebApi/WebApi.csproj \
+    -c Release \
+    -r linux-musl-x64 \
+    --self-contained false \
+    -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine3.22 AS final
 WORKDIR /app
 
-EXPOSE 8080
-
 COPY --from=build /app/publish .
 
-USER $APP_UID
+ENV ASPNETCORE_URLS=http://+:8080
 
 ENTRYPOINT ["dotnet", "WebApi.dll"]
