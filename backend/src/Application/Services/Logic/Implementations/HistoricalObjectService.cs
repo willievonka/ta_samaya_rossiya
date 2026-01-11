@@ -68,7 +68,8 @@ public class HistoricalObjectService : IHistoricalObjectService
     /// <param name="histObjectDto"></param>
     /// <param name="ct"></param>
     /// <returns></returns>
-    public async Task<Guid> UpdateHistoricalObjectAsync(Guid histObjectId, HistoricalObjectDto histObjectDto, CancellationToken ct)
+    public async Task<Guid> UpdateHistoricalObjectAsync(Guid histObjectId, HistoricalObjectDto histObjectDto,
+        CancellationToken ct)
     {
         var histObject = await _historicalObjectRepository.GetByIdAsync(histObjectId, ct);
 
@@ -77,18 +78,22 @@ public class HistoricalObjectService : IHistoricalObjectService
             _logger.LogWarning("HistoricalObject {histObjectId} could not be found", histObjectId);
             return Guid.Empty;
         }
-        
+
         if (histObjectDto.Image != null)
-        { 
+        {
             _logger.LogInformation("Starting update HistoricalObject image");
             var fileUri = await _imageService.UpdateImageAsync(histObject.Id, histObject.ImagePath, FilePath,
                 histObjectDto.Image);
-            
+
             histObject.ImagePath = fileUri;
         }
-        else _logger.LogWarning("Image is null");
-        
-        if (histObjectDto.ExcursionUrl != null) histObject.ExcursionUrl = histObjectDto.ExcursionUrl;
+        else if (histObject.ImagePath != null)
+        {
+            await _imageService.DeleteImageAsync(histObject.ImagePath);
+            _logger.LogInformation("Image {path} deleted", histObject.ImagePath);
+        }
+
+        histObject.ExcursionUrl = histObjectDto.ExcursionUrl ?? null;
         if (histObjectDto.Year != null) histObject.Year = histObjectDto.Year.Value;
         if (histObjectDto.Title != null) histObject.Title = histObjectDto.Title;
         if (histObjectDto.Description != null) histObject.Description = histObjectDto.Description;

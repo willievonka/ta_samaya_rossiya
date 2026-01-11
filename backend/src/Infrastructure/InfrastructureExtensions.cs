@@ -25,6 +25,8 @@ public static class InfrastructureExtensions
         services.AddScoped<IRegionSeederService, RegionSeederService>();
         services.AddScoped<ISaveImageService, SaveImageService>();
         services.AddScoped<IAdminSeederService, AdminSeederService>();
+        services.AddScoped<IMapSeederService, MapSeederService>();
+        
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITokenService, TokenService>();
         
