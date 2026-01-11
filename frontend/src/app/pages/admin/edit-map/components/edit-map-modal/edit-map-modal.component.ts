@@ -322,7 +322,7 @@ export class EditMapModalComponent
             return;
         }
 
-        const url: string | undefined = item.imagePath.trim();
+        const url: string | undefined = item.imagePath?.trim();
         this.editItemForm.controls.image.setValue(
             url ? this.fileService.getCachedFileByUrl(url) : null,
         );

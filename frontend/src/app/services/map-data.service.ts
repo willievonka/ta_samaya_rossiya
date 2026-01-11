@@ -60,7 +60,10 @@ export class MapDataService {
                             `${this._adminApiUrl}/maps`,
                             formData(false),
                             { params: new HttpParams({ fromObject: { mapId: res.mapId } }) }
-                        ).pipe(catchError(handleError));
+                        ).pipe(
+                            map(() => res.mapId),
+                            catchError(handleError)
+                        );
                     })
                 );
         }
@@ -176,14 +179,12 @@ export class MapDataService {
                             `${analyticsPrefix}.image`,
                             layer.analyticsData.image
                         );
-                        console.log(layer.analyticsData.image.name);
                     }
                 }
 
                 layer.points?.forEach((point, pointIndex) => {
                     const pointPrefix: string = `${layerPrefix}.points[${pointIndex}]`;
 
-                    formData.append(`${pointPrefix}.id`, point.id);
                     formData.append(`${pointPrefix}.title`, point.title);
                     formData.append(`${pointPrefix}.year`, String(point.year));
                     formData.append(
@@ -196,6 +197,9 @@ export class MapDataService {
                     );
                     formData.append(`${pointPrefix}.description`, point.description);
 
+                    if (point.id) {
+                        formData.append(`${pointPrefix}.id`, point.id);
+                    }
                     if (point.excursionUrl) {
                         formData.append(`${pointPrefix}.excursionUrl`, point.excursionUrl);
                     }
@@ -204,7 +208,6 @@ export class MapDataService {
                             `${pointPrefix}.image`,
                             point.image
                         );
-                        console.log(point.image.name);
                     }
                 });
             });

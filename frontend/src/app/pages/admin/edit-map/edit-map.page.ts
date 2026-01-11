@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
 import { EditMapPageBaseComponent } from '../../../components/map-page/edit-map.page.base.component';
 import { IMapPoint } from '../../../components/map/interfaces/map-point.interface';
 import { PageHeaderComponent } from '../../../components/page-header/page-header.component';
@@ -26,7 +26,7 @@ import { Router } from '@angular/router';
     ]
 })
 export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
-    protected readonly isEditMode: boolean = !!this.mapId;
+    protected readonly isEditMode: WritableSignal<boolean> = signal<boolean>(!!this.mapId);
     private readonly _router: Router = inject(Router);
 
     /** Обработчик сохранения карты */
@@ -59,8 +59,13 @@ export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
                     finalize(() => this.isSaving.set(false))
                 )
                 .subscribe((mapId) => {
-                    if (!this.isEditMode) {
-                        this._router.navigate([`admin/edit-map?id=${mapId}`]);
+                    if (!this.isEditMode()) {
+                        this._router.navigate(
+                            ['admin/edit-map'],
+                            { queryParams: { id: mapId } }
+                        );
+
+                        this.isEditMode.set(false);
                     }
                 });
         }

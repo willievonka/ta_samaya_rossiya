@@ -1,7 +1,7 @@
 <div class="edit-map">
     <page-header
         class="edit-map__header"
-        [title]="isEditMode ? 'Редактирование карты' : 'Создание карты'"
+        [title]="isEditMode() ? 'Редактирование карты' : 'Создание карты'"
         [options]="headerOptions"
     />
     @if (zoomActions(); as zoomActions) {
@@ -25,7 +25,7 @@
             [model]="model"
             [card]="card()"
             [isSaving]="isSaving()"
-            [canDelete]="isEditMode"
+            [canDelete]="isEditMode()"
             (mapSaved)="handleMapSave($event)"
             (mapDeleted)="handleMapDelete()"
             (activeItemsChanged)="handlePointsChange($event)"
