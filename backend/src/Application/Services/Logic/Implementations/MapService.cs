@@ -223,6 +223,7 @@ public class MapService : IMapService
         else if (map.BackgroundImage != null)
         { 
             await _imageService.DeleteImageAsync(map.BackgroundImage);
+            map.BackgroundImage = null;
             _logger.LogInformation("Image {path} deleted", map.BackgroundImage);
         }
         
