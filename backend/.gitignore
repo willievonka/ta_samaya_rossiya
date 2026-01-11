@@ -11,6 +11,7 @@
 *.sln.docstates
 *.env
 .idea/
+/src/WebApi/wwwroot/images/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

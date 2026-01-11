@@ -25,6 +25,7 @@ services:
       - "8080:8080"
     volumes:
       - ./backend:/app
+      - ./backend/src/WebApi/wwwroot/images:/src/WebApi/wwwroot/images
     env_file:
       - ./backend/.env
     depends_on:
