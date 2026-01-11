@@ -40,7 +40,10 @@ public class MapService : IMapService
             return list;
         }
 
-        foreach (var card in cards)
+        var sortedCards = cards.OrderByDescending(c => c.IsAnalytics)
+                                                    .ThenBy(c => c.CreatedAt);
+        
+        foreach (var card in sortedCards)
         {
             list.Add(new MapDto
             {
@@ -53,7 +56,7 @@ public class MapService : IMapService
             });
         }
         
-        return list.OrderByDescending(m => m.IsAnalytics).ToList();
+        return list;
     }
 
     /// <summary>
