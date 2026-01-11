@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, output, OutputEmitterRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, InputSignal, OnInit, output, OutputEmitterRef } from '@angular/core';
 import { EditMapModalBaseComponent } from '../../../../../components/edit-map-modal/edit-map-modal.base.component';
 import { IMapSettingsForm } from '../../../../../components/edit-map-modal/interfaces/map-settings-form.interface';
 import { IEditPointForm } from '../../interfaces/edit-point-form.interface';
@@ -49,7 +49,10 @@ export class EditMapModalComponent
     extends EditMapModalBaseComponent<IMapSettingsForm, IEditPointForm, IMapPoint>
     implements OnInit
 {
+    public readonly canDelete: InputSignal<boolean> = input(true);
+
     public readonly colorsChanged: OutputEmitterRef<{ layerWithPointsColor: string, pointColor: string }> = output();
+    public readonly mapDeleted: OutputEmitterRef<void> = output();
 
     protected readonly cardPreviewBackgroundImage$: Observable<SafeStyle | null> = this.createImagePreview(
         this.settingsForm.controls.cardBackgroundImage
@@ -59,6 +62,13 @@ export class EditMapModalComponent
         super.ngOnInit();
         this.initModel();
         this.handleColorsChange();
+    }
+
+    /** Удалить карту */
+    protected deleteMap(): void {
+        if (confirm('Вы уверены, что хотите удалить проект?')) {
+            this.mapDeleted.emit();
+        }
     }
 
     /** Собрать форму настроек */
@@ -296,7 +306,7 @@ export class EditMapModalComponent
             image: controls.image.value,
             imagePath: '',
             description: controls.description.value.trim(),
-            excursionUrl: controls.excursionUrl.value.trim()
+            excursionUrl: controls.excursionUrl.value
         } as IMapPoint;
     }
 

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { EditMapPageBaseComponent } from '../../../components/map-page/edit-map.page.base.component';
 import { IMapPoint } from '../../../components/map/interfaces/map-point.interface';
 import { PageHeaderComponent } from '../../../components/page-header/page-header.component';
@@ -9,7 +9,8 @@ import { IMapModel } from '../../../components/map/models/map.model';
 import { IMapLayer } from '../../../components/map/interfaces/map-layer.interface';
 import { ɵFormGroupRawValue } from '@angular/forms';
 import { IMapSettingsForm } from '../../../components/edit-map-modal/interfaces/map-settings-form.interface';
-import { take, tap } from 'rxjs';
+import { finalize, take, tap } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'edit-map',
@@ -25,6 +26,9 @@ import { take, tap } from 'rxjs';
     ]
 })
 export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
+    protected readonly isEditMode: boolean = !!this.mapId;
+    private readonly _router: Router = inject(Router);
+
     /** Обработчик сохранения карты */
     protected handleMapSave(savedData: ɵFormGroupRawValue<IMapSettingsForm>): void {
         this.isSaving.set(true);
@@ -45,14 +49,31 @@ export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
                 infoText: model.infoText,
                 backgroundImage: savedData.cardBackgroundImage,
                 description: savedData.cardDescription,
-                layers: model.layers.map(layer => layer.properties)
+                layers: model.layers.map(layer => layer.properties),
+                pointColor: model.pointColor,
+                activeLayerColor: model.layerWithPointsColor
             })
                 .pipe(
                     take(1),
-                    tap(() => this.hasUnsavedChanges.set(false))
+                    tap(() => this.hasUnsavedChanges.set(false)),
+                    finalize(() => this.isSaving.set(false))
                 )
-                .subscribe(() => this.isSaving.set(false));
+                .subscribe((mapId) => {
+                    if (!this.isEditMode) {
+                        this._router.navigate([`admin/edit-map?id=${mapId}`]);
+                    }
+                });
         }
+    }
+
+    /** Обработчик удаления карты */
+    protected handleMapDelete(): void {
+        this.mapDataService.deleteMap(this.mapId)
+            .pipe(
+                take(1),
+                tap(() => this._router.navigate(['admin']))
+            )
+            .subscribe();
     }
 
     /**

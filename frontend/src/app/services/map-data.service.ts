@@ -1,6 +1,6 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { catchError, EMPTY, map, Observable } from 'rxjs';
+import { catchError, EMPTY, map, Observable, switchMap } from 'rxjs';
 import { IMapLayerProperties } from '../components/map/interfaces/map-layer.interface';
 import { environment } from '../../environments';
 import { IMapDto } from '../components/map/dto/map.dto';
@@ -41,15 +41,49 @@ export class MapDataService {
      * @param mapId
      * @param data
      */
-    public saveMap(mapId: string, dto: ISaveMapDto): Observable<void> {
-        return this._http.put<void>(
+    public saveMap(mapId: string, dto: ISaveMapDto): Observable<string> {
+        const formData = (isCreate: boolean): FormData => this.mapDtoToFormData(dto, isCreate);
+        const handleError = (error: HttpErrorResponse): Observable<never> => {
+            if (error.status !== 401) {
+                alert('Данные не сохранены, попробуйте еще раз');
+            }
+
+            return EMPTY;
+        };
+
+        if (!mapId) {
+            return this._http.post<{ mapId: string }>(`${this._adminApiUrl}/maps`, formData(true))
+                .pipe(
+                    catchError(handleError),
+                    switchMap((res) => {
+                        return this._http.put<string>(
+                            `${this._adminApiUrl}/maps`,
+                            formData(false),
+                            { params: new HttpParams({ fromObject: { mapId: res.mapId } }) }
+                        ).pipe(catchError(handleError));
+                    })
+                );
+        }
+
+        return this._http.put<string>(
             `${this._adminApiUrl}/maps`,
-            this.mapDtoToFormData(dto),
+            formData(false),
+            { params: new HttpParams({ fromObject: { mapId } }) }
+        ).pipe(catchError(handleError));
+    }
+
+    /**
+     * Удалить карту
+     * @param mapId
+     */
+    public deleteMap(mapId: string): Observable<void> {
+        return this._http.delete<void>(
+            `${this._adminApiUrl}/maps`,
             { params: new HttpParams({ fromObject: { mapId } }) }
         ).pipe(
             catchError((error) => {
                 if (error.status !== 401) {
-                    alert('Данные не сохранены, попробуйте еще раз');
+                    alert('Не удалось удалить проект, попробуйте еще раз');
                 }
 
                 return EMPTY;
@@ -78,7 +112,7 @@ export class MapDataService {
      * Смаппить dto в FormData
      * @param dto
      */
-    private mapDtoToFormData(dto: ISaveMapDto): FormData {
+    private mapDtoToFormData(dto: ISaveMapDto, isCreate?: boolean): FormData {
         const formData: FormData = new FormData();
 
         formData.append('isAnalytics', String(dto.isAnalytics));
@@ -98,81 +132,83 @@ export class MapDataService {
             formData.append('backgroundImage', dto.backgroundImage);
         }
 
-        dto.layers.forEach((layer, layerIndex) => {
-            const layerPrefix: string = `layers[${layerIndex}]`;
+        if (!isCreate) {
+            dto.layers.forEach((layer, layerIndex) => {
+                const layerPrefix: string = `layers[${layerIndex}]`;
 
-            formData.append(`${layerPrefix}.id`, layer.id);
-            formData.append(`${layerPrefix}.regionName`, layer.regionName);
-            formData.append(`${layerPrefix}.isActive`, String(layer.isActive ?? false));
+                formData.append(`${layerPrefix}.id`, layer.id);
+                formData.append(`${layerPrefix}.regionName`, layer.regionName);
+                formData.append(`${layerPrefix}.isActive`, String(layer.isActive ?? false));
 
-            if (layer.style) {
-                Object.entries(layer.style).forEach(([key, value]: [string, unknown]) => {
-                    if (value !== undefined && value !== null) {
+                if (layer.style) {
+                    Object.entries(layer.style).forEach(([key, value]: [string, unknown]) => {
+                        if (value !== undefined && value !== null) {
+                            formData.append(
+                                `${layerPrefix}.style.${key}`,
+                                String(value)
+                            );
+                        }
+                    });
+                }
+
+                if (layer.analyticsData) {
+                    const analyticsPrefix: string = `${layerPrefix}.analyticsData`;
+
+                    formData.append(
+                        `${analyticsPrefix}.partnersCount`,
+                        String(layer.analyticsData.partnersCount)
+                    );
+                    formData.append(
+                        `${analyticsPrefix}.excursionsCount`,
+                        String(layer.analyticsData.excursionsCount)
+                    );
+                    formData.append(
+                        `${analyticsPrefix}.membersCount`,
+                        String(layer.analyticsData.membersCount)
+                    );
+                    formData.append(
+                        `${analyticsPrefix}.isActive`,
+                        'true'
+                    );
+
+                    if (layer.analyticsData.image) {
                         formData.append(
-                            `${layerPrefix}.style.${key}`,
-                            String(value)
+                            `${analyticsPrefix}.image`,
+                            layer.analyticsData.image
                         );
+                        console.log(layer.analyticsData.image.name);
+                    }
+                }
+
+                layer.points?.forEach((point, pointIndex) => {
+                    const pointPrefix: string = `${layerPrefix}.points[${pointIndex}]`;
+
+                    formData.append(`${pointPrefix}.id`, point.id);
+                    formData.append(`${pointPrefix}.title`, point.title);
+                    formData.append(`${pointPrefix}.year`, String(point.year));
+                    formData.append(
+                        `${pointPrefix}.coordinates[0]`,
+                        String(point.coordinates[0])
+                    );
+                    formData.append(
+                        `${pointPrefix}.coordinates[1]`,
+                        String(point.coordinates[1])
+                    );
+                    formData.append(`${pointPrefix}.description`, point.description);
+
+                    if (point.excursionUrl) {
+                        formData.append(`${pointPrefix}.excursionUrl`, point.excursionUrl);
+                    }
+                    if (point.image) {
+                        formData.append(
+                            `${pointPrefix}.image`,
+                            point.image
+                        );
+                        console.log(point.image.name);
                     }
                 });
-            }
-
-            if (layer.analyticsData) {
-                const analyticsPrefix: string = `${layerPrefix}.analyticsData`;
-
-                formData.append(
-                    `${analyticsPrefix}.partnersCount`,
-                    String(layer.analyticsData.partnersCount)
-                );
-                formData.append(
-                    `${analyticsPrefix}.excursionsCount`,
-                    String(layer.analyticsData.excursionsCount)
-                );
-                formData.append(
-                    `${analyticsPrefix}.membersCount`,
-                    String(layer.analyticsData.membersCount)
-                );
-                formData.append(
-                    `${analyticsPrefix}.isActive`,
-                    'true'
-                );
-
-                if (layer.analyticsData.image) {
-                    formData.append(
-                        `${analyticsPrefix}.image`,
-                        layer.analyticsData.image
-                    );
-                    console.log(layer.analyticsData.image.name);
-                }
-            }
-
-            layer.points?.forEach((point, pointIndex) => {
-                const pointPrefix: string = `${layerPrefix}.points[${pointIndex}]`;
-
-                formData.append(`${pointPrefix}.id`, point.id);
-                formData.append(`${pointPrefix}.title`, point.title);
-                formData.append(`${pointPrefix}.year`, String(point.year));
-                formData.append(
-                    `${pointPrefix}.coordinates[0]`,
-                    String(point.coordinates[0])
-                );
-                formData.append(
-                    `${pointPrefix}.coordinates[1]`,
-                    String(point.coordinates[1])
-                );
-                formData.append(`${pointPrefix}.description`, point.description);
-
-                if (point.excursionUrl) {
-                    formData.append(`${pointPrefix}.excursionUrl`, point.excursionUrl);
-                }
-                if (point.image) {
-                    formData.append(
-                        `${pointPrefix}.image`,
-                        point.image
-                    );
-                    console.log(point.image.name);
-                }
             });
-        });
+        }
 
         return formData;
     }

@@ -158,14 +158,17 @@
         >
             Сохранить
         </button>
-        <button
-            type="button"
-            appearance="outline"
-            tuiButton
-            size="m"
-            [style.color]="'var(--tui-text-negative)'"
-        >
-            Удалить проект
-        </button>
+        @if (canDelete()) {
+            <button
+                type="button"
+                appearance="outline"
+                tuiButton
+                size="m"
+                [style.color]="'var(--tui-text-negative)'"
+                (click)="deleteMap()"
+            >
+                Удалить проект
+            </button>
+        }
     </div>
 </div>

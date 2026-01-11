@@ -8,7 +8,7 @@ import { EditMapPageBaseComponent } from '../../../components/map-page/edit-map.
 import { IMapModel } from '../../../components/map/models/map.model';
 import { ɵFormGroupRawValue } from '@angular/forms';
 import { IAnalyticsMapSettingsForm } from '../../../components/edit-map-modal/interfaces/analytics-map-settings-form.interface';
-import { take, tap } from 'rxjs';
+import { finalize, take, tap } from 'rxjs';
 
 @Component({
     selector: 'edit-analytics-map-page',
@@ -46,9 +46,10 @@ export class EditAnalyticsMapPageComponent extends EditMapPageBaseComponent<IMap
             })
                 .pipe(
                     take(1),
-                    tap(() => this.hasUnsavedChanges.set(false))
+                    tap(() => this.hasUnsavedChanges.set(false)),
+                    finalize(() => this.isSaving.set(false))
                 )
-                .subscribe(() => this.isSaving.set(false));
+                .subscribe();
         }
     }
 
