@@ -118,11 +118,13 @@ export class MapDataService {
     private mapDtoToFormData(dto: ISaveMapDto, isCreate?: boolean): FormData {
         const formData: FormData = new FormData();
 
-        formData.append('isAnalytics', String(dto.isAnalytics));
         formData.append('title', dto.title);
         formData.append('description', dto.description);
         formData.append('infoText', dto.infoText);
 
+        if (dto.isAnalytics) {
+            formData.append('isAnalytics', String(dto.isAnalytics));
+        }
         if (dto.activeLayerColor) {
             formData.append('activeLayerColor', dto.activeLayerColor);
         }
