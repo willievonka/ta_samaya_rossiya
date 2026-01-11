@@ -65,6 +65,9 @@ public static class InfrastructureStartup
             
             var adminSeeder = scope.ServiceProvider.GetRequiredService<IAdminSeederService>();
             await adminSeeder.SeedIfNotExistAsync();
+            
+            var mapSeeder = scope.ServiceProvider.GetRequiredService<IMapSeederService>();
+            await mapSeeder.SeedAnalyticsMapIfEmptyAsync();
         }
         catch (Exception e)
         {

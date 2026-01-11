@@ -37,6 +37,15 @@ public class AdminSeederService : IAdminSeederService
                     , index);
                 break;
             }
+
+            if (password.Length < 8 || !password.Any(char.IsUpper) || !password.Any(char.IsLower) ||
+                !password.Any(char.IsDigit))
+            {
+                _logger.LogWarning("Environment file does not contain email or password for creating admin number {index}"
+                    , index);
+                throw new InvalidOperationException($"The administrator's {email} password is invalid. " +
+                                                    "It contains less than 8 characters or is case-sensitive.");
+            }
             
             var existingAdmin = await _adminRepository.GetByEmailAsync(email);
             if (existingAdmin != null)

@@ -112,7 +112,11 @@ public class IndicatorsService : IIndicatorsService
             
             indicators.ImagePath = fileUri;
         }
-        else _logger.LogWarning("Image is null");
+        else if (indicators.ImagePath != null)
+        {
+            await _imageService.DeleteImageAsync(indicators.ImagePath);
+            _logger.LogInformation("Image {path} deleted", indicators.ImagePath);
+        }
         
         if (indicatorsRegionDto.IsActive != null) indicators.IsActive = indicatorsRegionDto.IsActive.Value;
         if (indicatorsRegionDto.Excursions != null) indicators.Excursions = indicatorsRegionDto.Excursions.Value;

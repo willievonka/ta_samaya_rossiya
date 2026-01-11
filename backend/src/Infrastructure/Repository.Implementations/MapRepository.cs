@@ -20,6 +20,12 @@ public class MapRepository : IMapRepository
         await _context.SaveChangesAsync(ct);
     }
 
+    public async Task<bool> AnalyticsMapExistsAsync()
+    {
+        return await _context.Maps
+            .AnyAsync(m => m.IsAnalytics == true);;
+    }
+
     public async Task<Map?> GetHeaderByIdAsync(Guid mapId, CancellationToken ct)
     {
         return await _context.Maps
