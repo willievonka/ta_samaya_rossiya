@@ -1,0 +1,24 @@
+﻿services:
+  backend:
+    image: backend:prod
+    container_name: backend-prod-container
+    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/app
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+  db:
+    image: postgis/postgis:17-3.5-alpine
+    container_name: db-prod
+    restart: always
+    volumes:
+      - ./db/postgres-data:/var/lib/postgresql/data
+    env_file:
+      - ./backend/.env
