@@ -1,7 +1,7 @@
 <div class="edit-map">
     <page-header
         class="edit-map__header"
-        [title]="'Редактирование карты'"
+        [title]="isEditMode ? 'Редактирование карты' : 'Создание карты'"
         [options]="headerOptions"
     />
     @if (zoomActions(); as zoomActions) {

@@ -156,7 +156,7 @@
             [disabled]="settingsForm.invalid || isEditItemModalOpen()"
             (click)="saveMap()"
         >
-            Сохранить
+            {{ canDelete() ? 'Сохранить' : 'Создать' }}
         </button>
         @if (canDelete()) {
             <button
