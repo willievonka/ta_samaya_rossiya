@@ -37,7 +37,6 @@ public class MapRepository : IMapRepository
     {
         return await _context.Maps
             .AsNoTracking()
-            .OrderBy(m => m.CreatedAt)
             .ToListAsync(ct);
     }
 
