@@ -75,8 +75,8 @@ public class MapService : IMapService
         var map = new Map
         {
             Title = mapDto.Title!,
-            Description = mapDto.Description!,
-            Info = mapDto.Info!,
+            Description = mapDto.Description ?? "",
+            Info = mapDto.Info ?? "",
             IsAnalytics = mapDto.IsAnalytics,
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
@@ -220,7 +220,11 @@ public class MapService : IMapService
             
             map.BackgroundImage = fileUri;
         }
-        else _logger.LogWarning("Image is null");
+        else if (map.BackgroundImage != null)
+        { 
+            await _imageService.DeleteImageAsync(map.BackgroundImage);
+            _logger.LogInformation("Image {path} deleted", map.BackgroundImage);
+        }
         
         if (mapDto.Title != null) map.Title = mapDto.Title;
         if (mapDto.Description != null) map.Description = mapDto.Description;
