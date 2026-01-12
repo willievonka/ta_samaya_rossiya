@@ -7,7 +7,7 @@ RUN npm install -g @angular/cli
 RUN npm install
 
 COPY . .
-RUN ng build --configuration production
+RUN ng build --configuration production --base-href /map/
 
 FROM alpine:3.22.2
 
