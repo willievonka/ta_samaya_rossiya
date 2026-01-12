@@ -16,6 +16,9 @@
     build:
       context: ./backend
       dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
     volumes:
       - ./backend/src/WebApi/wwwroot/images:/app/wwwroot/images
     env_file:

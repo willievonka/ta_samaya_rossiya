@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using Application;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
@@ -147,6 +148,11 @@ public class Program
     
     private static void ConfigureMiddleware(WebApplication app)
     {
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+        });
+        
         app.UseSerilogRequestLogging();
         app.UseCors("AllowAngularDev");
         app.UseDefaultFiles();
