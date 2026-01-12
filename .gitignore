@@ -4,3 +4,7 @@
 
 [Bb]in/
 [Obj]j/
+
+README.md
+
+docker-compose.dev.yml

@@ -1747,7 +1747,6 @@
 
     <ItemGroup>
       <Folder Include="wwwroot\images\" />
-      <Folder Include="wwwroot\images\indicators\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -1757,6 +1756,16 @@
       <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019af8af-5dd2-711b-a9d5-e395666ad662.Image.png" />
       <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019af8af-5f11-7293-ade3-bfd50c0e3d3f.Image.jpg" />
       <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019b1d2f-56aa-7b90-ad87-466ed39b3d61.Image.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019b20ef-55e2-726d-946b-3f42f47f4594.41ce1d44-8e9e-4f8f-b9a5-6ac0d74a00a2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019b20ef-5632-71a2-963b-07c61b4fba25.Image.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019b2115-4c53-74ed-990c-92c98d981a4e.Leningrad.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019b2115-4d58-74d6-a54f-125fa91f4581.stalingrad.jpeg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019b211e-ff16-7dba-bc58-998060f05b65.PLESECK.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\historical-objects\019b211f-005e-7b0a-8c60-b0939af0b5c4.BAIKONUR.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\map-cards\019b20ef-5380-76aa-bfc5-f5c2e64c58b4.BackgroundImage.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\map-cards\019b20ef-d437-79a6-a3be-5d34c6e30b7b.BackgroundImage.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\map-cards\019b2115-4b74-79ee-a080-b4e5dd620f27.image_2.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\images\map-cards\019b211e-fedf-7ba0-940c-ba798ffaa138.image_3.svg" />
     </ItemGroup>
 
 </Project>

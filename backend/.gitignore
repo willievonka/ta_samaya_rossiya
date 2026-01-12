@@ -419,3 +419,11 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+
+Tests/
+
+README.md
+
+#Dockerfile development
+Dockerfile.dev
