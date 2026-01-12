@@ -7,11 +7,11 @@
       dockerfile: Dockerfile
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
-    ports:
-      - "8001:80"
-      - "443:443"
+    networks:
+      - shared_net
     depends_on:
       - backend
+
   backend:
     image: backend:prod
     container_name: backend-prod-container
@@ -28,6 +28,7 @@
       - ./backend/.env
     depends_on:
       - db
+
   db:
     image: postgis/postgis:17-3.5-alpine
     container_name: db-prod-container
@@ -36,3 +37,8 @@
       - ./db/postgres-data:/var/lib/postgresql/data
     env_file:
       - ./backend/.env
+
+networks:
+  shared_net:
+    external: true
+    name: shared_network
