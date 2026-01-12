@@ -134,6 +134,13 @@ public class MapService : IMapService
             await _imageService.DeleteImageAsync(map.BackgroundImage);
         }
         
+        var regionsIds = await _layerRegionService.GetAllIdsByMapIdAsync(mapId, ct);
+        
+        foreach (var id in regionsIds)
+        {
+            await _layerRegionService.DeleteLayerRegionAsync(id, map.Id, ct);
+        }
+        
         await _mapRepository.DeleteByIdAsync(mapId, ct);
        
         _logger.LogInformation("Map {mapId} deleted", mapId);
