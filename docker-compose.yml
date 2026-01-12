@@ -5,10 +5,14 @@
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt:ro
     networks:
       - shared_net
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - django_shared_static:/staticfiles:ro
+    ports:
+      - "80:80"
     depends_on:
       - backend
 
@@ -24,6 +28,8 @@
       - ASPNETCORE_URLS=http://+:8080
     volumes:
       - ./backend/src/WebApi/wwwroot/images:/app/wwwroot/images
+    networks:
+      - shared_net
     env_file:
       - ./backend/.env
     depends_on:
@@ -37,8 +43,14 @@
       - ./db/postgres-data:/var/lib/postgresql/data
     env_file:
       - ./backend/.env
+    networks:
+      - shared_net
 
 networks:
   shared_net:
     external: true
     name: shared_network
+
+volumes:
+  django_shared_static:
+    external: true
