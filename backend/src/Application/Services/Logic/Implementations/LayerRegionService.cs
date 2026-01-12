@@ -322,6 +322,18 @@ public class LayerRegionService : ILayerRegionService
             return false;
         }
         
+        var historicalObjectsIds = await _historicalObjectService.GetAllIdsByLayerRegionIdAsync(layerRegionId, ct);
+        foreach (var histObjectId in historicalObjectsIds)
+        {
+            await _historicalObjectService.DeleteHistoricalObjectAsync(histObjectId, ct);
+        }
+        
+        var styleDto = await _layerRegionStyleService.GetStyleByLayerIdAsync(layerRegionId, ct);
+        if (styleDto != null)
+        {
+            await _layerRegionStyleService.DeleteByLayerIdAsync(layerRegionId, ct);
+        }
+        
         var regionName = layerRegion.Region.Name;
         
         await _layerRegionRepository.DeleteByIdAsync(layerRegionId, ct);
