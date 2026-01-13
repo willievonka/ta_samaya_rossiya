@@ -1,4 +1,18 @@
 ﻿services:
+  npm:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: npm-proxy
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '127.0.0.1:81:81'
+    volumes:
+      - ./npm/data:/data
+      - ./npm/letsencrypt:/etc/letsencrypt
+    networks:
+      - shared_net
+  
   frontend:
     image: frontend:prod
     container_name: frontend-prod-container
@@ -11,8 +25,6 @@
       - ./frontend:/app
       - /app/node_modules
       - django_shared_static:/staticfiles:ro
-    ports:
-      - "80:80"
     depends_on:
       - backend
 
