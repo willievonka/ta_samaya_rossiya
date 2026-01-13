@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TuiTextfield, TuiButton, TuiIcon, TuiError } from '@taiga-ui/core';
-import { TuiFieldErrorPipe, TuiPassword } from '@taiga-ui/kit';
+import { TuiButtonLoading, TuiFieldErrorPipe, TuiPassword } from '@taiga-ui/kit';
 import { IAuthForm, IAuthFormErrors } from './interfaces/auth-form.interface';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
-import { take } from 'rxjs';
+import { finalize, take } from 'rxjs';
 
 @Component({
     selector: 'auth-page',
@@ -19,6 +19,7 @@ import { take } from 'rxjs';
         ReactiveFormsModule,
         TuiTextfield,
         TuiButton,
+        TuiButtonLoading,
         TuiIcon,
         TuiPassword,
         TuiError,
@@ -31,24 +32,26 @@ export class AuthPageComponent {
         email: new FormControl<string>('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
         password: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] })
     });
+    protected readonly isLoading: WritableSignal<boolean> = signal(false);
 
     private readonly _authService: AuthService = inject(AuthService);
     private readonly _router: Router = inject(Router);
 
     /** Войти в аккаунт */
     protected login(): void {
-        this.authForm.updateValueAndValidity();
         this.authForm.markAllAsTouched();
         this.authForm.setErrors(null);
-
         if (this.authForm.invalid) {
             return;
         }
 
         const { email, password }: { email: string; password: string } = this.authForm.getRawValue();
-
+        this.isLoading.set(true);
         this._authService.login(email, password)
-            .pipe(take(1))
+            .pipe(
+                take(1),
+                finalize(() => this.isLoading.set(false))
+            )
             .subscribe({
                 next: () => this._router.navigate(['admin']),
                 error: (error) => {
@@ -56,8 +59,9 @@ export class AuthPageComponent {
                         (error?.status === 401 || error?.status === 403)
                             ? { invalidCredits: true }
                             : { serverError: true };
-
-                    this.authForm.setErrors(errors);
+                    if (errors !== this.authForm.errors) {
+                        this.authForm.setErrors(errors);
+                    }
                 }
             });
     }

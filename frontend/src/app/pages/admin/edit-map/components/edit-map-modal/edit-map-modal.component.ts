@@ -10,13 +10,14 @@ import { TuiButton, TuiScrollbar, TuiTextfield } from '@taiga-ui/core';
 import { ImageUploaderComponent } from '../../../../../components/image-uploader/image-uploader.component';
 import { FormFieldComponent } from '../../../../../components/form-field/form-field.component';
 import { TuiAccordion } from '@taiga-ui/experimental';
-import { catchError, distinctUntilChanged, forkJoin, Observable, of, take, tap } from 'rxjs';
+import { catchError, distinctUntilChanged, forkJoin, Observable, of, startWith, take, tap } from 'rxjs';
 import { SafeStyle } from '@angular/platform-browser';
 import { IMapPoint } from '../../../../../components/map/interfaces/map-point.interface';
 import { PointsListComponent } from '../points-list/points-list.component';
 import { IMapModel } from '../../../../../components/map/models/map.model';
 import { EditPointModalComponent } from '../edit-point-modal/edit-point-modal.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { editMapConfig } from '../../../../../components/map/configs/edit-map.config';
 
 @Component({
     selector: 'edit-map-modal',
@@ -87,11 +88,11 @@ export class EditMapModalComponent
                 nonNullable: true,
                 validators: [Validators.required]
             }),
-            layerWithPointsColor: new FormControl ('', {
+            layerWithPointsColor: new FormControl (editMapConfig.defaultLayerStyle.layerWithPointsColor, {
                 nonNullable: true,
                 validators: [Validators.required]
             }),
-            pointsColor: new FormControl('', {
+            pointsColor: new FormControl(editMapConfig.defaultPointOptions.color, {
                 nonNullable: true,
                 validators: [Validators.required]
             })
@@ -220,8 +221,8 @@ export class EditMapModalComponent
             title: model.pageTitle,
             mapInfo: model.infoText,
             cardDescription: this.card()?.description ?? '',
-            pointsColor: model.pointColor ?? '',
-            layerWithPointsColor: model.layerWithPointsColor ?? ''
+            pointsColor: model.pointColor ?? this.settingsForm.controls.pointsColor.value,
+            layerWithPointsColor: model.layerWithPointsColor ?? this.settingsForm.controls.layerWithPointsColor.value
         });
 
         this.preloadFiles();
@@ -332,6 +333,7 @@ export class EditMapModalComponent
     private handleColorsChange(): void {
         this.settingsForm.valueChanges
             .pipe(
+                startWith(this.settingsForm.value),
                 distinctUntilChanged(),
                 takeUntilDestroyed(this.destroyRef)
             )

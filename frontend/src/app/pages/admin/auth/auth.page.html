@@ -44,19 +44,18 @@
                 [formControl]="authForm.controls.password"
                 [error]="[] | tuiFieldError | async"
             />
-            @if (authForm.errors) {
-                <tui-error
-                    class="auth-page__error"
-                    [formGroup]="authForm"
-                    [error]="[] | tuiFieldError | async"
-                />
-            }
+            <tui-error
+                class="auth-page__error"
+                [formGroup]="authForm"
+                [error]="[] | tuiFieldError | async"
+            />
         </div>
 
         <button
             size="l"
             tuiButton
             type="button"
+            [loading]="isLoading()"
             (click)="login()"
         >
             Войти
