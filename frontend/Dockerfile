@@ -9,9 +9,7 @@ RUN npm install
 COPY . .
 RUN ng build --configuration production --base-href /map/
 
-FROM alpine:3.22.2
-
-RUN apk add --no-cache nginx
+FROM nginx:stable-alpine
 
 COPY --from=build /app/dist/ta_samaya_rossiya /usr/share/nginx/html
 
