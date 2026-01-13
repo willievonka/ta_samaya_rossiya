@@ -1,9 +1,10 @@
-import { Directive, signal, WritableSignal } from '@angular/core';
+import { Directive, inject, signal, WritableSignal } from '@angular/core';
 import { MapPageBaseComponent } from './map.page.base.component';
 import { IPageHeaderOptions } from '../page-header/interfaces/page-header-options.interface';
 import { IMapConfig } from '../map/interfaces/map-config.interface';
 import { editMapConfig } from '../map/configs/edit-map.config';
 import { ICanComponentDeactivate } from '../../guards/can-deactivate.guard';
+import { FileService } from '../../services/file.service';
 
 @Directive()
 export class EditMapPageBaseComponent<TData>
@@ -22,6 +23,7 @@ export class EditMapPageBaseComponent<TData>
         }
     };
     protected readonly config: IMapConfig = editMapConfig;
+    protected readonly fileService: FileService = inject(FileService);
 
     /** Защита от потери изменений при выходе со страницы */
     public canDeactivate(): boolean {

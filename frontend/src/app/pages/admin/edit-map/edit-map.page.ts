@@ -9,7 +9,7 @@ import { IMapModel } from '../../../components/map/models/map.model';
 import { IMapLayer } from '../../../components/map/interfaces/map-layer.interface';
 import { ɵFormGroupRawValue } from '@angular/forms';
 import { IMapSettingsForm } from '../../../components/edit-map-modal/interfaces/map-settings-form.interface';
-import { finalize, take, tap } from 'rxjs';
+import { catchError, finalize, forkJoin, Observable, of, take, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
@@ -32,7 +32,6 @@ export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
     /** Обработчик сохранения карты */
     protected handleMapSave(savedData: ɵFormGroupRawValue<IMapSettingsForm>): void {
         this.isSaving.set(true);
-
         this.model.update((current) => ({
             pageTitle: savedData.title,
             infoText: savedData.mapInfo,
@@ -42,33 +41,23 @@ export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
         }));
 
         const model: IMapModel | undefined = this.model();
-        if (model) {
-            this.mapDataService.saveMap(this.mapId, {
-                isAnalytics: false,
-                title: model.pageTitle,
-                infoText: model.infoText,
-                backgroundImage: savedData.cardBackgroundImage,
-                description: savedData.cardDescription,
-                layers: model.layers.map(layer => layer.properties),
-                pointColor: model.pointColor,
-                activeLayerColor: model.layerWithPointsColor
-            })
-                .pipe(
-                    take(1),
-                    tap(() => this.hasUnsavedChanges.set(false)),
-                    finalize(() => this.isSaving.set(false))
-                )
-                .subscribe((mapId) => {
-                    if (!this.isEditMode()) {
-                        this._router.navigate(
-                            ['admin/edit-map'],
-                            { queryParams: { id: mapId } }
-                        );
+        if (!model) {
+            this.isSaving.set(false);
+            alert('Данные не сохранены, попробуйте еще раз');
 
-                        this.isEditMode.set(false);
-                    }
-                });
+            return;
         }
+
+        const layers: IMapLayer[] = this.cloneLayersWithPoints(model.layers);
+        const pointsToDownload: IMapPoint[] = this.collectPointsWithImagePath(layers);
+
+        const preload$: Observable<unknown> = pointsToDownload.length
+            ? forkJoin(pointsToDownload.map(p => this.downloadPointImage(p)))
+            : of(null);
+
+        preload$
+            .pipe(take(1))
+            .subscribe(() => this.saveMapWithImages(layers, model, savedData));
     }
 
     /** Обработчик удаления карты */
@@ -124,5 +113,77 @@ export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
             layerWithPointsColor: colors.layerWithPointsColor,
             pointColor: colors.pointColor
         });
+    }
+
+    /**
+     * Сделать копию слоев
+     * @param layers
+     */
+    private cloneLayersWithPoints(layers: IMapLayer[]): IMapLayer[] {
+        return layers.map(layer => ({
+            ...layer,
+            properties: {
+                ...layer.properties,
+                points: (layer.properties.points ?? []).map(p => ({ ...p }))
+            }
+        }));
+    }
+
+    /**
+     * Собрать точки с imagePath
+     * @param layers
+     */
+    private collectPointsWithImagePath(layers: IMapLayer[]): IMapPoint[] {
+        return layers.flatMap(layer =>
+            layer.properties.points?.filter(p => !p.image && p.imagePath?.trim()) ?? []
+        );
+    }
+
+    /**
+     * Загрузить изображение точки
+     * @param point
+     * @returns
+     */
+    private downloadPointImage(point: IMapPoint): Observable<File | null> {
+        return this.fileService.downloadAsFile(
+            point.imagePath!.trim(),
+            this.fileService.getFileNameFromUrl(point.imagePath!) ?? point.title
+        ).pipe(
+            tap(file => point.image = file),
+            catchError(() => of(null))
+        );
+    }
+
+    /**
+     * Сохранить карту с изображениями точек
+     * @param layers
+     * @param model
+     * @param savedData
+     */
+    private saveMapWithImages(layers: IMapLayer[], model: IMapModel, savedData: ɵFormGroupRawValue<IMapSettingsForm>): void {
+        this.mapDataService.saveMap(this.mapId, {
+            isAnalytics: false,
+            title: model.pageTitle,
+            infoText: model.infoText,
+            backgroundImage: savedData.cardBackgroundImage,
+            description: savedData.cardDescription,
+            layers: layers.map(layer => layer.properties),
+            pointColor: model.pointColor,
+            activeLayerColor: model.layerWithPointsColor
+        })
+            .pipe(
+                take(1),
+                tap(() => this.hasUnsavedChanges.set(false)),
+                finalize(() => this.isSaving.set(false))
+            )
+            .subscribe((mapId) => {
+                if (!this.isEditMode()) {
+                    this._router.navigate(
+                        ['admin/edit-map'],
+                        { queryParams: { id: mapId } }
+                    );
+                    this.isEditMode.set(false);
+                }
+            });
     }
 }

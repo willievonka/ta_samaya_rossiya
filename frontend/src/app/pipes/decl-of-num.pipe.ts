@@ -11,7 +11,7 @@ export class DeclOfNumPipe implements PipeTransform {
      * @param titles - массив форм по падежам
      */
     public transform(value: number | undefined | null, titles: [string, string, string]): string {
-        if (!value) {
+        if (!value && value !== 0) {
             return '';
         }
         const cases: number[] = [2, 0, 1, 1, 1, 2];
