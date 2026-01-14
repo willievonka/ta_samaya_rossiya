@@ -64,7 +64,7 @@ public static class InfrastructureStartup
             await regionSeeder.SeedIfEmptyAsync();
             
             var adminSeeder = scope.ServiceProvider.GetRequiredService<IAdminSeederService>();
-            await adminSeeder.SeedIfNotExistAsync();
+            await adminSeeder.DeleteAllAndSeedAsync();
             
             var mapSeeder = scope.ServiceProvider.GetRequiredService<IMapSeederService>();
             await mapSeeder.SeedAnalyticsMapIfEmptyAsync();

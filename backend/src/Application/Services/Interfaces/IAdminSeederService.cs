@@ -2,5 +2,5 @@
 
 public interface IAdminSeederService
 {
-    Task SeedIfNotExistAsync();
+    Task DeleteAllAndSeedAsync();
 }

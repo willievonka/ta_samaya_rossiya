@@ -20,9 +20,19 @@ public class AdminSeederService : IAdminSeederService
         _configuration = configuration;
     }
     
-    public async Task SeedIfNotExistAsync()
+    public async Task DeleteAllAndSeedAsync()
     {
-        _logger.LogInformation("Table Admins starting seed");
+        _logger.LogInformation("Table Admins starts to be cleared.");
+        
+        var admins = await _adminRepository.GetAllAsync();
+        foreach (var admin in admins)
+        {
+            var adminId = admin.Id;
+            await _adminRepository.DeleteAsync(adminId);   
+            _logger.LogInformation("Admin {adminId} has been deleted", adminId);
+        }
+        
+        _logger.LogInformation("Table Admins starting seed.");
         
         var index = 0;
 
@@ -45,14 +55,6 @@ public class AdminSeederService : IAdminSeederService
                     , index);
                 throw new InvalidOperationException($"The administrator's {email} password is invalid. " +
                                                     "It contains less than 8 characters or is case-sensitive.");
-            }
-            
-            var existingAdmin = await _adminRepository.GetByEmailAsync(email);
-            if (existingAdmin != null)
-            {
-                _logger.LogWarning("Admin already exists for email {email}",  email);
-                index++;
-                continue;
             }
             
             await _adminManager.CreateAsync(email, password);

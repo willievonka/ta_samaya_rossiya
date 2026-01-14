@@ -26,4 +26,22 @@ internal class AdminRepository : IAdminRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(a => a.Email == email);
     }
+
+    public async Task<List<Admin>> GetAllAsync()
+    {
+        return await _context.Admins
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task DeleteAsync(Guid adminId)
+    {
+        var existingAdmin = await _context.Admins
+            .FirstOrDefaultAsync(a => a.Id == adminId);
+        if (existingAdmin != null)
+        {
+            _context.Admins.Remove(existingAdmin);
+            await _context.SaveChangesAsync();
+        }
+    }
 }
