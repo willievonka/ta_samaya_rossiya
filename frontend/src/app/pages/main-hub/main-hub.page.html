@@ -1,14 +1,18 @@
-<page-header [title]="'Интерактивные карты России'"/>
+@if (isLoading()) {
+    <img class="main-hub__loader" src="/fallbacks/loader.gif" alt="Лоадер"/>
+} @else {
+    <page-header [title]="'Интерактивные карты России'"/>
 
-<div class="main-hub">
-    <h2 class="main-hub__description">Тематические экскурсии на карте</h2>
+    <div class="main-hub">
+        <h2 class="main-hub__description">Тематические экскурсии на карте</h2>
 
-    <div class="main-hub__content">
-        @for (mapCard of mapCardsList(); track mapCard.id) {
-            <hub-card
-                [data]="mapCard"
-                (click)="navigateToMap(mapCard)"
-            />
-        }
+        <div class="main-hub__content">
+            @for (mapCard of mapCardsList(); track mapCard.id) {
+                <hub-card
+                    [data]="mapCard"
+                    (click)="navigateToMap(mapCard)"
+                />
+            }
+        </div>
     </div>
-</div>
+}

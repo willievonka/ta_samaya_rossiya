@@ -68,4 +68,12 @@
         left: $spacing-m;
         bottom: $spacing-m;
     }
+
+    &__loader {
+        display: block;
+        margin: 35vh auto;
+        margin-bottom: 0;
+        width: 500px;
+        height: fit-content;
+    }
 }

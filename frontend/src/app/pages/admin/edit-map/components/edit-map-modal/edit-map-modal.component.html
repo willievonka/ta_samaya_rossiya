@@ -164,6 +164,7 @@
                 appearance="outline"
                 tuiButton
                 size="m"
+                [loading]="isDeleting()"
                 [style.color]="'var(--tui-text-negative)'"
                 (click)="deleteMap()"
             >

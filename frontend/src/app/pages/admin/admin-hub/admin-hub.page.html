@@ -1,27 +1,31 @@
-<page-header
-    [title]="'Панель администрирования'"
-    [options]="headerOptions"
-    (logout)="logout()"
-/>
+@if (isLoading()) {
+    <img class="admin-hub__loader" src="/fallbacks/loader.gif" alt="Лоадер"/>
+} @else {
+    <page-header
+        [title]="'Панель администрирования'"
+        [options]="headerOptions"
+        (logout)="logout()"
+    />
 
-<div class="admin-hub">
-    <h2 class="admin-hub__description">Активные проекты</h2>
+    <div class="admin-hub">
+        <h2 class="admin-hub__description">Активные проекты</h2>
 
-    <div class="admin-hub__content">
-        @for (mapCard of mapCardsList(); track mapCard.id) {
-            <hub-card
-                [data]="mapCard"
-                (click)="navigateToEditMap(mapCard)"
-            />
-        }
-        <button
-            class="admin-hub__add-project-button"
-            type="button"
-            (click)="navigateToCreateMap()"
-        >
-            <svg class="admin-hub__add-project-button-icon">
-                <use href="/sprites/plus-big.svg" />
-            </svg>
-        </button>
+        <div class="admin-hub__content">
+            @for (mapCard of mapCardsList(); track mapCard.id) {
+                <hub-card
+                    [data]="mapCard"
+                    (click)="navigateToEditMap(mapCard)"
+                />
+            }
+            <button
+                class="admin-hub__add-project-button"
+                type="button"
+                (click)="navigateToCreateMap()"
+            >
+                <svg class="admin-hub__add-project-button-icon">
+                    <use href="/sprites/plus-big.svg" />
+                </svg>
+            </button>
+        </div>
     </div>
-</div>
+}

@@ -1,6 +1,8 @@
 import { TuiRoot } from '@taiga-ui/core';
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject } from '@angular/core';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-root',
@@ -15,9 +17,19 @@ import { RouterOutlet } from '@angular/router';
 export class App implements AfterViewInit {
     private readonly _originalHeight: number = 952;
     private readonly _host: ElementRef<HTMLElement> = inject(ElementRef<HTMLElement>);
+    private readonly _router: Router = inject(Router);
+    private readonly _destroyRef: DestroyRef = inject(DestroyRef);
+
 
     public ngAfterViewInit(): void {
         this.applyZoom();
+
+        this._router.events
+            .pipe(
+                filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+                takeUntilDestroyed(this._destroyRef)
+            )
+            .subscribe(() => this.applyZoom());
     }
 
     /** Применить зум к хосту */

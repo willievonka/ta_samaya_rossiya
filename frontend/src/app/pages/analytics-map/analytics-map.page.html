@@ -1,36 +1,40 @@
-<div class="analytics-map">
-    @if (model()?.pageTitle; as pageTitle) {
-        <page-header
-            class="analytics-map__header"
-            [title]="pageTitle"
-            [options]="headerOptions"
-        />
-    }
-    @if (zoomActions(); as zoomActions) {
-        <map-zoom
-            class="analytics-map__zoom-controls"
-            [zoomActions]="zoomActions"
-        />
-    }
-    @if (model()?.layers; as mapLayers) {
-        <map
-            [layers]="mapLayers"
-            (regionSelected)="toggleModal($event)"
-        ></map>
-    }
-    @if (activeItem(); as activeLayer) {
-        <analytics-map-modal
-            class="analytics-map__modal"
-            [data]="activeLayer"
-            (closeModal)="toggleModal(null)"
-            animate.enter="analytics-map__modal_enter"
-            animate.leave="analytics-map__modal_leave"
-        />
-    }
-    @if (model()?.infoText; as infoText) {
-        <map-info
-            class="analytics-map__info"
-            [text]="infoText"
-        />
-    }
-</div>
+@if (isLoading()) {
+    <img class="analytics-map__loader" src="/fallbacks/loader.gif" alt="Лоадер"/>
+} @else {
+    <div class="analytics-map">
+        @if (model()?.pageTitle; as pageTitle) {
+            <page-header
+                class="analytics-map__header"
+                [title]="pageTitle"
+                [options]="headerOptions"
+            />
+        }
+        @if (zoomActions(); as zoomActions) {
+            <map-zoom
+                class="analytics-map__zoom-controls"
+                [zoomActions]="zoomActions"
+            />
+        }
+        @if (model()?.layers; as mapLayers) {
+            <map
+                [layers]="mapLayers"
+                (regionSelected)="toggleModal($event)"
+            ></map>
+        }
+        @if (activeItem(); as activeLayer) {
+            <analytics-map-modal
+                class="analytics-map__modal"
+                [data]="activeLayer"
+                (closeModal)="toggleModal(null)"
+                animate.enter="analytics-map__modal_enter"
+                animate.leave="analytics-map__modal_leave"
+            />
+        }
+        @if (model()?.infoText; as infoText) {
+            <map-info
+                class="analytics-map__info"
+                [text]="infoText"
+            />
+        }
+    </div>
+}

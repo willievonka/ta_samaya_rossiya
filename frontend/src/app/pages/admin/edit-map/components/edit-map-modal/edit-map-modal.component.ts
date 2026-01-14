@@ -51,6 +51,7 @@ export class EditMapModalComponent
     implements OnInit
 {
     public readonly canDelete: InputSignal<boolean> = input(true);
+    public readonly isDeleting: InputSignal<boolean> = input(false);
 
     public readonly colorsChanged: OutputEmitterRef<{ layerWithPointsColor: string, pointColor: string }> = output();
     public readonly mapDeleted: OutputEmitterRef<void> = output();

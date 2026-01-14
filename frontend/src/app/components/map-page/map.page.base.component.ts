@@ -9,11 +9,12 @@ import { distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { IPageHeaderOptions } from '../page-header/interfaces/page-header-options.interface';
 import { IHubCard } from '../hub-card/interfaces/hub-card.interface';
 import { HubService } from '../../services/hub.service';
+import { HubPageBaseComponent } from '../hub-page/hub-page.base.component';
 
 @Directive({
     standalone: true
 })
-export abstract class MapPageBaseComponent<TData> {
+export abstract class MapPageBaseComponent<TData> extends HubPageBaseComponent {
     protected readonly activeItem: WritableSignal<TData | null> = signal(null);
     protected readonly mapInstance: Signal<MapComponent | undefined> = viewChild(MapComponent);
     protected readonly zoomActions: Signal<IMapZoomActions | undefined> = computed(() => this.mapInstance()?.zoomActions());
@@ -65,8 +66,10 @@ export abstract class MapPageBaseComponent<TData> {
     );
 
     constructor() {
+        super();
         effect(() => {
             this.model.set(this._mapData());
+            setTimeout(() => this.isLoading.set(false), 500);
         });
     }
 }
