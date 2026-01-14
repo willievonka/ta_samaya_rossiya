@@ -38,7 +38,9 @@ export class MapComponent implements AfterViewInit {
         const layers: IMapLayer[] = this.layers();
         const allPoints: IMapPoint[] = layers.flatMap(layer => layer.properties.points ?? []);
 
-        return allPoints.sort((a, b) => a.year - b.year);
+        return allPoints.sort((a, b) =>
+            a.year - b.year || a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
+        );
     });
 
     /** Private fields */
@@ -105,7 +107,7 @@ export class MapComponent implements AfterViewInit {
         );
 
         this._renderService.renderPoints(
-            this.points().sort((a, b) => a.year - b.year),
+            this.points(),
             this.pointColor(),
             (point) => this.pointSelected.emit(point),
             this.isReadonly()

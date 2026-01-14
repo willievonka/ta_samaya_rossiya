@@ -146,8 +146,8 @@ export class EditMapModalComponent
                 )
                 : [...list, point];
 
-            return [...updatedList].sort(
-                (a, b) => a.year - b.year
+            return [...updatedList].sort((a, b) =>
+                a.year - b.year || a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
             );
         });
 
@@ -214,7 +214,9 @@ export class EditMapModalComponent
                         regionName: region.regionName
                     }))
                 )
-                .sort((a, b) => a.year - b.year)
+                .sort((a, b) =>
+                    a.year - b.year || a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
+                )
         );
 
         const model: IMapModel = this.model();
