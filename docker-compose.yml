@@ -25,7 +25,7 @@
       - ./frontend:/app
       - /app/node_modules
       - django_shared_static:/staticfiles:ro
-      - /opt/webapps/MesuProject/media:/django/media:ro
+      - django_shared_media:/django/media:ro
     depends_on:
       - backend
 
@@ -65,5 +65,7 @@ networks:
     name: shared_network
 
 volumes:
+  django_shared_media:
+    external: true
   django_shared_static:
     external: true
