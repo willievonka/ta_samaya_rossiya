@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using Application;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -21,6 +22,11 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Limits.MaxRequestBodySize = 268435456;
+        });
+        
         DotNetEnv.Env.TraversePath().Load();
         builder.Configuration.AddEnvironmentVariables();
         
@@ -79,6 +85,12 @@ public class Program
         services.AddInfrastructure(configuration);
         services.AddApplicationServices();
         services.AddEndpointsApiExplorer();
+        
+        services.Configure<FormOptions>(options =>
+        {
+            options.MultipartBodyLengthLimit = 268435456;
+            options.ValueLengthLimit = 268435456;
+        });
     }
     
     private static void AddAuthentication(IServiceCollection services, ConfigurationManager configuration)
