@@ -1,49 +1,53 @@
-<div class="map">
-     @if (model()?.pageTitle; as pageTitle) {
-        <page-header
-            class="map__header"
-            [title]="pageTitle"
-            [options]="headerOptions"
-        />
-    }
-    @if (zoomActions(); as zoomActions) {
-        <map-zoom
-            class="map__zoom-controls"
-            [zoomActions]="zoomActions"
-        />
-    }
-    @if (model()?.layers; as mapLayers) {
-        <map
-            [layers]="mapLayers"
-            [layerWithPointsColor]="model()?.layerWithPointsColor"
-            [pointColor]="model()?.pointColor"
-            (pointSelected)="toggleState($event)"
-        ></map>
-    }
-    @if (model()?.infoText; as infoText) {
-        <map-info
-            class="map__info"
-            [text]="infoText"
-        />
-    }
-    <div class="map__aside">
-        @if (mapInstance(); as mapInstance) {
-            <historical-line
-                class="map__historical-line"
-                [items]="mapInstance.points()"
-                [activeItem]="activeItem()"
-                [iconColor]="model()?.pointColor"
-                (itemSelected)="toggleState($event)"
+@if (isLoading()) {
+    <img class="map__loader" src="/fallbacks/loader.gif" alt="Лоадер"/>
+} @else {
+    <div class="map">
+        @if (model()?.pageTitle; as pageTitle) {
+            <page-header
+                class="map__header"
+                [title]="pageTitle"
+                [options]="headerOptions"
             />
         }
-        @if (activeItem(); as activePoint) {
-            <point-info-modal
-                class="map__modal"
-                [data]="activePoint"
-                (closeModal)="toggleState(null)"
-                animate.enter="map__modal_enter"
-                animate.leave="map__modal_leave"
+        @if (zoomActions(); as zoomActions) {
+            <map-zoom
+                class="map__zoom-controls"
+                [zoomActions]="zoomActions"
             />
         }
+        @if (model()?.layers; as mapLayers) {
+            <map
+                [layers]="mapLayers"
+                [layerWithPointsColor]="model()?.layerWithPointsColor"
+                [pointColor]="model()?.pointColor"
+                (pointSelected)="toggleState($event)"
+            ></map>
+        }
+        @if (model()?.infoText; as infoText) {
+            <map-info
+                class="map__info"
+                [text]="infoText"
+            />
+        }
+        <div class="map__aside">
+            @if (mapInstance(); as mapInstance) {
+                <historical-line
+                    class="map__historical-line"
+                    [items]="mapInstance.points()"
+                    [activeItem]="activeItem()"
+                    [iconColor]="model()?.pointColor"
+                    (itemSelected)="toggleState($event)"
+                />
+            }
+            @if (activeItem(); as activePoint) {
+                <point-info-modal
+                    class="map__modal"
+                    [data]="activePoint"
+                    (closeModal)="toggleState(null)"
+                    animate.enter="map__modal_enter"
+                    animate.leave="map__modal_leave"
+                />
+            }
+        </div>
     </div>
-</div>
+}

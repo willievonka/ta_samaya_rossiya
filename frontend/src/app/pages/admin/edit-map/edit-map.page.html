@@ -1,36 +1,41 @@
-<div class="edit-map">
-    <page-header
-        class="edit-map__header"
-        [title]="isEditMode() ? 'Редактирование карты' : 'Создание карты'"
-        [options]="headerOptions"
-    />
-    @if (zoomActions(); as zoomActions) {
-        <map-zoom
-            class="edit-map__zoom-controls"
-            [zoomActions]="zoomActions"
+@if (isLoading()) {
+    <img class="edit-map__loader" src="/fallbacks/loader.gif" alt="Лоадер"/>
+} @else {
+    <div class="edit-map">
+        <page-header
+            class="edit-map__header"
+            [title]="isEditMode() ? 'Редактирование карты' : 'Создание карты'"
+            [options]="headerOptions"
         />
-    }
-    @if (model()?.layers) {
-        <map
-            [layers]="model()!.layers"
-            [layerWithPointsColor]="model()?.layerWithPointsColor"
-            [pointColor]="model()?.pointColor"
-            [config]="config"
-            [isReadonly]="true"
-        ></map>
-    }
-    @if (model(); as model) {
-        <edit-map-modal
-            class="edit-map__modal"
-            [model]="model"
-            [card]="card()"
-            [isSaving]="isSaving()"
-            [canDelete]="isEditMode()"
-            (mapSaved)="handleMapSave($event)"
-            (mapDeleted)="handleMapDelete()"
-            (activeItemsChanged)="handlePointsChange($event)"
-            (colorsChanged)="handleColorsChange($event)"
-            (dirtyChange)="hasUnsavedChanges.set($event)"
-        />
-    }
-</div>
+        @if (zoomActions(); as zoomActions) {
+            <map-zoom
+                class="edit-map__zoom-controls"
+                [zoomActions]="zoomActions"
+            />
+        }
+        @if (model()?.layers) {
+            <map
+                [layers]="model()!.layers"
+                [layerWithPointsColor]="model()?.layerWithPointsColor"
+                [pointColor]="model()?.pointColor"
+                [config]="config"
+                [isReadonly]="true"
+            ></map>
+        }
+        @if (model(); as model) {
+            <edit-map-modal
+                class="edit-map__modal"
+                [model]="model"
+                [card]="card()"
+                [isSaving]="isSaving()"
+                [isDeleting]="isDeleting()"
+                [canDelete]="isEditMode()"
+                (mapSaved)="handleMapSave($event)"
+                (mapDeleted)="handleMapDelete()"
+                (activeItemsChanged)="handlePointsChange($event)"
+                (colorsChanged)="handleColorsChange($event)"
+                (dirtyChange)="hasUnsavedChanges.set($event)"
+            />
+        }
+    </div>
+}

@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { HubCardComponent } from '../../components/hub-card/hub-card.component';
 import { PageHeaderComponent } from '../../components/page-header/page-header.component';
 import { IHubCard } from '../../components/hub-card/interfaces/hub-card.interface';
-import { HubService } from '../../services/hub.service';
-import { take } from 'rxjs';
+import { HubPageBaseComponent } from '../../components/hub-page/hub-page.base.component';
 
 @Component({
     selector: 'main-hub-page',
@@ -16,26 +15,12 @@ import { take } from 'rxjs';
         PageHeaderComponent
     ]
 })
-export class MainHubPageComponent {
-    protected readonly mapCardsList: WritableSignal<IHubCard[] | undefined> = signal(undefined);
-    private readonly _hubService: HubService = inject(HubService);
-
-    constructor() {
-        this.loadMapCardList();
-    }
-
+export class MainHubPageComponent extends HubPageBaseComponent {
     /**
      * Редирект на страницу карты
      * @param card
      */
     protected navigateToMap(card: IHubCard): void {
-        this._hubService.navigateToMap(card);
-    }
-
-    /** Загрузить список карточек карт */
-    private loadMapCardList(): void {
-        this._hubService.getMapCardsList()
-            .pipe(take(1))
-            .subscribe(list => this.mapCardsList.set(list));
+        this.hubService.navigateToMap(card);
     }
 }

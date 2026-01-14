@@ -27,6 +27,7 @@ import { Router } from '@angular/router';
 })
 export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
     protected readonly isEditMode: WritableSignal<boolean> = signal<boolean>(!!this.mapId);
+    protected readonly isDeleting: WritableSignal<boolean> = signal<boolean>(false);
     private readonly _router: Router = inject(Router);
 
     /** Обработчик сохранения карты */
@@ -62,10 +63,12 @@ export class EditMapPageComponent extends EditMapPageBaseComponent<IMapPoint> {
 
     /** Обработчик удаления карты */
     protected handleMapDelete(): void {
+        this.isDeleting.set(true);
         this.mapDataService.deleteMap(this.mapId)
             .pipe(
                 take(1),
-                tap(() => this._router.navigate(['admin']))
+                tap(() => this._router.navigate(['admin'])),
+                finalize(() => this.isDeleting.set(false))
             )
             .subscribe();
     }

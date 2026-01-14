@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { HubCardComponent } from '../../../components/hub-card/hub-card.component';
 import { PageHeaderComponent } from '../../../components/page-header/page-header.component';
 import { AuthService } from '../../../services/auth.service';
-import { HubService } from '../../../services/hub.service';
 import { Router } from '@angular/router';
 import { IHubCard } from '../../../components/hub-card/interfaces/hub-card.interface';
 import { take } from 'rxjs';
 import { IPageHeaderOptions } from '../../../components/page-header/interfaces/page-header-options.interface';
+import { HubPageBaseComponent } from '../../../components/hub-page/hub-page.base.component';
 
 @Component({
     selector: 'admin-hub-page',
@@ -19,8 +19,7 @@ import { IPageHeaderOptions } from '../../../components/page-header/interfaces/p
         PageHeaderComponent
     ]
 })
-export class AdminHubPageComponent {
-    protected readonly mapCardsList: WritableSignal<IHubCard[] | undefined> = signal(undefined);
+export class AdminHubPageComponent extends HubPageBaseComponent {
     protected readonly headerOptions: IPageHeaderOptions = {
         adminState: {
             changeRedirect: true,
@@ -29,12 +28,7 @@ export class AdminHubPageComponent {
     };
 
     private readonly _authService: AuthService = inject(AuthService);
-    private readonly _hubService: HubService = inject(HubService);
     private readonly _router: Router = inject(Router);
-
-    constructor() {
-        this.loadMapCardList();
-    }
 
     /** Разлогин и выход в клиентское приложение */
     protected logout(): void {
@@ -48,18 +42,11 @@ export class AdminHubPageComponent {
      * @param card
      */
     protected navigateToEditMap(card: IHubCard): void {
-        this._hubService.navigateToMap(card, true);
+        this.hubService.navigateToMap(card, true);
     }
 
     /** Редирект на страницу создания карты */
     protected navigateToCreateMap(): void {
-        this._hubService.navigateToCreateMap();
-    }
-
-    /** Загрузить список карточек карт */
-    private loadMapCardList(): void {
-        this._hubService.getMapCardsList()
-            .pipe(take(1))
-            .subscribe(list => this.mapCardsList.set(list));
+        this.hubService.navigateToCreateMap();
     }
 }
