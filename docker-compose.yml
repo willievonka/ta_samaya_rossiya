@@ -67,6 +67,8 @@
       resources:
         limits:
           memory: 600M
+    networks:
+      - shared_net
   
   db:
     image: postgis/postgis:17-3.5-alpine
