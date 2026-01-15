@@ -29,6 +29,7 @@ public static class InfrastructureExtensions
         
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<ICacheService, CacheService>();
         
         services.AddScoped<IAdminManager, AdminManager>();
         

@@ -1,4 +1,5 @@
-﻿using Application.Services.Dtos;
+﻿using Application.Services.Dtos.LayerRegion;
+using Application.Services.Dtos.Map;
 using Application.Services.Logic.Interfaces;
 using Domain.Entities;
 using Domain.Repository.Interfaces;
@@ -28,7 +29,7 @@ public class MapService : IMapService
     /// </summary>
     /// <param name="ct"></param>
     /// <returns></returns>
-    public async Task<List<MapDto>> GetAllCardsASync(CancellationToken ct)
+    public async Task<List<MapDto>> GetAllCardsAsync(CancellationToken ct)
     {
         var cards = await _mapRepository.GetAllHeadersAsync(ct);
 

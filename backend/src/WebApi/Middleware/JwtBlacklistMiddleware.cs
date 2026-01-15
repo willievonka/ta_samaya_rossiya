@@ -18,12 +18,18 @@ public class JwtBlacklistMiddleware
     public async Task InvokeAsync(HttpContext context)
     {
         var jti = context.User?.FindFirstValue(JwtRegisteredClaimNames.Jti);
-        if (!string.IsNullOrEmpty(jti) && _blacklistService.IsTokenBlacklisted($"bl_{jti}"))
+        
+        if (!string.IsNullOrEmpty(jti))
         {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            var message = "У вас нет доступа к этому сервису.";
-            await context.Response.WriteAsync(message);
-            return;
+            var isBlacklisted = await _blacklistService.IsTokenBlacklistedAsync(jti);
+
+            if (isBlacklisted)
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                var message = "У вас нет доступа к этому сервису.";
+                await context.Response.WriteAsync(message);
+                return;
+            }
         }
         
         await _next(context);

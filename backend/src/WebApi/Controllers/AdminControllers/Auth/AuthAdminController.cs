@@ -1,8 +1,7 @@
 ﻿using Application.Services.Auth.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Application.Services.Dtos.Auth.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Controllers.AdminControllers.Auth.Request;
 
 namespace WebApi.Controllers.AdminControllers.Auth;
 
@@ -11,16 +10,14 @@ namespace WebApi.Controllers.AdminControllers.Auth;
 public class AuthAdminController : ControllerBase
 {
     private readonly IAuthService _authService;
-    private readonly ITokenService _tokenService;
     private readonly ILogger<AuthAdminController> _logger;
     private readonly IWebHostEnvironment _environment;
 
-    public AuthAdminController(IAuthService authService, ILogger<AuthAdminController> logger,
-        ITokenService tokenService, IWebHostEnvironment environment)
+    public AuthAdminController(IAuthService authService, ILogger<AuthAdminController> logger, 
+        IWebHostEnvironment environment)
     {
         _authService = authService;
         _logger = logger;
-        _tokenService = tokenService;
         _environment = environment;
     }
 

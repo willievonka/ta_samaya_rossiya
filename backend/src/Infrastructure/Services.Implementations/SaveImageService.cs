@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Application.Services.Interfaces;
+﻿using Application.Services.Interfaces;
 
 namespace Infrastructure.Services.Implementations;
 
@@ -18,7 +17,7 @@ public class SaveImageService : ISaveImageService
 
     public async Task<string> SaveImageAsync(Guid entityId, string folder, IFormFile newFile)
     {
-        if (newFile == null || newFile.Length == 0)
+        if (newFile.Length == 0)
         {   
             _logger.LogError("The file has not been transferred or is empty");
             throw new ArgumentException("The file has not been transferred or is empty");
