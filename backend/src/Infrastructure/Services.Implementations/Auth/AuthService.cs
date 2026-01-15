@@ -1,7 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Application.Services.Auth.Interfaces;
-using Application.Services.Dtos;
+using Application.Services.Dtos.Auth;
 using Domain.Entities;
 using Domain.Repository.Interfaces;
 using Isopoh.Cryptography.Argon2;
@@ -164,7 +164,7 @@ public class AuthService : IAuthService
 
         if (remaining > TimeSpan.Zero)
         {
-            _blacklistService.AddTokenToBlackList(jti, remaining);
+            await _blacklistService.AddTokenToBlackListAsync(jti, remaining, ct);
             _logger.LogInformation("Token {Jti} blacklisted for {Remaining} min.", jti, remaining.TotalMinutes);
         }
 

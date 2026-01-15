@@ -1,4 +1,5 @@
-﻿using Application.Services.Dtos;
+﻿using Application.Services.Dtos.HistoricalObject;
+using Application.Services.Dtos.LayerRegion;
 
 namespace Application.Services.Logic.Interfaces;
 

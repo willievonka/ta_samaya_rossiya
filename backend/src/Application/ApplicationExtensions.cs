@@ -13,6 +13,8 @@ public static class ApplicationExtensions
         services.AddScoped<ILayerRegionService, LayerRegionService>();
         services.AddScoped<IMapService, MapService>();
         services.AddScoped<IHistoricalObjectService, HistoricalObjectService>();
+        services.AddScoped<IMapQueryCachingService, MapQueryCachingCachingService>();
+        
         return services;
     }
 }

@@ -1,7 +1,5 @@
 ﻿using Application.Services.Interfaces;
-using Domain.Entities;
 using Infrastructure.Persistence;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Polly;
@@ -14,13 +12,22 @@ public static class InfrastructureStartup
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("MapDBConnection") 
+        var postgresConnString = configuration.GetConnectionString("MapDBConnection") 
                                ?? throw new NullReferenceException("Connection string 'MapDBConnection' not found.");
 
         services.AddDbContext<MapDbContext>(options =>
         {
-            options.UseNpgsql(connectionString, postgresOptions => postgresOptions.UseNetTopologySuite());
+            options.UseNpgsql(postgresConnString, postgresOptions => postgresOptions.UseNetTopologySuite());
             options.UseSnakeCaseNamingConvention();
+        });
+
+        var redisConnString = configuration.GetConnectionString("Redis")
+            ?? throw new NullReferenceException("Connection string 'Redis' not found.");
+
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = redisConnString;
+            options.InstanceName = "TaSamayaRossiyaCache_";
         });
         
         return services;

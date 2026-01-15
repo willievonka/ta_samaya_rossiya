@@ -1,4 +1,4 @@
-﻿using Application.Services.Dtos;
+﻿using Application.Services.Dtos.HistoricalObject;
 
 namespace Application.Services.Logic.Interfaces;
 
