@@ -5,27 +5,30 @@
 
 ### Стек проекта 🚀
 - Frontend: Angular 21, TypeScript, Taiga UI, Leaflet
-- Backend: .NET 8 (ASP.NET Core), Entity Framework Core, Npgsql (PostGIS)
+- Backend: .NET 8 (ASP.NET Core), Entity Framework Core, PostgreSql (PostGIS), Redis, Jwt
 - База данных: PostgreSQL + PostGIS
+- Кэш: Redis
 - Инфраструктура: Docker, Docker Compose
 
 ---
 
 ### Быстрый старт (dev) 🛠️
 1. Склонировать репозиторий (git clone)
-2. Запустить все сервисы в dev:
+2. Создать .env файл в дирректории /backend (пример файла env.example)
+3. Запустить все сервисы в dev:
    - docker compose -f docker-compose.dev.yml up --build
-   - это поднимет: frontend (порт 4200), backend (порт 8080), db (порт 5432)
-3. Откройте frontend: http://localhost:4200
+   - это поднимет: frontend (порт 4200), backend (порт 8080), db (порт 5432), redis (6379)
+4. Откройте frontend: http://localhost:4200
 
 ---
 
 ### Быстрый старт (prod) 📦
 1. Склонировать репозиторий (git clone)
-2. Построить и запустить прод:
+2. Создать .env файл в дирректории /backend (пример файла env.example)
+3. Построить и запустить прод:
    - docker compose up --build -d
    - используется nginx (порт 80)
-3. Откройте frontend: http://localhost
+4. Откройте frontend: http://localhost
 
 > Примечание: перед запуском убедитесь, что настроен файл .env в папке backend
 
