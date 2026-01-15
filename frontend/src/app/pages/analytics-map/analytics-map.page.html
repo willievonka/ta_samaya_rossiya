@@ -19,6 +19,7 @@
             <map
                 [layers]="mapLayers"
                 (regionSelected)="toggleModal($event)"
+                (hasLoaded)="this.isLoading.set(false)"
             ></map>
         }
         @if (activeItem(); as activeLayer) {

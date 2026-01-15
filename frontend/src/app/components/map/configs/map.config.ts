@@ -7,7 +7,7 @@ export const mapConfig: IMapConfig = {
         zoomSnap: 0.1,
         minZoom: 3.2,
         maxZoom: 7,
-        center: [110, 67.5]
+        center: [82, 72]
     },
     defaultLayerStyle: {
         fillColor: '#B4B4B4',

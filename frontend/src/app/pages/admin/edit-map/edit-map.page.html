@@ -20,6 +20,7 @@
                 [pointColor]="model()?.pointColor"
                 [config]="config"
                 [isReadonly]="true"
+                (hasLoaded)="this.isLoading.set(false)"
             ></map>
         }
         @if (model(); as model) {

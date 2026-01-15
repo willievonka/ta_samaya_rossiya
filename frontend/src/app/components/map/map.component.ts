@@ -31,6 +31,7 @@ export class MapComponent implements AfterViewInit {
     /** Outputs */
     public readonly regionSelected: OutputEmitterRef<IMapLayerProperties | null> = output<IMapLayerProperties | null>();
     public readonly pointSelected: OutputEmitterRef<IMapPoint | null> = output<IMapPoint | null>();
+    public readonly hasLoaded: OutputEmitterRef<void> = output();
 
     /** Public fields */
     public readonly zoomActions: WritableSignal<IMapZoomActions | undefined> = signal<IMapZoomActions | undefined>(undefined);
@@ -60,6 +61,7 @@ export class MapComponent implements AfterViewInit {
 
         this.zoomActions.set(this._renderService.getZoomActions(mapInstance));
         this.renderMapContent();
+        this.hasLoaded.emit();
     }
 
     /** Снять выделение со слоя */
