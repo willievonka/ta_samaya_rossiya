@@ -2,8 +2,9 @@
 
 ### О проекте ℹ️
 - Ядро: ASP.NET Core на .NET 8
-- ORM: Entity Framework Core + Npgsql (с поддержкой NetTopologySuite для геоданных)
+- ORM: Entity Framework Core + PostgreSql (с поддержкой NetTopologySuite для геоданных)
 - DB: PostgreSQL + PostGIS
+- CACHE: Redis (Microsoft.Extensions.Caching.StackExchangeRedis)
 - Миграции хранятся в папке `src/Infrastructure/Migrations`. При старте приложение пытается автоматически выполнить миграции (см. `InfrastructureStartup`).
 
 ---
@@ -11,7 +12,7 @@
 ### Требования (локально)
 - .NET SDK 8.x (https://dotnet.microsoft.com/)
 - Docker & Docker Compose (если вы используете контейнеры)
-- (Опционально) PostgreSQL с PostGIS, если не используете Docker
+- (Опционально) PostgreSQL с PostGIS, Redis, если не используете Docker
 
 ---
 
@@ -19,11 +20,12 @@
 Файл конфигурации: .env (используется docker-compose). Не храните секреты в публичных репозиториях.
 
 Основные переменные:
-- CONNECTIONSTRINGS__MapDBConnection — строка подключения (например: Host=db;Port=5432;Database=ta-samaya-rossiya;Username=postgres;Password=...)
+- CONNECTIONSTRINGS__MapDBConnection — строка подключения к Postgresql-server (например: Host=db;Port=5432;Database=ta-samaya-rossiya;Username=postgres;Password=...)
 - POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT
+- CONNECTIONSTRINGS__Redis - строка подключения к Redis-server
 - Jwt__Key, Jwt__Issuer, Jwt__Audience, Jwt__AccessTokenExpirationMinutes, Jwt__RefreshTokenExpirationHours
 - В .env могут быть добавлены seed-администраторы (ADMIN__0__EMAIL и т.д.)
-
+Пример файла - env.example 
 ---
 
 ### Запуск в режиме разработки (локально)
@@ -34,7 +36,7 @@
 - Или используйте Docker Compose (рекомендуется):
   - docker compose -f docker-compose.dev.yml up --build
   - Backend будет доступен на `http://localhost:8080`
-
+  - Доступна поддержка Swagger на `http://localhost:8080/Swagger`
 ---
 
 ### Сборка и запуск в прод (Docker)
