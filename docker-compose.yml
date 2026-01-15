@@ -55,7 +55,7 @@
     restart: always
     command: >
       redis-server 
-      --requirepass ${REDIS_PASSWORD}
+      --requirepass redispass
       --maxmemory ${REDIS_MAX_MEMORY}
       --maxmemory-policy allkeys-lru
     env_file:
