@@ -1,9 +1,9 @@
-﻿using Application.Services.Logic.Interfaces;
+﻿using Application.Services.Dtos.HistoricalObject.Requests;
+using Application.Services.Dtos.HistoricalObject.Responses;
+using Application.Services.Logic.Interfaces;
+using Application.Services.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Controllers.AdminControllers.HistoricalObject.Request;
-using WebApi.Controllers.AdminControllers.HistoricalObject.Response;
-using WebApi.Controllers.AdminControllers.Mapper;
 
 namespace WebApi.Controllers.AdminControllers.HistoricalObject;
 
@@ -12,14 +12,11 @@ namespace WebApi.Controllers.AdminControllers.HistoricalObject;
 [Route("api/admin/maps/{mapId:guid}/layers")]
 public class HistoricalObjectController : ControllerBase
 {
-    private readonly ILayerRegionService _layerRegionService;
     private readonly IHistoricalObjectService _historicalObjectService;
     
-    public HistoricalObjectController(ILayerRegionService layerRegionService,
-        IHistoricalObjectService historicalObjectService)
+    public HistoricalObjectController(IHistoricalObjectService historicalObjectService)
     {
         _historicalObjectService = historicalObjectService;
-        _layerRegionService = layerRegionService;
     }
 
     /// <summary>

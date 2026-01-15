@@ -1,28 +1,31 @@
 ﻿using Application.Services.Auth.Interfaces;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace Infrastructure.Services.Implementations.Auth;
 
 public class BlacklistService : IBlacklistService
 {
-    private readonly IMemoryCache _cache;
+    private readonly IDistributedCache _cache;
+    private const string Prefix = "bl_";
     
-    public BlacklistService(IMemoryCache cache)
+    public BlacklistService(IDistributedCache cache)
     {
         _cache = cache;
     }
     
-    public void AddTokenToBlackList(string jti, TimeSpan lifetime)
+    public async Task AddTokenToBlackListAsync(string jti, TimeSpan lifetime, CancellationToken ct = default)
     {
-        _cache.Set($"bl_{jti}", true, new MemoryCacheEntryOptions
+        var options = new DistributedCacheEntryOptions
         {
-            AbsoluteExpirationRelativeToNow = lifetime,
-            Priority = CacheItemPriority.NeverRemove
-        });
+            AbsoluteExpirationRelativeToNow = lifetime
+        };
+        
+        await _cache.SetStringAsync($"{Prefix}{jti}", "1", options, ct);
     }
 
-    public bool IsTokenBlacklisted(string jti)
+    public async Task<bool> IsTokenBlacklistedAsync(string jti, CancellationToken ct = default)
     {
-        return _cache.TryGetValue(jti, out _);
+        var result = await _cache.GetStringAsync($"{Prefix}{jti}", ct);
+        return result != null;
     }
 }

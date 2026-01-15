@@ -1,4 +1,4 @@
-﻿using Application.Services.Dtos;
+﻿using Application.Services.Dtos.HistoricalObject;
 using Application.Services.Logic.Interfaces;
 using Domain.Entities;
 using Domain.Repository.Interfaces;

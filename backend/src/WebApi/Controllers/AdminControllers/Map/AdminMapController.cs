@@ -1,9 +1,9 @@
-﻿using Application.Services.Logic.Interfaces;
+﻿using Application.Services.Dtos.Map.Requests;
+using Application.Services.Dtos.Map.Responses;
+using Application.Services.Logic.Interfaces;
+using Application.Services.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Controllers.AdminControllers.Map.Requests;
-using WebApi.Controllers.AdminControllers.Map.Responses;
-using WebApi.Controllers.AdminControllers.Mapper;
 
 namespace WebApi.Controllers.AdminControllers.Map;
 
@@ -13,10 +13,12 @@ namespace WebApi.Controllers.AdminControllers.Map;
 public class AdminMapController : ControllerBase
 {
     private readonly IMapService _mapService;
+    private readonly IMapQueryCachingService _mapQueryCachingService;
     
-    public AdminMapController(IMapService mapService)
+    public AdminMapController(IMapService mapService, IMapQueryCachingService mapQueryCachingService)
     {
         _mapService = mapService;
+        _mapQueryCachingService = mapQueryCachingService;
     }
 
     /// <summary>
@@ -32,16 +34,18 @@ public class AdminMapController : ControllerBase
     {
         if (mapId == null)
         {
-            var mapDto = await _mapService.GetEmptyMapAsync(ct);
+            var emptyMapResponse = await _mapQueryCachingService.GetEmptyMapResponseAsync(ct);
         
-            return Ok(MapMapper.EmptyMapDtoToResponse(mapDto));
+            return emptyMapResponse == null 
+                ? NotFound() 
+                : Content(emptyMapResponse, "application/json");
         }
         
-        var map = await _mapService.GetMapAsync(mapId.Value, ct);
-
-        var response = MapMapper.MapDtoToResponse(map);
-        
-        return response == null ? NotFound() : Ok(response);
+        var mapResponse = await _mapQueryCachingService.GetMapResponseAsync(mapId.Value, ct);
+            
+        return mapResponse == null 
+            ? NotFound() 
+            : Content(mapResponse, "application/json");
     }
     
     /// <summary>
@@ -54,11 +58,9 @@ public class AdminMapController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllMapsCards(CancellationToken ct)
     {
-        var cards = await _mapService.GetAllCardsASync(ct);
+        var response = await _mapQueryCachingService.GetAllMapsCardsResponseAsync(ct);
         
-        var response = MapMapper.MapsDtosToMapsCardsResponse(cards);
-        
-        return Ok(response);
+        return Content(response, "application/json");
     }
 
     /// <summary>
@@ -79,6 +81,8 @@ public class AdminMapController : ControllerBase
         
         if (mapId == Guid.Empty)
             return BadRequest();
+        
+        await _mapQueryCachingService.RemoveAllMapsCardsResponseCacheAsync(ct);
         
         return Ok(new { mapId = mapId });
     }
@@ -101,6 +105,8 @@ public class AdminMapController : ControllerBase
         var mapDto = MapMapper.UpdateMapCardRequestToDto(request, mapId);
         
         await _mapService.UpdateMapAsync(mapDto, ct);
+        
+        await _mapQueryCachingService.RemoveAllMapsCardsResponseCacheAsync(ct);
         
         return RedirectToAction(nameof(GetAllMapsCards));
     }
@@ -126,6 +132,9 @@ public class AdminMapController : ControllerBase
         
         if (id == Guid.Empty)
             return BadRequest();
+
+        await _mapQueryCachingService.RemoveAllMapsCardsResponseCacheAsync(ct);
+        await _mapQueryCachingService.RemoveMapResponseCacheAsync(mapId, ct);
         
         return Ok();
     }
@@ -142,6 +151,9 @@ public class AdminMapController : ControllerBase
     public async Task<IActionResult> DeleteMap([FromQuery] Guid mapId, CancellationToken ct)
     {
         var res = await _mapService.DeleteMapAsync(mapId, ct);
+        
+        await _mapQueryCachingService.RemoveAllMapsCardsResponseCacheAsync(ct);
+        await _mapQueryCachingService.RemoveMapResponseCacheAsync(mapId, ct);
         
         if (res) return NoContent();
         

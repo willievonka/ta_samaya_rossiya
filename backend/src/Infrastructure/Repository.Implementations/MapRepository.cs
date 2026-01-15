@@ -23,7 +23,7 @@ public class MapRepository : IMapRepository
     public async Task<bool> AnalyticsMapExistsAsync()
     {
         return await _context.Maps
-            .AnyAsync(m => m.IsAnalytics == true);;
+            .AnyAsync(m => m.IsAnalytics == true);
     }
 
     public async Task<Map?> GetHeaderByIdAsync(Guid mapId, CancellationToken ct)

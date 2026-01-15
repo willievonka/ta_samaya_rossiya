@@ -2,6 +2,6 @@
 
 public interface IBlacklistService
 {
-    void AddTokenToBlackList(string jti, TimeSpan lifetime);
-    bool IsTokenBlacklisted(string jti);
+    Task AddTokenToBlackListAsync(string jti, TimeSpan lifetime, CancellationToken ct = default);
+    Task<bool> IsTokenBlacklistedAsync(string jti, CancellationToken ct = default);
 }

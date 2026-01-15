@@ -1,7 +1,6 @@
-﻿using Application.Services.Logic.Interfaces;
+﻿using Application.Services.Dtos.Map.Responses;
+using Application.Services.Logic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Controllers.AdminControllers.Map.Responses;
-using WebApi.Controllers.AdminControllers.Mapper;
 
 namespace WebApi.Controllers.UserControllers;
 
@@ -9,11 +8,11 @@ namespace WebApi.Controllers.UserControllers;
 [Route("api/client/maps")]
 public class MapController : ControllerBase
 {
-    private readonly IMapService _mapService;
+    private readonly IMapQueryCachingService _mapQueryCachingService;
     
-    public MapController(IMapService mapService)
+    public MapController(IMapQueryCachingService mapQueryCachingService)
     {
-        _mapService = mapService;
+        _mapQueryCachingService = mapQueryCachingService;
     }
     
     /// <summary>
@@ -27,11 +26,11 @@ public class MapController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetMap([FromQuery] Guid mapId, CancellationToken ct)
     {
-        var map = await _mapService.GetMapAsync(mapId, ct);
-
-        var response = MapMapper.MapDtoToResponse(map);
-        
-        return response == null ? NotFound() : Ok(response);
+        var mapResponse = await _mapQueryCachingService.GetMapResponseAsync(mapId, ct);
+            
+        return mapResponse == null 
+            ? NotFound() 
+            : Content(mapResponse, "application/json");
     }
     
     /// <summary>
@@ -44,10 +43,8 @@ public class MapController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllMapsCards(CancellationToken ct)
     {
-        var cards = await _mapService.GetAllCardsASync(ct);
+        var response = await _mapQueryCachingService.GetAllMapsCardsResponseAsync(ct);
         
-        var response = MapMapper.MapsDtosToMapsCardsResponse(cards);
-        
-        return Ok(response);
+        return Content(response, "application/json");
     }
 }

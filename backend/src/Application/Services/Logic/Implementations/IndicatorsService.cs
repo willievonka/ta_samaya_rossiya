@@ -1,4 +1,4 @@
-﻿using Application.Services.Dtos;
+﻿using Application.Services.Dtos.Indicators;
 using Application.Services.Logic.Interfaces;
 using Domain.Entities;
 using Domain.Repository.Interfaces;

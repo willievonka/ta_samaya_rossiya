@@ -1,9 +1,8 @@
-﻿using Application.Services.Logic.Interfaces;
+﻿using Application.Services.Dtos.LayerRegion.Requests;
+using Application.Services.Logic.Interfaces;
+using Application.Services.Mapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Controllers.AdminControllers.LayerRegion.Request;
-using WebApi.Controllers.AdminControllers.Map.Requests;
-using WebApi.Controllers.AdminControllers.Mapper;
 
 namespace WebApi.Controllers.AdminControllers.LayerRegion;
 
