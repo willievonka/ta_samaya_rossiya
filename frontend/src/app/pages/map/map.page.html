@@ -21,6 +21,7 @@
                 [layerWithPointsColor]="model()?.layerWithPointsColor"
                 [pointColor]="model()?.pointColor"
                 (pointSelected)="toggleState($event)"
+                (hasLoaded)="this.isLoading.set(false)"
             ></map>
         }
         @if (model()?.infoText; as infoText) {

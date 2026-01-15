@@ -7,7 +7,7 @@ export const editMapConfig: IMapConfig = {
         zoomSnap: 0.1,
         minZoom: 3.2,
         maxZoom: 7,
-        center: [160, 72]
+        center: [115, 72]
     },
     defaultLayerStyle: {
         fillColor: '#B4B4B4',

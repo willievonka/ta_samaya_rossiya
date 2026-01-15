@@ -67,9 +67,6 @@ export abstract class MapPageBaseComponent<TData> extends HubPageBaseComponent {
 
     constructor() {
         super();
-        effect(() => {
-            this.model.set(this._mapData());
-            setTimeout(() => this.isLoading.set(false), 500);
-        });
+        effect(() => this.model.set(this._mapData()));
     }
 }
