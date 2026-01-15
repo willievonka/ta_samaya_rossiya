@@ -46,7 +46,7 @@ public class MapQueryCachingCachingService : IMapQueryCachingService
         
         var json = JsonSerializer.Serialize(responseDto, JsonCacheSettings.Default);
         
-        await _cacheService.SetCachedResponseAsync(cacheKey, json, TimeSpan.FromDays(7), ct);
+        await _cacheService.SetCachedResponseAsync(cacheKey, json, TimeSpan.FromDays(30), ct);
         
         return json;
     }
