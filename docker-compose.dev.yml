@@ -15,6 +15,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
+  
   backend:
     image: backend:dev
     container_name: backend-dev-container
@@ -30,6 +31,28 @@ services:
       - ./backend/.env
     depends_on:
       - db
+  
+  redis:
+    image: redis:7-alpine
+    container_name: redis-dev-container
+    restart: always
+    command:
+      - redis-server
+      - --requirepass
+      - "redispass"
+      - --maxmemory
+      - "512mb"
+      - --maxmemory-policy
+      - allkeys-lru
+    env_file:
+      - ./backend/.env
+    deploy:
+      resources:
+        limits:
+          memory: 600M
+    ports:
+      - "6379:6379"
+  
   db:
     image: postgis/postgis:17-3.5-alpine
     container_name: db-dev-container
