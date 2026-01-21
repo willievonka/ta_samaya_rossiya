@@ -38,12 +38,11 @@ services:
     restart: always
     command:
       - redis-server
-      - --requirepass
-      - "redispass"
-      - --maxmemory
-      - "512mb"
-      - --maxmemory-policy
-      - allkeys-lru
+      - --requirepass "redispass"
+      - --maxmemory "512mb"
+      - --maxmemory-policy allkeys-lru
+      - --save ""
+      - --appendonly no
     env_file:
       - ./backend/.env
     deploy:
