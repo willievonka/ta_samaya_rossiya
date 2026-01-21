@@ -2,5 +2,5 @@
 
 public interface IRegionSeederService
 {
-    Task SeedIfEmptyAsync(CancellationToken ct = default); 
+    Task SeedNewRegionAsync(CancellationToken ct = default); 
 }

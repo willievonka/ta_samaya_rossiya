@@ -1,4 +1,5 @@
 ﻿using Application.Services.Interfaces;
+using Application.Services.Logic.Interfaces;
 using Domain.Entities;
 using Domain.Repository.Interfaces;
 using NetTopologySuite.Features;
@@ -15,37 +16,54 @@ public class RegionSeederService : IRegionSeederService
     private readonly IRegionRepository _regionRepository;
     private readonly ILogger<RegionSeederService> _logger;
     private readonly IWebHostEnvironment _webHostEnvironment;
-
+    private readonly IMapRepository _mapRepository;
+    private readonly ILayerRegionRepository _layerRegionRepository;
+    private readonly ILayerRegionService _layerRegionService;
+    
     public RegionSeederService(IRegionRepository regionRepository,
-        ILogger<RegionSeederService> logger,  IWebHostEnvironment webHostEnvironment)
+        ILogger<RegionSeederService> logger,  IWebHostEnvironment webHostEnvironment,
+        IMapRepository mapRepository, ILayerRegionRepository layerRegionRepository, ILayerRegionService layerRegionService)
     {
         _regionRepository = regionRepository;
         _logger = logger;
         _webHostEnvironment = webHostEnvironment;
+        _mapRepository = mapRepository;
+        _layerRegionRepository = layerRegionRepository;
+        _layerRegionService = layerRegionService;
     }
     
-    public async Task SeedIfEmptyAsync(CancellationToken ct = default)
+    public async Task SeedNewRegionAsync(CancellationToken ct = default)
     {
         var regions = await _regionRepository.GetAllAsync(ct);
 
         if (regions?.Count > 0)
         {
             _logger.LogInformation("Table Regions already contains {count} entries.", regions.Count);
-            return;
         }
         
-        _logger.LogInformation("Table Regions is empty, starting seed.");
+        _logger.LogInformation("Starting seed in the table Regions.");
 
         var featureColletion = await ParseFeatureCollectionAsync(ct);
-
+        
+        await RemoveInactiveRegionsInAllMapsAsync(regions, featureColletion, ct);
+        
         var featureNumber = 0;
         var totalCount = featureColletion.Count;
         foreach (var feature in featureColletion)
         {
             featureNumber++;
+            
             if (!feature.Attributes.Exists("NL_NAME_1_FIXED"))
             {
                 _logger.LogInformation("Feature {Index} of {Total} is missing attribute NL_NAME_1_FIXED.", featureNumber, totalCount);
+                continue;
+            }
+            
+            var name = feature.Attributes["NL_NAME_1_FIXED"]?.ToString();
+
+            if (regions!.Any(r => r.Name == name))
+            {
+                _logger.LogInformation("Region {name} already exists.", name);
                 continue;
             }
 
@@ -65,8 +83,6 @@ public class RegionSeederService : IRegionSeederService
                 _logger.LogError("Feature {Index} of {Total} has invalid type of geometry.", featureNumber, totalCount);
                 throw new Exception($"Feature {featureNumber} of {totalCount} has invalid type of geometry.");
             }
-            
-            var name = feature.Attributes["NL_NAME_1_FIXED"]?.ToString();
 
             if (string.IsNullOrEmpty(name))
             {
@@ -80,7 +96,60 @@ public class RegionSeederService : IRegionSeederService
                 Geometry = new RegionGeometry { Geometry = geometry },
             }, ct);
             
-            _logger.LogInformation("Feature {Index} of {Total} finished seed.",  featureNumber, totalCount);
+            _logger.LogInformation("Region {name} with index {Index} of {Total} finished seed.", name, featureNumber, totalCount);
+        }
+
+        await AddNewRegionInAllMapsAsync(ct);
+    }
+
+    private async Task RemoveInactiveRegionsInAllMapsAsync(List<Region>? regions, FeatureCollection featureColletion, CancellationToken ct)
+    {
+        _logger.LogInformation("Removing inactive regions from the table.");
+        
+        var namesInFeatures = featureColletion
+            .Select(f => f.Attributes["NL_NAME_1_FIXED"]?.ToString())
+            .Where(n => !string.IsNullOrEmpty(n))
+            .ToHashSet();
+        
+        var regionsToDelete = regions!
+            .Where(r => !namesInFeatures.Contains(r.Name))
+            .ToList();
+
+        _logger.LogWarning("Found {count} regions to delete (not present in FeatureCollection).", regionsToDelete.Count);
+        
+        foreach (var region in regionsToDelete)
+        {
+            await _regionRepository.DeleteByIdAsync(region.Id, ct);
+            _logger.LogWarning("Region {region} has been deleted.", region.Name);
+        }
+    }
+    
+    private async Task AddNewRegionInAllMapsAsync(CancellationToken ct)
+    {
+        _logger.LogInformation("Starting adding new regions in all maps.");
+        
+        var regions = await _regionRepository.GetAllAsync(ct);
+        var maps = await _mapRepository.GetAllHeadersAsync(ct);
+
+        foreach (var map in maps!)
+        {
+            var existingRegionsMap = await _layerRegionRepository.GetAllWithRegionAndGeometryByMapIdAsync(map.Id, ct);
+            var namesExistingRegions = existingRegionsMap!.Select(lr => lr.Region.Name);
+            
+            var newRegions = regions!.ExceptBy(namesExistingRegions!, r => r.Name).ToList();
+            
+            _logger.LogInformation("Starting adding new regions in Map {map.Title}.", map.Title);
+            
+            foreach (var newRegion in newRegions)
+            {
+                await _layerRegionRepository.AddAsync(new LayerRegion
+                {
+                    MapId = map.Id,
+                    IsActive = false,
+                    RegionId = newRegion.Id
+                }, ct);
+                _logger.LogInformation("Region {region} has been added in Map {map.Title}", newRegion.Name, map.Title);
+            }
         }
     }
 
