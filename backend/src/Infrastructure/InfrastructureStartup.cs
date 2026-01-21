@@ -68,7 +68,7 @@ public static class InfrastructureStartup
             await combinedPolicy.ExecuteAsync(async () => await dbContext.Database.MigrateAsync());
 
             var regionSeeder = scope.ServiceProvider.GetRequiredService<IRegionSeederService>();
-            await regionSeeder.SeedIfEmptyAsync();
+            await regionSeeder.SeedNewRegionAsync();
             
             var adminSeeder = scope.ServiceProvider.GetRequiredService<IAdminSeederService>();
             await adminSeeder.DeleteAllAndSeedAsync();

@@ -2,51 +2,51 @@
 const fs = require('fs');
 const path = require('path');
 
-// ==================== НАСТРОЙКИ ====================
-const INPUT_FILE  = '../wwwroot/maps/map.geojson';   // входной файл
-const OUTPUT_FILE = '../wwwroot/maps/simplifiedMap.geojson';  // куда сохранять результат
-const KEEP_PERCENT = '20%';            // насколько упрощать (10% от исходного количества точек)
-const METHOD = 'visvalingam';          // или 'dp' (Douglas-Peucker)
-// ===================================================
+const INPUT_FILE  = '../wwwroot/maps/map.geojson';
+const OUTPUT_FILE = '../wwwroot/maps/simplifiedMap.geojson';
+const KEEP_PERCENT = '20%';
+const METHOD = 'visvalingam';
 
-// Проверяем существование входного файла
 if (!fs.existsSync(INPUT_FILE)) {
     console.error(`Ошибка: файл "${INPUT_FILE}" не найден!`);
     process.exit(1);
 }
 
-console.log(`Читаем файл: ${INPUT_FILE}`);
-
-// Читаем файл в память как строку (mapshaper принимает именно строки)
 const geojsonString = fs.readFileSync(INPUT_FILE, 'utf8');
+const fileName = path.basename(INPUT_FILE);
 
-// Формируем объект, который ожидает mapshaper
+// В inputFiles ключом делаем просто имя файла
 const inputFiles = {
-    [path.basename(INPUT_FILE)]: geojsonString
+    [fileName]: geojsonString
 };
 
-// Команда mapshaper (можно менять под свои нужды)
-const commands = `
-    -i "${path.basename(INPUT_FILE)}"
-    -simplify ${METHOD} weighted ${KEEP_PERCENT}
-    -o "${OUTPUT_FILE}" format=geojson
-`;
+// В командах НЕ используем -o для записи на диск, 
+// вместо этого просим mapshaper выдать результат в формате geojson
+const commands = `-i ${fileName} -simplify ${METHOD} weighted ${KEEP_PERCENT} -o output.json format=geojson`;
 
-console.log(`Запускаем упрощение (${KEEP_PERCENT} точек)...`);
+console.log(`Запускаем упрощение...`);
 
 mapshaper.applyCommands(commands, inputFiles, (err, output) => {
     if (err) {
         console.error('Ошибка mapshaper:', err);
-        process.exit(1);
+        return;
     }
 
-    // Если указали -o с именем файла, mapshaper сам сохранит его,
-    // но если вдруг вывел в output-объект — запишем вручную
-    if (output && output[OUTPUT_FILE]) {
-        fs.writeFileSync(OUTPUT_FILE, output[OUTPUT_FILE]);
-        console.log(`Успешно сохранено в ${OUTPUT_FILE}`);
+    // Mapshaper вернет объект, где ключи — это имена файлов из команды -o
+    if (output && output['output.json']) {
+        try {
+            // Создаем папку, если её нет
+            const dir = path.dirname(OUTPUT_FILE);
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+
+            fs.writeFileSync(OUTPUT_FILE, output['output.json']);
+            console.log(`Успешно сохранено! Файл: ${path.resolve(OUTPUT_FILE)}`);
+        } catch (fsErr) {
+            console.error('Ошибка при записи файла на диск:', fsErr);
+        }
     } else {
-        // В большинстве случаев файл уже записан на диск
-        console.log(`Готово! Результат: ${path.resolve(OUTPUT_FILE)}`);
+        console.error('Ошибка: Mapshaper не вернул данные. Проверьте синтаксис команд.');
     }
 });
