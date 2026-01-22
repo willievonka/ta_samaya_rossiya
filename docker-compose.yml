@@ -2,7 +2,7 @@
   npm:
     image: 'jc21/nginx-proxy-manager:latest'
     container_name: npm-proxy
-    restart: unless-stopped
+    restart: always
     ports:
       - '80:80'
       - '443:443'
@@ -16,6 +16,7 @@
   frontend:
     image: frontend:prod
     container_name: frontend-prod-container
+    restart: always
     build:
       context: ./frontend
       dockerfile: Dockerfile
