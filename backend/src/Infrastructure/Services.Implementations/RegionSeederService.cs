@@ -1,5 +1,4 @@
 ﻿using Application.Services.Interfaces;
-using Application.Services.Logic.Interfaces;
 using Domain.Entities;
 using Domain.Repository.Interfaces;
 using NetTopologySuite.Features;
@@ -18,20 +17,23 @@ public class RegionSeederService : IRegionSeederService
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IMapRepository _mapRepository;
     private readonly ILayerRegionRepository _layerRegionRepository;
-    private readonly ILayerRegionService _layerRegionService;
     
     public RegionSeederService(IRegionRepository regionRepository,
         ILogger<RegionSeederService> logger,  IWebHostEnvironment webHostEnvironment,
-        IMapRepository mapRepository, ILayerRegionRepository layerRegionRepository, ILayerRegionService layerRegionService)
+        IMapRepository mapRepository, ILayerRegionRepository layerRegionRepository)
     {
         _regionRepository = regionRepository;
         _logger = logger;
         _webHostEnvironment = webHostEnvironment;
         _mapRepository = mapRepository;
         _layerRegionRepository = layerRegionRepository;
-        _layerRegionService = layerRegionService;
     }
     
+    /// <summary>
+    /// Обновляет базовые регионы на основе map.geojson
+    /// </summary>
+    /// <param name="ct"></param>
+    /// <exception cref="Exception"></exception>
     public async Task SeedNewRegionAsync(CancellationToken ct = default)
     {
         var regions = await _regionRepository.GetAllAsync(ct);
@@ -102,6 +104,12 @@ public class RegionSeederService : IRegionSeederService
         await AddNewRegionInAllMapsAsync(ct);
     }
 
+    /// <summary>
+    /// Удаляет старые базовые регионы, которых нет в map.geojson, но которые есть базе
+    /// </summary>
+    /// <param name="regions"></param>
+    /// <param name="featureColletion"></param>
+    /// <param name="ct"></param>
     private async Task RemoveInactiveRegionsInAllMapsAsync(List<Region>? regions, FeatureCollection featureColletion, CancellationToken ct)
     {
         _logger.LogInformation("Removing inactive regions from the table.");
@@ -124,6 +132,10 @@ public class RegionSeederService : IRegionSeederService
         }
     }
     
+    /// <summary>
+    /// Добавляет новые слои регионов к каждой карте, на основе новых базовых регионов.
+    /// </summary>
+    /// <param name="ct"></param>
     private async Task AddNewRegionInAllMapsAsync(CancellationToken ct)
     {
         _logger.LogInformation("Starting adding new regions in all maps.");
